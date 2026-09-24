@@ -51,7 +51,7 @@ class DynamicMapService extends ChangeNotifier {
   }
 
   void setRadiusKm(double radius) {
-    if (radius >= 10.0 && radius <= 100.0) {
+    if (radius >= 0.3 && radius <= 100.0) {
       _radiusKm = radius;
       notifyListeners();
     }
@@ -172,6 +172,75 @@ class DynamicMapService extends ChangeNotifier {
       return await trigger50KmDownload(lat, lon, pipeline);
     } else {
       _statusMessage = 'GPS location required for 50km map download';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Downloads a 300m micro-grid of small streets (residential, service, alleys) around current vehicle position.
+  Future<bool> trigger300mSmallStreetsDownload(IdrPipeline pipeline) async {
+    final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat;
+    final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon;
+    if (lat == null || lon == null) {
+      _statusMessage = 'GPS location required for 300m small streets download';
+      notifyListeners();
+      return false;
+    }
+
+    if (_isDownloading) return false;
+
+    _isDownloading = true;
+    _statusMessage = 'Downloading 300m small street grid...';
+    _downloadProgress = 0.1;
+    notifyListeners();
+
+    try {
+      final latStr = lat.toStringAsFixed(3).replaceAll('.', '_');
+      final lonStr = lon.toStringAsFixed(3).replaceAll('.', '_');
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final mapName = 'micro_300m_${latStr}_${lonStr}_$timestamp';
+
+      final file = await OsmDownloadService.downloadRadiusArea(
+        mapName: mapName,
+        centerLat: lat,
+        centerLon: lon,
+        radiusKm: 0.3, // 300 meters
+        level: RoadLevel.minorRoads, // Includes residential, service lanes, living streets, alleys
+        onProgress: (status, progress) {
+          _statusMessage = status;
+          _downloadProgress = progress;
+          notifyListeners();
+        },
+      );
+
+      final refLat = pipeline.sensorService.refLat ?? lat;
+      final refLon = pipeline.sensorService.refLon ?? lon;
+      final refAlt = pipeline.sensorService.refAlt ?? 0.0;
+
+      await pipeline.loadOfflineOsmMapFromFile(
+        file,
+        mapName: '300m Small Streets (${lat.toStringAsFixed(3)}°, ${lon.toStringAsFixed(3)}°)',
+        anchorLat: refLat,
+        anchorLon: refLon,
+        anchorAlt: refAlt,
+      );
+
+      _activeCenterLat = lat;
+      _activeCenterLon = lon;
+      _distanceMovedSinceCenterKm = 0.0;
+      _currentDynamicMapPath = file.path;
+      _lastDownloadTime = DateTime.now();
+      _statusMessage = 'Active 300m small streets (${pipeline.activeRoadBranchCount} roads)';
+      _isDownloading = false;
+      _downloadProgress = 1.0;
+
+      await OsmDownloadService.pruneDynamicCache(keepFilePath: file.path, maxFilesToKeep: 4);
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _statusMessage = 'Download note: ${e.toString().replaceAll('Exception: ', '')}';
+      _isDownloading = false;
       notifyListeners();
       return false;
     }

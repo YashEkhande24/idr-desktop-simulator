@@ -378,7 +378,7 @@ class _PureNavScreenState extends State<PureNavScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.navigation, size: 12, color: Color(0xFF38BDF8)),
+                    const Icon(Icons.gps_fixed, size: 12, color: Color(0xFF38BDF8)),
                     const SizedBox(width: 5),
                     Text(
                       'IDR NAVIGATOR',
@@ -443,7 +443,7 @@ class _PureNavScreenState extends State<PureNavScreen> {
               ),
               child: Row(
                 children: [
-                  // Maneuver / Direction Arrow
+                  // Road/Tracking Indicator Icon (no misleading maneuver arrow when not routing)
                   Container(
                     width: 44,
                     height: 44,
@@ -452,22 +452,22 @@ class _PureNavScreenState extends State<PureNavScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
-                      Icons.navigation,
+                      Icons.alt_route_rounded,
                       color: Colors.white,
-                      size: 26,
+                      size: 24,
                     ),
                   ),
 
                   const SizedBox(width: 12),
 
-                  // Road Name & Guidance Subtitle
+                  // Road Name & Status Readout
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          solution.isMapMatched ? 'Head towards' : 'Drive towards',
+                          solution.isMapMatched ? 'Current Road' : 'Free Drive Tracking',
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -488,25 +488,14 @@ class _PureNavScreenState extends State<PureNavScreen> {
                         const SizedBox(height: 3),
                         Row(
                           children: [
-                            const Icon(Icons.turn_slight_left, size: 13, color: Color(0xFF99F6E4)),
-                            const SizedBox(width: 3),
-                            Text(
-                              'Then ↰',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF99F6E4),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.18),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                solution.isMapMatched ? crossTrackText : (isDenied ? 'DR MODE' : 'TRACKING'),
+                                solution.isMapMatched ? crossTrackText : (isDenied ? 'DR MODE' : 'MAP MATCHED'),
                                 style: GoogleFonts.jetBrainsMono(
                                   fontSize: 8.5,
                                   fontWeight: FontWeight.w700,
@@ -848,23 +837,19 @@ class _PureNavScreenState extends State<PureNavScreen> {
                       color: const Color(0xFFCCFBF1),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      const Icon(Icons.turn_slight_left, size: 13, color: Color(0xFF99F6E4)),
-                      const SizedBox(width: 3),
-                      Text(
-                        'Then ↰',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF99F6E4),
-                        ),
+                  if (nav.nextStep != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      'Then: ${nav.nextStep!.instruction}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF99F6E4),
                       ),
-                      const Spacer(),
-                      const Icon(Icons.auto_awesome, size: 16, color: Colors.white70),
-                    ],
-                  ),
+                    ),
+                  ],
                 ],
               ),
             ),

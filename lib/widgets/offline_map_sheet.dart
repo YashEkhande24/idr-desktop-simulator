@@ -130,6 +130,64 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
     }
   }
 
+  Future<void> _download300mSmallStreets(IdrPipeline pipeline) async {
+    final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat;
+    final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon;
+
+    if (lat == null || lon == null) {
+      await pipeline.forceRefreshGps();
+      final freshLat = pipeline.currentLatitude ?? pipeline.sensorService.refLat;
+      final freshLon = pipeline.currentLongitude ?? pipeline.sensorService.refLon;
+      if (freshLat == null || freshLon == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('GPS fix required to download local 300m small streets.'),
+              backgroundColor: Color(0xFFEF4444),
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    setState(() {
+      _isDownloading = true;
+      _downloadError = null;
+      _downloadStatus = 'Downloading 300m micro-grid of small streets...';
+      _downloadProgress = 0.1;
+    });
+
+    try {
+      final success = await pipeline.dynamicMapService.trigger300mSmallStreetsDownload(pipeline);
+      await _refreshDownloadedFiles();
+
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+          _downloadProgress = success ? 1.0 : 0.0;
+          _downloadStatus = success ? 'Loaded 300m small street grid!' : 'Download failed';
+        });
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Loaded 300m small streets & residential lanes (${pipeline.activeRoadBranchCount} roads)!'),
+              backgroundColor: const Color(0xFF10B981),
+            ),
+          );
+          _tabController.animateTo(0);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+          _downloadError = e.toString().replaceAll('Exception: ', '');
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final pipeline = context.watch<IdrPipeline>();
@@ -588,6 +646,67 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // 1-Tap 300m Micro-Radius Small Streets Downloader Card
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0369A1).withValues(alpha: 0.22),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF38BDF8), width: 1.2),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.flash_on, color: Color(0xFF38BDF8), size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    '1-TAP 300M MICRO-GRID DOWNLOAD',
+                    style: GoogleFonts.rajdhani(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Instantly extracts all small streets, residential lanes, living streets, and service alleys within a 300m radius of your vehicle.',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: const Color(0xFF94A3B8),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isDownloading ? null : () => _download300mSmallStreets(pipeline),
+                  icon: const Icon(Icons.download, size: 16),
+                  label: Text(
+                    _isDownloading ? 'DOWNLOADING MICRO-GRID...' : 'DOWNLOAD 300M SMALL STREETS',
+                    style: GoogleFonts.rajdhani(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0284C7),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
         // Presets selector buttons
         Text(
           'QUICK CITY PRESETS',
@@ -603,6 +722,27 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
           spacing: 6,
           runSpacing: 6,
           children: [
+            ActionChip(
+              backgroundColor: const Color(0xFF064E3B),
+              side: const BorderSide(color: Color(0xFF10B981)),
+              label: Text(
+                '📍 300m GPS Micro-Radius',
+                style: GoogleFonts.rajdhani(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF34D399)),
+              ),
+              onPressed: () {
+                final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat ?? 18.520;
+                final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon ?? 73.856;
+                const dDeg = 0.0027; // ~300 meters
+                setState(() {
+                  _nameController.text = 'micro_300m_${lat.toStringAsFixed(3)}_${lon.toStringAsFixed(3)}';
+                  _southController.text = (lat - dDeg).toStringAsFixed(4);
+                  _northController.text = (lat + dDeg).toStringAsFixed(4);
+                  _westController.text = (lon - dDeg).toStringAsFixed(4);
+                  _eastController.text = (lon + dDeg).toStringAsFixed(4);
+                  _selectedLevel = RoadLevel.minorRoads;
+                });
+              },
+            ),
             _quickPresetChip('Pune Urban Grid', 'pune_urban_full', 18.500, 73.810, 18.540, 73.865),
             _quickPresetChip('Mumbai BKC + Express', 'mumbai_bkc', 19.050, 72.850, 19.080, 72.890),
             _quickPresetChip('Thane Urban Center', 'thane_center', 19.180, 72.960, 19.220, 73.000),
