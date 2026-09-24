@@ -1,0 +1,4 @@
+ninja: Entering directory `E:\inventor\cpp_mobile_app\android\.cxx\RelWithDebInfo\3z354j4d\arm64-v8a'
+[1/3] Building CXX object CMakeFiles/idr_native_app.dir/src/main_native.cpp.o
+[2/3] Building CXX object CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o
+[3/3] Linking CXX shared library ..\..\..\..\build\intermediates\cxx\RelWithDebInfo\3z354j4d\obj\arm64-v8a\libidr_native_app.so

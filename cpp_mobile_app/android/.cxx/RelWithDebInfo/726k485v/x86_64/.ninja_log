@@ -1,0 +1,16 @@
+# ninja log v5
+1	706	8105028846124989	CMakeFiles/native_app_glue.dir/C_/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c.o	e90aaffbeaccb9dc
+727	1152	8105028850713433	libnative_app_glue.a	e8872d1b4fff82d0
+103	5039	8105028890527495	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/baseline_dr.cpp.o	4f49c2ab262c0ad8
+178	5435	8105028894572053	CMakeFiles/idr_native_app.dir/src/native_sensor_service.cpp.o	4c619aa467d44127
+52	5465	8105028894915033	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/tcn_speed_engine.cpp.o	ef519ff4cb4ce807
+89	5473	8105028894985205	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/vibration_gate.cpp.o	f45fb8fd993d2be4
+117	5526	8105028895551438	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/pipeline.cpp.o	8dae742876691cc7
+40	5530	8105028895606728	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/c_api.cpp.o	3c63a494bd7f370b
+138	5934	8105028899677907	CMakeFiles/idr_native_app.dir/src/main_native.cpp.o	c6d7d978e4ad9d31
+163	6016	8105028900472263	CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o	e91888a5e11e5608
+27	6485	8105028904989844	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/cabin_aligner.cpp.o	9759856fea393b40
+15	6513	8105028905386825	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/common.cpp.o	efdfde00136be00f
+75	8802	8105028928137591	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/ekf_3d.cpp.o	5e16e7498dedf12b
+8803	8944	8105028929679411	libidr_core_static.a	73c1c51f59973c46
+8945	9137	8105028931672589	../../../../build/intermediates/cxx/RelWithDebInfo/726k485v/obj/x86_64/libidr_native_app.so	ea81d30ff697a03

@@ -1,0 +1,96 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.sih2026.idr.purecpp"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- Hardware Sensor & Positioning Permissions -->
+12    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+12-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:5:5-79
+12-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:5:22-76
+13    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+13-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:6:5-81
+13-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:6:22-78
+14    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+14-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:7:5-85
+14-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:7:22-82
+15    <uses-permission android:name="android.permission.WAKE_LOCK" />
+15-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:8:5-68
+15-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:8:22-65
+16
+17    <!-- Pure Native App Requirements -->
+18    <uses-feature
+18-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:11:5-78
+19        android:glEsVersion="0x00030000"
+19-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:11:19-51
+20        android:required="true" />
+20-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:11:52-75
+21    <uses-feature
+21-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:12:5-98
+22        android:name="android.hardware.sensor.accelerometer"
+22-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:12:19-71
+23        android:required="true" />
+23-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:12:72-95
+24    <uses-feature
+24-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:13:5-94
+25        android:name="android.hardware.sensor.gyroscope"
+25-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:13:19-67
+26        android:required="true" />
+26-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:13:68-91
+27    <uses-feature
+27-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:14:5-93
+28        android:name="android.hardware.sensor.compass"
+28-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:14:19-65
+29        android:required="false" />
+29-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:14:66-90
+30    <uses-feature
+30-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:15:5-95
+31        android:name="android.hardware.sensor.barometer"
+31-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:15:19-67
+32        android:required="false" />
+32-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:15:68-92
+33
+34    <application
+34-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:17:5-37:19
+35        android:extractNativeLibs="false"
+36        android:label="Pure C++ IDR Navigator"
+36-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:18:9-47
+37        android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+37-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:19:9-67
+38        <activity
+38-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:21:9-36:20
+39            android:name="android.app.NativeActivity"
+39-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:22:13-54
+40            android:configChanges="orientation|keyboardHidden|screenSize"
+40-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:24:13-74
+41            android:exported="true"
+41-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:25:13-36
+42            android:label="IDR Pure C++" >
+42-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:23:13-41
+43
+44            <!-- Tell NativeActivity which native shared library to load -->
+45            <meta-data
+45-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:28:13-30:50
+46                android:name="android.app.lib_name"
+46-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:29:17-52
+47                android:value="idr_native_app" />
+47-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:30:17-47
+48
+49            <intent-filter>
+49-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:32:13-35:29
+50                <action android:name="android.intent.action.MAIN" />
+50-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:33:17-69
+50-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:33:25-66
+51
+52                <category android:name="android.intent.category.LAUNCHER" />
+52-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:34:17-77
+52-->E:\inventor\cpp_mobile_app\android\src\main\AndroidManifest.xml:34:27-74
+53            </intent-filter>
+54        </activity>
+55    </application>
+56
+57</manifest>

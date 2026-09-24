@@ -1,0 +1,39 @@
+{
+  "buildFiles": [
+    "E:\\inventor\\cpp_mobile_app\\android\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\yashe\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "E:\\inventor\\cpp_mobile_app\\android\\.cxx\\RelWithDebInfo\\726k485v\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\yashe\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "E:\\inventor\\cpp_mobile_app\\android\\.cxx\\RelWithDebInfo\\726k485v\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "idr_core_static::@6890427a1f51a3e7e1df": {
+      "artifactName": "idr_core_static",
+      "abi": "x86_64",
+      "output": "E:\\inventor\\cpp_mobile_app\\android\\.cxx\\RelWithDebInfo\\726k485v\\x86_64\\libidr_core_static.a",
+      "runtimeFiles": []
+    },
+    "idr_native_app::@6890427a1f51a3e7e1df": {
+      "artifactName": "idr_native_app",
+      "abi": "x86_64",
+      "output": "E:\\inventor\\cpp_mobile_app\\android\\build\\intermediates\\cxx\\RelWithDebInfo\\726k485v\\obj\\x86_64\\libidr_native_app.so",
+      "runtimeFiles": []
+    },
+    "native_app_glue::@6890427a1f51a3e7e1df": {
+      "artifactName": "native_app_glue",
+      "abi": "x86_64",
+      "output": "E:\\inventor\\cpp_mobile_app\\android\\.cxx\\RelWithDebInfo\\726k485v\\x86_64\\libnative_app_glue.a",
+      "runtimeFiles": []
+    }
+  }
+}

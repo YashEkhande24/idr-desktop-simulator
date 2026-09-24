@@ -1,3 +1,7 @@
-"""AI-ML Intelligent Dead Reckoning (IDR) desktop simulator."""
+"""AI-Enhanced Intelligent Dead Reckoning (IDR) System.
 
-__version__ = "1.0.0"
+Smart India Hackathon (SIH) Super-Architecture:
+Edge-deployable GNSS-denied inertial navigation for smartphones and vehicles.
+"""
+
+__version__ = "2.0.0"

@@ -1,4 +1,6 @@
-from .cabin_alignment import CabinAligner
-from .generator import RoadGeometry, Segment, SensorSimulator, SimConfig
+"""Sensor simulation and in-vehicle alignment modules."""
 
-__all__ = ["CabinAligner", "RoadGeometry", "Segment", "SensorSimulator", "SimConfig"]
+from .cabin_alignment import CabinAligner
+from .generator import SensorSimulator, SimConfig, RoadGeometry
+
+__all__ = ["CabinAligner", "SensorSimulator", "SimConfig", "RoadGeometry"]

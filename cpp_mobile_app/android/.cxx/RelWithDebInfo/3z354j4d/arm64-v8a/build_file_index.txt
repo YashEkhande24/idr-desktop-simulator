@@ -1,0 +1,1 @@
+E:\inventor\cpp_mobile_app\android\CMakeLists.txt

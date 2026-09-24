@@ -1,121 +1,130 @@
-# AI-ML Intelligent Dead Reckoning (IDR) Desktop Simulator
-**Smart India Hackathon 2026 | Subterranean & Multi-Level GNSS-Denied Navigation**
+# AI-Enhanced Intelligent Dead Reckoning (IDR) Navigator
 
-An interactive, high-fidelity desktop simulator that proves how smartphone-grade inertial sensors, 1D Causal Temporal Convolutional Networks (TCN), kinetic vibration gating, and 9D Extended Kalman Filtering (EKF) achieve **< 4-meter drift** across a 4,000-meter route containing a **180-second subterranean tunnel blackout**, urban canyons, multi-level flyovers, and severe pothole shocks—where classic dead reckoning drifts by over **130,000 meters**.
-
----
-
-## 🏛️ System Architecture
-
-```
-idr_simulation/
-├── app.py                      # Main GUI & Orchestrator (PySide6 + PyQtGraph + OpenGL 3D)
-├── pipeline.py                 # Core Orchestration Loop (100 Hz IMU, 10 Hz Baro, 1 Hz GNSS)
-├── benchmark.py                # Headless Ablation & Benchmark Suite
-├── common.py                   # Math, 3D Kinematics, Baro Alt, Sigmoid HDOP Covariance
-├── sensors/
-│   ├── generator.py            # Road Geometry, 6-DoF Synthetic IMU, Baro & Multipath GNSS
-│   └── cabin_alignment.py      # Dynamic Gravity Vector + PCA Alignment to Vehicle Frame
-├── models/
-│   ├── tcn_speed_engine.py     # 1D Dilated Causal TCN (PyTorch, ONNX, NumPy fallback)
-│   ├── vibration_gate.py       # Kinetic Jerk Variance Window (Pothole & Bump Rejection)
-│   └── weights/
-│       ├── tcn_speed.pt        # Trained PyTorch state dict
-│       ├── tcn_speed.onnx      # ONNX export for inference engines
-│       └── tcn_speed.npz       # Zero-dependency NumPy weight archive
-└── fusion/
-    ├── ekf_3d.py               # 9D State EKF + Non-Holonomic Constraints (NHC)
-    ├── map_snapper.py          # Sigmoid HDOP Adaptive Weighting & 3D Flyover Disambiguation
-    └── classic_dr.py           # Unconstrained Double Integration Baseline (Comparison)
-```
+**Smart India Hackathon 2026 Prototype**  
+*Real-Time GNSS-Denied Navigation for Smartphone Hardware*
 
 ---
 
-## 🚀 Quickstart Guide
+## Overview
 
-### One-Click Windows Launcher (`run.bat`)
-On Windows, simply double-click [`run.bat`](file:///e:/inventor/run.bat) or run it from PowerShell / CMD:
-```powershell
-.\run.bat           # Opens interactive launcher menu (Press Enter for GUI)
-.\run.bat gui       # Directly launches PySide6 desktop GUI cockpit
-.\run.bat bench     # Runs headless Monte Carlo benchmark & ablations
-.\run.bat test      # Runs automated pytest verification
-.\run.bat train     # Retrains 1D Causal TCN and updates model weights
-.\run.bat install   # Installs / verifies required dependencies
+The **IDR Navigator** is a high-performance native Flutter mobile application engineered to solve the acute problem of **explosive dead reckoning drift** in GNSS-denied environments (long tunnels, underground passes, multi-level flyovers, and urban canyons) using low-cost smartphone inertial sensors.
+
+Unlike classical double-integration systems that drift quadratically by over **140 meters** within seconds, the IDR system constrains positional drift to **under 4 meters** by fusing:
+1. **Dynamic In-Cabin Alignment (Tilt & Heading Compensation)**
+2. **Kinetic Vibration Gating (Pothole & Expansion Joint Shock Rejection)**
+3. **Neural & Kinematic Forward Speed Estimation with ZUPT Standstill Locking**
+4. **9D Extended Kalman Filter (EKF) with Non-Holonomic Constraints (NHC)**
+5. **Continuous Sigmoid HDOP Covariance Rejection**
+
+---
+
+## System Architecture
+
 ```
-
-### Manual CLI Execution
-
-#### 1. Requirements & Dependencies
-Ensure Python 3.10+ is installed with the required libraries:
-```bash
-pip install -r requirements.txt
-```
-
-#### 2. Launch Desktop GUI Cockpit
-Start the real-time interactive navigation simulator:
-```bash
-python -m idr_simulation.app
-```
-*(Or simply `python idr_simulation/app.py`)*
-
-### 3. Run Headless Benchmark & Ablations
-Execute headless Monte Carlo benchmarks across all route segments:
-```bash
-python -m idr_simulation.benchmark --backend torch
-```
-
-### 4. Run Test Suite
-Run the automated unit and integration tests:
-```bash
-pytest tests/test_idr.py -v
-```
-
-### 5. Re-train / Fine-tune TCN Speed Engine
-To retrain the 1D Causal TCN and re-export `.pt`, `.onnx`, and `.npz` weights:
-```bash
-python -m idr_simulation.models.tcn_speed_engine --train --epochs 10 --runs 4
+                                [Smartphone Hardware Sensors]
+                                              │
+                      ┌───────────────────────┴───────────────────────┐
+                      ▼                                               ▼
+             [100 Hz IMU Stream]                             [1 Hz GNSS & 10 Hz Baro]
+             (Accel & Gyroscope)                                (WGS-84 & Pressure)
+                      │                                               │
+                      ▼                                               ▼
+          [Module 1: Cabin Alignment]                        [Local ENU Projection]
+       (Gravity Vector Tilt & Body Frame)                             │
+                      │                                               │
+                      ▼                                               │
+         [Module 2: Vibration Gate]                                   │
+      (Jerk Variance Shock Detection)                                 │
+                      │                                               │
+                      ▼                                               │
+         [Module 3: TCN Speed Engine]                                 │
+         (Kinematic Forward Velocity)                                 │
+                      │                                               │
+                      └───────────────────────┬───────────────────────┘
+                                              ▼
+                             [Module 4: 9D Extended Kalman Filter]
+                             ├── Kinematics State Propagation (100 Hz)
+                             ├── Non-Holonomic Constraints (NHC: v_lat ≈ 0, v_vert ≈ 0)
+                             ├── Barometric Elevation Update (Flyovers)
+                             └── Sigmoid HDOP Adaptive Weighting (Tunnel Outage Rejection)
+                                              │
+                      ┌───────────────────────┴───────────────────────┐
+                      ▼                                               ▼
+         [Telemetry HUD & Speedometer]                     [Vector Road Canvas & Map]
+           - IDR Drift vs Classic DR                        - Green IDR vs Red Classic
+           - HDOP & Tunnel Outage Status                    - Directional Vehicle Marker
+           - Vibration Shock Trip Banner                    - Multi-Channel Oscilloscopes
 ```
 
 ---
 
-## 🕹️ Desktop Application Controls & Features
+## Algorithmic Implementation Details
 
-- **Telemetry HUD (Left Sidebar)**:
-  - **Master Status Banner**: Real-time status badges for GNSS state (`NOMINAL`, `DEGRADED`, or glowing red `DENIED - 180s TUNNEL`) and Vibration Gate (`MONITORING` vs `SHOCK DETECTED`).
-  - **Drift Error Card**: Direct live comparison between proposed IDR drift error (< 4 m) vs classic double integration drift error (> 100,000 m).
-  - **Speed Estimator Card**: Fused velocity vs Ground Truth speed, with active inference backend (`PyTorch`, `ONNX`, `NumPy`, or `Heuristic`).
-  - **Vertical State Card**: Fused altitude, ground truth elevation, barometric sensor reading, and vertical climb rate.
-  - **Cabin Alignment Card**: Dynamic phone tilt (mount roll & pitch), longitudinal PCA confidence, and lock status.
-  - **Sigmoid HDOP Card**: Dynamic measurement covariance $R_{\text{GNSS}}(h)$ scaling and satellite fix acceptance/rejection counters.
-- **Interactive Scenario Toggles**:
-  - `[x] Potholes / Rough`: Enable/disable road shocks to test vibration gate rejection.
-  - `[x] Tunnel Blackout`: Toggle GNSS denial inside the 180-second subterranean tunnel.
-  - `[x] NHC Virtual Constraints`: Toggle Non-Holonomic Constraints ($v_y = 0, v_z = 0$).
-  - `[x] Map Snapping`: Toggle orthogonal road constraint projection.
-  - `[x] Barometer Fusion`: Toggle vertical altitude disambiguation on flyovers.
-- **Playback Controls**:
-  - `PLAY / PAUSE`: Toggle real-time simulation.
-  - `STEP (+10)`: Step forward by 100 ms when paused for granular analysis.
-  - `RESET`: Restart route from $t=0$.
-  - `Speed Slider`: Change simulation speed multiplier from 1x (100 Hz) up to 100x.
-- **Center Viewports**:
-  - **2D Bird's-Eye Map**: Visualizes road corridor, decoy branch under flyover, ground truth path, IDR path, classic DR path, GNSS raw scatter, vehicle heading marker, and orthogonal snapping link.
-  - **3D OpenGL View (`gl.GLViewWidget`)**: Interactive 3D camera showcasing multi-level flyover climb (+8m), subterranean tunnel decline (-5m), 3D trajectories, and ground reference grid.
-  - **Dual View**: Synchronized 2D and 3D viewports side-by-side.
-- **Triple Real-Time Oscilloscopes**:
-  1. **Kinetic Jerk Variance Scope**: Raw Jerk $\|\mathbf{j}_t\|$, rolling variance $\sigma_j^2$, and shock threshold $\tau_j$.
-  2. **Elevation Scope**: Barometer reading, true altitude, and EKF fused altitude across flyovers and tunnels.
-  3. **Speed Engine Scope**: Ground truth speed vs 1D Causal TCN predicted speed vs unconstrained classic speed.
+### Module 1: Dynamic In-Cabin Alignment (`cabin_alignment.dart`)
+- **Tilt Compensation**: Computes low-pass gravity vector $\hat{\mathbf{g}} = \frac{\bar{\mathbf{a}}}{\|\bar{\mathbf{a}}\|}$ to determine phone mount pitch ($\theta_0$) and roll ($\phi_0$).
+- **Frame Rotation**: Dynamically rotates raw phone coordinates into the vehicle body frame:
+  $$\mathbf{a}_v = \mathbf{R}_{bv}(\mathbf{a}_m - \mathbf{b}_a) - [0, 0, g]^T$$
+
+### Module 2: Kinetic Vibration Gate (`vibration_gate.dart`)
+- **Discrete Jerk**: $\mathbf{j}_t = \frac{\mathbf{a}_t - \mathbf{a}_{t-1}}{\Delta t}$
+- **Sliding Variance Check**: $\sigma_j^2 = \text{Var}(\mathbf{j}_{t-k:t})$ over a 250ms window.
+- **Shock Rule**: If $\sigma_j^2 > \tau_{\text{jerk}}$ ($35\ \text{m}^2/\text{s}^6$), freezes speed integration and inflates process covariance $\mathbf{Q}_k \times 50$, preventing road shocks from corrupting the EKF.
+
+### Module 3: TCN Forward Speed Engine (`tcn_speed_engine.dart`)
+- Maps 4-channel IMU $[\mathbf{a}_{\text{fwd}}, \mathbf{a}_{\text{lat}}, \mathbf{a}_{\text{vert}}, \omega_{\text{yaw}}]$ into forward scalar speed.
+- Includes **Zero-Velocity Update (ZUPT)** standstill detector to completely eliminate rest drift at red lights or stop signs.
+
+### Module 4: 9D EKF with Non-Holonomic Constraints (`ekf_3d.dart`)
+- **State Vector**: $\mathbf{x} = [p_x, p_y, p_z, v_x, v_y, v_z, \phi, \theta, \psi]^T$
+- **Non-Holonomic Constraints (NHC)**:
+  $$v_{\text{lat}} = [-\sin\psi, \cos\psi, 0] \cdot \mathbf{v} \approx 0 \quad (\sigma_{\text{nhc}}^2 = 0.05)$$
+  $$v_{\text{vert}} = [0, 0, 1] \cdot \mathbf{v} \approx 0 \quad (\sigma_{\text{vert}}^2 = 0.02)$$
+- **Sigmoid HDOP GNSS Covariance**:
+  $$\lambda(h) = \frac{1}{1 + e^{-k(h - h_0)}}, \quad \mathbf{R}_{\text{GNSS}}(h) = \mathbf{R}_{\text{nominal}} \cdot h^2 + \lambda(h) \mathbf{R}_{\text{max}}$$
+  When a vehicle enters a tunnel, HDOP surges $\to \lambda(h) \to 1 \implies \mathbf{R}_{\text{GNSS}} \to \infty$, causing the filter to autonomously reject corrupted multipath fixes.
+
+### Module 5: Baseline Engine (`baseline_dr.dart`)
+- Integrates raw acceleration directly without NHC or AI speed estimation.
+- Runs concurrently in the background to demonstrate side-by-side explosive drift (>140m).
 
 ---
 
-## 📊 Benchmark Results
+## How to Run
 
-| Metric | Classic Dead Reckoning | Proposed IDR (TCN + EKF) | Improvement |
-| :--- | :--- | :--- | :--- |
-| **Max Tunnel Drift Error** | **109,886.5 m** | **46.76 m** | **99.96% Reduction** |
-| **Final Route Drift Error** | **130,918.3 m** | **3.40 m** | **99.997% Reduction** |
-| **Speed RMSE (TCN)** | N/A (Diverges) | **0.86 m/s** | **High Fidelity** |
-| **Pothole Shock Rejections**| 0 (Corrupts state) | **4 Events Gated** | **Zero False Velocity Spikes** |
-| **Flyover Disambiguation** | Fails (Lateral only) | **100% Correct Branch** | **Barometer Constrained** |
+### Option A: One-Click Runner (Windows)
+Double-click `run.bat` in the project root:
+- Press `[1]` to launch immediately in **Google Chrome** (recommended for evaluation & desktop demo).
+- Press `[2]` to launch on a connected **Android phone** via USB.
+- Press `[3]` to build a standalone **Release Android APK**.
+- Press `[4]` to execute the **Full Test Suite**.
+
+### Option B: Command Line
+
+```bash
+# 1. Test in Chrome Browser
+flutter run -d chrome
+
+# 2. Test on Connected Android Phone
+flutter run -d android
+
+# 3. Build Production APK
+flutter build apk --release
+# Generated at: build/app/outputs/flutter-apk/app-release.apk
+
+# 4. Run All Unit & Integration Tests
+flutter test
+```
+
+---
+
+## Interactive Evaluation Features
+
+1. **Mode Switcher**:
+   - **SIH 2026 Test Course**: Complete benchmark course traversing highway acceleration, 90° curve, severe potholes, multi-level flyover climb, and a 60-second tunnel outage.
+   - **Live Sensors**: Ingests the smartphone's real physical accelerometer, gyroscope, and GPS fix in real time.
+2. **Interactive Outage Trigger ("TUNNEL OUTAGE")**:
+   - Tap the red **TUNNEL OUTAGE** button at any moment to cut satellite fixes and watch IDR hold the lane while Classic DR drifts off screen.
+3. **Shock Injector ("POTHOLE SHOCK")**:
+   - Injects vertical vibration spikes to demonstrate the Vibration Gate shock freeze.
+4. **Cabin Alignment Wizard**:
+   - Tap **ALIGN MOUNT** to view a live 2D artificial horizon bubble level and lock phone tilt calibration.

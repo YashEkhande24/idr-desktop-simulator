@@ -1,0 +1,35 @@
+ninja: Entering directory `E:\inventor\cpp_mobile_app\android\.cxx\RelWithDebInfo\726k485v\x86_64'
+[1/15] Building C object CMakeFiles/native_app_glue.dir/C_/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c.o
+C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c:181:80: warning: unused parameter 'source' [-Wunused-parameter]
+  181 | static void process_input(struct android_app* app, struct android_poll_source* source) {
+      |                                                                                ^
+C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c:194:78: warning: unused parameter 'source' [-Wunused-parameter]
+  194 | static void process_cmd(struct android_app* app, struct android_poll_source* source) {
+      |                                                                              ^
+C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c:410:79: warning: unused parameter 'window' [-Wunused-parameter]
+  410 | static void onNativeWindowDestroyed(ANativeActivity* activity, ANativeWindow* window) {
+      |                                                                               ^
+C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c:415:82: warning: unused parameter 'window' [-Wunused-parameter]
+  415 | static void onNativeWindowRedrawNeeded(ANativeActivity* activity, ANativeWindow* window) {
+      |                                                                                  ^
+C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c:420:77: warning: unused parameter 'window' [-Wunused-parameter]
+  420 | static void onNativeWindowResized(ANativeActivity* activity, ANativeWindow* window) {
+      |                                                                             ^
+C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c:430:75: warning: unused parameter 'queue' [-Wunused-parameter]
+  430 | static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue) {
+      |                                                                           ^
+6 warnings generated.
+[2/15] Linking C static library libnative_app_glue.a
+[3/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/baseline_dr.cpp.o
+[4/15] Building CXX object CMakeFiles/idr_native_app.dir/src/native_sensor_service.cpp.o
+[5/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/tcn_speed_engine.cpp.o
+[6/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/vibration_gate.cpp.o
+[7/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/pipeline.cpp.o
+[8/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/c_api.cpp.o
+[9/15] Building CXX object CMakeFiles/idr_native_app.dir/src/main_native.cpp.o
+[10/15] Building CXX object CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o
+[11/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/cabin_aligner.cpp.o
+[12/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/common.cpp.o
+[13/15] Building CXX object CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/ekf_3d.cpp.o
+[14/15] Linking CXX static library libidr_core_static.a
+[15/15] Linking CXX shared library ..\..\..\..\build\intermediates\cxx\RelWithDebInfo\726k485v\obj\x86_64\libidr_native_app.so

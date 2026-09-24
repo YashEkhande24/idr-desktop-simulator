@@ -1,0 +1,18 @@
+# ninja log v5
+162	673	8105036266709765	CMakeFiles/idr_native_app.dir/C_/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c.o	e17b9ccad143dd59
+77	6031	8105036320532605	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/baseline_dr.cpp.o	9d08df3a9512dc84
+146	6387	8105036324102130	CMakeFiles/idr_native_app.dir/src/native_sensor_service.cpp.o	af02c56ab230e77e
+117	6422	8105036324452077	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/c_api.cpp.o	3bdf3a236f5cecd0
+66	6471	8105036324977565	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/pipeline.cpp.o	e9bf1cc8a28b5f88
+25	6476	8105036325042716	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/vibration_gate.cpp.o	97219621f5df5b6a
+37	6527	8105036325582881	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/tcn_speed_engine.cpp.o	b65c252a93a63136
+132	6850	8105036328795451	CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o	856cee826d656b3a
+103	7106	8105036331383753	CMakeFiles/idr_native_app.dir/src/main_native.cpp.o	c1823b901c88b86b
+2	7688	8105036337165158	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/common.cpp.o	87908722e4c37f19
+13	7706	8105036337255088	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/cabin_aligner.cpp.o	2cb636ed574b81f0
+90	10442	8105036364630442	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/ekf_3d.cpp.o	6eca5717d3e8685
+10442	10632	8105036366510408	libidr_core_static.a	73c1c51f59973c46
+10632	10890	8105036369204909	../../../../build/intermediates/cxx/RelWithDebInfo/3z354j4d/obj/arm64-v8a/libidr_native_app.so	8c3a8da8f75f8044
+16	5396	8105039278004424	CMakeFiles/idr_native_app.dir/src/main_native.cpp.o	c1823b901c88b86b
+31	5895	8105039282889077	CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o	856cee826d656b3a
+5896	6229	8105039286178889	../../../../build/intermediates/cxx/RelWithDebInfo/3z354j4d/obj/arm64-v8a/libidr_native_app.so	8c3a8da8f75f8044

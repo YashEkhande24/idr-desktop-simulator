@@ -1,0 +1,5 @@
+E:/inventor/cpp_mobile_app/build_x86_64/CMakeFiles/idr_core.dir
+E:/inventor/cpp_mobile_app/build_x86_64/CMakeFiles/idr_core_static.dir
+E:/inventor/cpp_mobile_app/build_x86_64/CMakeFiles/test_core.dir
+E:/inventor/cpp_mobile_app/build_x86_64/CMakeFiles/edit_cache.dir
+E:/inventor/cpp_mobile_app/build_x86_64/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,5 @@
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/726k485v/x86_64/CMakeFiles/native_app_glue.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/726k485v/x86_64/CMakeFiles/idr_core_static.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/726k485v/x86_64/CMakeFiles/idr_native_app.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/726k485v/x86_64/CMakeFiles/edit_cache.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/726k485v/x86_64/CMakeFiles/rebuild_cache.dir

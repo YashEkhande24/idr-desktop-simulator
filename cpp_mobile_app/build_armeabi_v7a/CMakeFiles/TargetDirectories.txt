@@ -1,0 +1,5 @@
+E:/inventor/cpp_mobile_app/build_armeabi_v7a/CMakeFiles/idr_core.dir
+E:/inventor/cpp_mobile_app/build_armeabi_v7a/CMakeFiles/idr_core_static.dir
+E:/inventor/cpp_mobile_app/build_armeabi_v7a/CMakeFiles/test_core.dir
+E:/inventor/cpp_mobile_app/build_armeabi_v7a/CMakeFiles/edit_cache.dir
+E:/inventor/cpp_mobile_app/build_armeabi_v7a/CMakeFiles/rebuild_cache.dir

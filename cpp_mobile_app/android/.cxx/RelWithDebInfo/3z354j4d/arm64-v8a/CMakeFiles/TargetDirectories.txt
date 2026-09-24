@@ -1,0 +1,4 @@
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a/CMakeFiles/idr_core_static.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a/CMakeFiles/idr_native_app.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a/CMakeFiles/edit_cache.dir
+E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a/CMakeFiles/rebuild_cache.dir

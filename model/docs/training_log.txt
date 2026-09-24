@@ -1,0 +1,1252 @@
+==============================================================================================
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+             AI DEAD RECKONING TCN ENGINE - TRAJECTORY MONITOR (250 EPOCHS MAX)
+  Start Time     : 2026-09-23 12:26:39
+  Device / VRAM  : NVIDIA GeForce RTX 3050 6GB Laptop GPU
+  Precision Mode : FP16 Mixed-Precision (GradScaler & Autocast Active)
+  Dataset Windows: Train: 116,073 | Val: 36,256 (Trip-Level Split)
+  Loss Weights   : 1.0*Speed + 0.2*NLL + 0.5*ZeroVel + 0.5*TrajDrift + 0.2*Bias + 0.05*Smoothness
+  Selection Metric: Trajectory Score = MAE + 1.5*|Bias| + 0.5*Standstill_MAE
+  Stopping Policy: Early Stopping (Patience = 10 epochs without Trajectory Score improvement)
+=
+
+[2026-09-23 12:26:59] Epoch 001/025 ( 20.0s) | LR: 0.000040
+  |-- Train : Loss=0.0588 [Speed=0.1411, NLL=-0.6070, ZV=0.0779, Traj=0.8252, Bias=0.0009, Smooth=0.2421]
+  |-- Val   : MAE=2.113 m/s (7.6 km/h) | Bias=-0.141 m/s | Loss=-0.2105
+  |-- ZUPT  : Stationary MAE=2.203 m/s | False Motion Rate=60.6%
+  |-- Score : Trajectory Score = 3.8358 [Best: 3.8358]
+  +-- Status: [*NEW BEST - Saved checkpoint*]
+
+[2026-09-23 12:27:16] Epoch 002/025 ( 17.2s) | LR: 0.000060
+  |-- Train : Loss=-0.1102 [Speed=0.1277, NLL=-1.2797, ZV=0.0353, Traj=2.0574, Bias=0.0023, Smooth=0.2392]
+  |-- Val   : MAE=2.081 m/s (7.5 km/h) | Bias=-0.307 m/s | Loss=-0.2310
+  |-- ZUPT  : Stationary MAE=1.643 m/s | False Motion Rate=65.5%
+  |-- Score : Trajectory Score = 3.4664 [Best: 3.4664]
+  +-- Status: [*NEW BEST - Saved checkpoint*]
+
+[2026-09-23 12:27:34] Epoch 003/025 ( 17.3s) | LR: 0.000080
+  |-- Train : Loss=-0.1523 [Speed=0.1196, NLL=-1.4192, ZV=0.0226, Traj=2.9234, Bias=0.0033, Smooth=0.2467]
+  |-- Val   : MAE=2.064 m/s (7.4 km/h) | Bias=-0.348 m/s | Loss=-0.2344
+  |-- ZUPT  : Stationary MAE=1.618 m/s | False Motion Rate=71.4%
+  |-- Score : Trajectory Score = 3.4514 [Best: 3.4514]
+  +-- Status: [*NEW BEST - Saved checkpoint*]
+
+[2026-09-23 12:27:52] Epoch 004/025 ( 17.7s) | LR: 0.000100
+  |-- Train : Loss=-0.1699 [Speed=0.1119, NLL=-1.4598, ZV=0.0191, Traj=2.6656, Bias=0.0029, Smooth=0.2585]
+  |-- Val   : MAE=2.059 m/s (7.4 km/h) | Bias=-0.393 m/s | Loss=-0.2343
+  |-- ZUPT  : Stationary MAE=1.518 m/s | False Motion Rate=67.2%
+  |-- Score : Trajectory Score = 3.3939 [Best: 3.3939]
+  +-- Status: [*NEW BEST - Saved checkpoint*]
+
+[2026-09-23 12:28:09] Epoch 005/025 ( 17.1s) | LR: 0.000100
+  |-- Train : Loss=-0.1839 [Speed=0.1053, NLL=-1.4926, ZV=0.0176, Traj=2.1862, Bias=0.0024, Smooth=0.2666]
+  |-- Val   : MAE=2.074 m/s (7.5 km/h) | Bias=-0.404 m/s | Loss=-0.2345
+  |-- ZUPT  : Stationary MAE=1.512 m/s | False Motion Rate=69.4%
+  |-- Score : Trajectory Score = 3.4102 [Best: 3.3939]
+  +-- Status: [Patience: 1/10]
+
+[2026-09-23 12:28:26] Epoch 006/025 ( 17.7s) | LR: 0.000099
+  |-- Train : Loss=-0.1941 [Speed=0.1006, NLL=-1.5173, ZV=0.0165, Traj=1.8900, Bias=0.0021, Smooth=0.2690]
+  |-- Val   : MAE=2.083 m/s (7.5 km/h) | Bias=-0.396 m/s | Loss=-0.2317
+  |-- ZUPT  : Stationary MAE=1.379 m/s | False Motion Rate=60.8%
+  |-- Score : Trajectory Score = 3.3149 [Best: 3.3149]
+  +-- Status: [*NEW BEST - Saved checkpoint*]
+
+[2026-09-23 12:28:44] Epoch 007/025 ( 17.7s) | LR: 0.000098
+  |-- Train : Loss=-0.2040 [Speed=0.0953, NLL=-1.5375, ZV=0.0156, Traj=1.5574, Bias=0.0017, Smooth=0.2756]
+  |-- Val   : MAE=2.091 m/s (7.5 km/h) | Bias=-0.493 m/s | Loss=-0.2327
+  |-- ZUPT  : Stationary MAE=1.290 m/s | False Motion Rate=57.7%
+  |-- Score : Trajectory Score = 3.3052 [Best: 3.3052]
+  +-- Status: [*NEW BEST - Saved checkpoint*]
+
+[2026-09-23 12:29:02] Epoch 008/025 ( 17.4s) | LR: 0.000095
+  |-- Train : Loss=-0.2128 [Speed=0.0909, NLL=-1.5573, ZV=0.0150, Traj=1.3821, Bias=0.0015, Smooth=0.2815]
+  |-- Val   : MAE=2.098 m/s (7.6 km/h) | Bias=-0.446 m/s | Loss=-0.2331
+  |-- ZUPT  : Stationary MAE=1.507 m/s | False Motion Rate=70.7%
+  |-- Score : Trajectory Score = 3.4513 [Best: 3.3052]
+  +-- Status: [Patience: 1/10]
+
+[2026-09-23 12:29:19] Epoch 009/025 ( 17.3s) | LR: 0.000091
+  |-- Train : Loss=-0.2193 [Speed=0.0873, NLL=-1.5707, ZV=0.0146, Traj=1.1337, Bias=0.0013, Smooth=0.2838]
+  |-- Val   : MAE=2.103 m/s (7.6 km/h) | Bias=-0.460 m/s | Loss=-0.2300
+  |-- ZUPT  : Stationary MAE=1.349 m/s | False Motion Rate=54.0%
+  |-- Score : Trajectory Score = 3.3446 [Best: 3.3052]
+  +-- Status: [Patience: 2/10]
+
+[2026-09-23 12:29:36] Epoch 010/025 ( 17.2s) | LR: 0.000087
+  |-- Train : Loss=-0.2259 [Speed=0.0835, NLL=-1.5837, ZV=0.0141, Traj=0.9966, Bias=0.0011, Smooth=0.2869]
+  |-- Val   : MAE=2.114 m/s (7.6 km/h) | Bias=-0.272 m/s | Loss=-0.2298
+  |-- ZUPT  : Stationary MAE=1.571 m/s | False Motion Rate=68.7%
+  |-- Score : Trajectory Score = 3.4285 [Best: 3.3052]
+  +-- Status: [Patience: 3/10]
+
+[2026-09-23 12:29:54] Epoch 011/025 ( 17.5s) | LR: 0.000081
+  |-- Train : Loss=-0.2326 [Speed=0.0804, NLL=-1.5994, ZV=0.0135, Traj=0.8432, Bias=0.0009, Smooth=0.2899]
+  |-- Val   : MAE=2.116 m/s (7.6 km/h) | Bias=-0.399 m/s | Loss=-0.2302
+  |-- ZUPT  : Stationary MAE=1.446 m/s | False Motion Rate=61.4%
+  |-- Score : Trajectory Score = 3.4002 [Best: 3.3052]
+  +-- Status: [Patience: 4/10]
+
+[2026-09-23 12:30:11] Epoch 012/025 ( 17.4s) | LR: 0.000075
+  |-- Train : Loss=-0.2376 [Speed=0.0779, NLL=-1.6128, ZV=0.0138, Traj=0.7155, Bias=0.0008, Smooth=0.2948]
+  |-- Val   : MAE=2.119 m/s (7.6 km/h) | Bias=-0.331 m/s | Loss=-0.2303
+  |-- ZUPT  : Stationary MAE=1.588 m/s | False Motion Rate=71.3%
+  |-- Score : Trajectory Score = 3.4759 [Best: 3.3052]
+  +-- Status: [Patience: 5/10]
+
+[2026-09-23 12:30:29] Epoch 013/025 ( 18.0s) | LR: 0.000069
+  |-- Train : Loss=-0.2419 [Speed=0.0755, NLL=-1.6208, ZV=0.0131, Traj=0.6588, Bias=0.0007, Smooth=0.2961]
+  |-- Val   : MAE=2.151 m/s (7.7 km/h) | Bias=-0.222 m/s | Loss=-0.2266
+  |-- ZUPT  : Stationary MAE=1.803 m/s | False Motion Rate=81.6%
+  |-- Score : Trajectory Score = 3.6141 [Best: 3.3052]
+  +-- Status: [Patience: 6/10]
+
+[2026-09-23 12:30:47] Epoch 014/025 ( 17.7s) | LR: 0.000062
+  |-- Train : Loss=-0.2461 [Speed=0.0733, NLL=-1.6306, ZV=0.0132, Traj=0.5705, Bias=0.0006, Smooth=0.2968]
+  |-- Val   : MAE=2.147 m/s (7.7 km/h) | Bias=-0.302 m/s | Loss=-0.2268
+  |-- ZUPT  : Stationary MAE=1.609 m/s | False Motion Rate=70.8%
+  |-- Score : Trajectory Score = 3.5048 [Best: 3.3052]
+  +-- Status: [Patience: 7/10]
+
+[2026-09-23 12:31:05] Epoch 015/025 ( 18.3s) | LR: 0.000055
+  |-- Train : Loss=-0.2502 [Speed=0.0715, NLL=-1.6407, ZV=0.0125, Traj=0.5387, Bias=0.0006, Smooth=0.2981]
+  |-- Val   : MAE=2.149 m/s (7.7 km/h) | Bias=-0.154 m/s | Loss=-0.2254
+  |-- ZUPT  : Stationary MAE=1.758 m/s | False Motion Rate=74.9%
+  |-- Score : Trajectory Score = 3.5447 [Best: 3.3052]
+  +-- Status: [Patience: 8/10]
+
+[2026-09-23 12:31:22] Epoch 016/025 ( 17.1s) | LR: 0.000048
+  |-- Train : Loss=-0.2528 [Speed=0.0702, NLL=-1.6463, ZV=0.0124, Traj=0.4800, Bias=0.0005, Smooth=0.3001]
+  |-- Val   : MAE=2.152 m/s (7.7 km/h) | Bias=-0.188 m/s | Loss=-0.2263
+  |-- ZUPT  : Stationary MAE=1.702 m/s | False Motion Rate=71.2%
+  |-- Score : Trajectory Score = 3.5223 [Best: 3.3052]
+  +-- Status: [Patience: 9/10]
+
+[2026-09-23 12:31:39] Epoch 017/025 ( 17.1s) | LR: 0.000041
+  |-- Train : Loss=-0.2557 [Speed=0.0686, NLL=-1.6505, ZV=0.0114, Traj=0.4642, Bias=0.0005, Smooth=0.3024]
+  |-- Val   : MAE=2.149 m/s (7.7 km/h) | Bias=-0.281 m/s | Loss=-0.2259
+  |-- ZUPT  : Stationary MAE=1.600 m/s | False Motion Rate=65.1%
+  |-- Score : Trajectory Score = 3.4896 [Best: 3.3052]
+  +-- Status: [Patience: 10/10]
+
+
+[!] Early stopping triggered at epoch 17 (no trajectory improvement for 10 epochs)
+==============================================================================================
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=
+TRAINING COMPLETE - Best Trajectory Score: 3.3052 | Final Val MAE: 2.091 m/s (7.53 km/h)
+Model Checkpoint saved to: E:\inventor\model\driversvt_finetuned_tcn.pth
+=

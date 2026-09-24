@@ -1,0 +1,7 @@
+com.sih2026.idr.purecpp-pngs-0 E:\inventor\cpp_mobile_app\android\build\generated\res\pngs\release
+com.sih2026.idr.purecpp-resValues-1 E:\inventor\cpp_mobile_app\android\build\generated\res\resValues\release
+com.sih2026.idr.purecpp-packageReleaseResources-2 E:\inventor\cpp_mobile_app\android\build\intermediates\incremental\release\packageReleaseResources\merged.dir
+com.sih2026.idr.purecpp-packageReleaseResources-3 E:\inventor\cpp_mobile_app\android\build\intermediates\incremental\release\packageReleaseResources\stripped.dir
+com.sih2026.idr.purecpp-release-4 E:\inventor\cpp_mobile_app\android\build\intermediates\merged_res\release\mergeReleaseResources
+com.sih2026.idr.purecpp-main-5 E:\inventor\cpp_mobile_app\android\src\main\res
+com.sih2026.idr.purecpp-release-6 E:\inventor\cpp_mobile_app\android\src\release\res

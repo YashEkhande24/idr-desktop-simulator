@@ -1,0 +1,4 @@
+#Mon Sep 07 22:35:34 IST 2026
+base.0=E\:\\inventor\\cpp_mobile_app\\android\\build\\intermediates\\dex\\release\\mergeDexRelease\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

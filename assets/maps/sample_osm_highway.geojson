@@ -1,0 +1,88 @@
+{
+  "type": "FeatureCollection",
+  "generator": "OpenStreetMap IDR Extractor",
+  "copyright": "OpenStreetMap contributors (ODbL)",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "NH-48 National Highway Mainline",
+        "ref": "NH-48",
+        "highway": "motorway",
+        "lanes": "3",
+        "maxspeed": "100",
+        "oneway": "yes"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.8567437, 18.5204303, 560.0],
+          [73.8582000, 18.5204303, 560.0],
+          [73.8600000, 18.5204303, 560.0],
+          [73.8625000, 18.5204303, 560.0]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Elevated Flyover Deck (Tier 2)",
+        "ref": "NH-48 Flyover",
+        "highway": "motorway",
+        "bridge": "yes",
+        "layer": "1",
+        "lanes": "2",
+        "maxspeed": "80"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.8625000, 18.5204303, 560.0],
+          [73.8640000, 18.5220000, 568.0],
+          [73.8655000, 18.5240000, 578.0],
+          [73.8670000, 18.5260000, 578.0]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "At-Grade Service Road (Underpass)",
+        "highway": "service",
+        "bridge": "no",
+        "layer": "0",
+        "lanes": "1",
+        "maxspeed": "30"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.8625000, 18.5204303, 560.0],
+          [73.8640000, 18.5220000, 560.0],
+          [73.8655000, 18.5240000, 560.0],
+          [73.8670000, 18.5260000, 560.0]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Underground Mountain Highway Tunnel",
+        "highway": "motorway",
+        "tunnel": "yes",
+        "layer": "-1",
+        "lanes": "3",
+        "maxspeed": "70"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [73.8670000, 18.5260000, 578.0],
+          [73.8700000, 18.5290000, 578.0],
+          [73.8740000, 18.5330000, 578.0],
+          [73.8780000, 18.5370000, 578.0]
+        ]
+      }
+    }
+  ]
+}

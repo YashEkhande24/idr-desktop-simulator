@@ -1,0 +1,19 @@
+<lint-module
+    format="1"
+    dir="E:\inventor\cpp_mobile_app\android"
+    name=":"
+    type="APP"
+    maven=":idr_pure_cpp_app:unspecified"
+    agpVersion="8.7.0"
+    buildFolder="build"
+    bootClassPath="C:\Users\yashe\AppData\Local\Android\sdk\platforms\android-35\android.jar;C:\Users\yashe\AppData\Local\Android\sdk\build-tools\34.0.0\core-lambda-stubs.jar"
+    javaSourceLevel="17"
+    compileTarget="android-35"
+    neverShrinking="true">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>

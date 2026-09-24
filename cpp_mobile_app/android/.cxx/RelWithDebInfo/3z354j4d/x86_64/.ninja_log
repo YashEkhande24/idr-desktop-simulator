@@ -1,0 +1,18 @@
+# ninja log v5
+163	837	8105036403047977	CMakeFiles/idr_native_app.dir/C_/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue/android_native_app_glue.c.o	3fa1798d8981e359
+77	4963	8105036444621439	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/baseline_dr.cpp.o	94b4962200e6be19
+149	5500	8105036449873406	CMakeFiles/idr_native_app.dir/src/native_sensor_service.cpp.o	1ea2dd40faa3ad8b
+36	5514	8105036450033517	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/vibration_gate.cpp.o	43153c69c3dbe57b
+106	5593	8105036450900647	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/c_api.cpp.o	ce585e6af90a56af
+25	5691	8105036451934384	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/tcn_speed_engine.cpp.o	f2d796971c819dd
+91	5767	8105036452751200	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/pipeline.cpp.o	79df89b9c1e720f3
+120	5961	8105036454650976	CMakeFiles/idr_native_app.dir/src/main_native.cpp.o	a67bee8dbe66ffc4
+134	6013	8105036455215965	CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o	bafea833efb48e9
+2	6469	8105036459734486	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/cabin_aligner.cpp.o	ac188b9b4ec717fc
+13	6544	8105036460526873	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/common.cpp.o	211c03595d6b32cb
+49	8774	8105036482681909	CMakeFiles/idr_core_static.dir/E_/inventor/cpp_mobile_app/core/src/ekf_3d.cpp.o	6caa062b961cdbc4
+8774	8941	8105036484369993	libidr_core_static.a	73c1c51f59973c46
+8942	9176	8105036486816553	../../../../build/intermediates/cxx/RelWithDebInfo/3z354j4d/obj/x86_64/libidr_native_app.so	b1934ccf589eae9e
+16	4136	8105039329778239	CMakeFiles/idr_native_app.dir/src/main_native.cpp.o	a67bee8dbe66ffc4
+33	4460	8105039333040527	CMakeFiles/idr_native_app.dir/src/native_renderer.cpp.o	bafea833efb48e9
+4461	4712	8105039335477593	../../../../build/intermediates/cxx/RelWithDebInfo/3z354j4d/obj/x86_64/libidr_native_app.so	b1934ccf589eae9e

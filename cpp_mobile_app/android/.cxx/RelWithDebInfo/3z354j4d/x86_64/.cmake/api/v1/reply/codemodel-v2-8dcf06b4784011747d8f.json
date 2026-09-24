@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-RelWithDebInfo-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "RelWithDebInfo",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "idr_native_app",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "idr_core_static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-idr_core_static-RelWithDebInfo-d2dc827e96f00c9fd8ea.json",
+					"name" : "idr_core_static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "idr_native_app::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-idr_native_app-RelWithDebInfo-02ceb040815466c65511.json",
+					"name" : "idr_native_app",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/x86_64",
+		"source" : "E:/inventor/cpp_mobile_app/android"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

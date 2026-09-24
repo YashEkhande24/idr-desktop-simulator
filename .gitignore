@@ -1,66 +1,65 @@
-# Byte-compiled / optimized / DLL files
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.pyo
 __pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# IDE / Editor files
-.vscode/
-.idea/
 *.swp
-*.swo
-
-# OS generated files
 .DS_Store
-Thumbs.db
-Desktop.ini
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+cpp_mobile_app/build/
+model/experiments/
+*.mp4
+*.pptx
+open_training_log.bat
+view_training_csv.bat
+watch_training_live.bat
+training.log
+
+# Raw Training Datasets & Binary Weights (gigabytes of raw sensor data)
+model/IO-VNBD/
+model/datasets/
+model/excluded_datasets/
+model/*.pth
+model/*.onnx
+
+# IntelliJ / Android Studio related
+*.iml
+*.ipr
+*.iws
+.idea/
+.metadata
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/**/generated/
+*.apk
+*.aab
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release

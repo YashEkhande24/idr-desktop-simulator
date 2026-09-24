@@ -1,0 +1,62 @@
+[
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\common.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\common.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\common.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\cabin_aligner.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\cabin_aligner.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\cabin_aligner.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\vibration_gate.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\vibration_gate.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\vibration_gate.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\tcn_speed_engine.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\tcn_speed_engine.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\tcn_speed_engine.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\ekf_3d.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\ekf_3d.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\ekf_3d.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\baseline_dr.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\baseline_dr.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\baseline_dr.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\pipeline.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\pipeline.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\pipeline.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_core_static.dir\\E_\\inventor\\cpp_mobile_app\\core\\src\\c_api.cpp.o -c E:\\inventor\\cpp_mobile_app\\core\\src\\c_api.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\core\\src\\c_api.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Didr_native_app_EXPORTS -IE:/inventor/cpp_mobile_app/android/src -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -IC:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_native_app.dir\\src\\main_native.cpp.o -c E:\\inventor\\cpp_mobile_app\\android\\src\\main_native.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\android\\src\\main_native.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Didr_native_app_EXPORTS -IE:/inventor/cpp_mobile_app/android/src -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -IC:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_native_app.dir\\src\\native_sensor_service.cpp.o -c E:\\inventor\\cpp_mobile_app\\android\\src\\native_sensor_service.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\android\\src\\native_sensor_service.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Didr_native_app_EXPORTS -IE:/inventor/cpp_mobile_app/android/src -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -IC:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -O3 -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -std=gnu++20 -o CMakeFiles\\idr_native_app.dir\\src\\native_renderer.cpp.o -c E:\\inventor\\cpp_mobile_app\\android\\src\\native_renderer.cpp",
+  "file": "E:\\inventor\\cpp_mobile_app\\android\\src\\native_renderer.cpp"
+},
+{
+  "directory": "E:/inventor/cpp_mobile_app/android/.cxx/RelWithDebInfo/3z354j4d/arm64-v8a",
+  "command": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Didr_native_app_EXPORTS -IE:/inventor/cpp_mobile_app/android/src -IE:/inventor/cpp_mobile_app/android/../core/include -IE:/inventor/cpp_mobile_app/android/../third_party/eigen -IC:/Users/yashe/AppData/Local/Android/Sdk/ndk/27.0.12077973/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O2 -g -DNDEBUG -fPIC -O3 -Wall -Wextra -ffast-math -o CMakeFiles\\idr_native_app.dir\\C_\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\sources\\android\\native_app_glue\\android_native_app_glue.c.o -c C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\sources\\android\\native_app_glue\\android_native_app_glue.c",
+  "file": "C:\\Users\\yashe\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\sources\\android\\native_app_glue\\android_native_app_glue.c"
+}
+]

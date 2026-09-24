@@ -1,0 +1,1 @@
+E:\inventor\cpp_mobile_app\android\build\intermediates\cxx\RelWithDebInfo\3z354j4d\obj\arm64-v8a
