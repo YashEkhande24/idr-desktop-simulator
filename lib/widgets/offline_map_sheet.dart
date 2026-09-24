@@ -28,6 +28,7 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
   RoadLevel _selectedLevel = RoadLevel.minorRoads;
 
   bool _isDownloading = false;
+  double _quickRadiusKm = 1.0;
   String _downloadStatus = '';
   double _downloadProgress = 0.0;
   String? _downloadError;
@@ -130,7 +131,7 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
     }
   }
 
-  Future<void> _download300mSmallStreets(IdrPipeline pipeline) async {
+  Future<void> _downloadLocalSmallStreets(IdrPipeline pipeline, {double radiusKm = 1.0}) async {
     final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat;
     final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon;
 
@@ -142,7 +143,7 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('GPS fix required to download local 300m small streets.'),
+              content: Text('GPS fix required to download local small streets.'),
               backgroundColor: Color(0xFFEF4444),
             ),
           );
@@ -151,27 +152,29 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
       }
     }
 
+    final radiusLabel = radiusKm < 1.0 ? '${(radiusKm * 1000).round()}m' : '${radiusKm.toStringAsFixed(radiusKm % 1 == 0 ? 0 : 1)}km';
+
     setState(() {
       _isDownloading = true;
       _downloadError = null;
-      _downloadStatus = 'Downloading 300m micro-grid of small streets...';
+      _downloadStatus = 'Downloading $radiusLabel small streets & alleys...';
       _downloadProgress = 0.1;
     });
 
     try {
-      final success = await pipeline.dynamicMapService.trigger300mSmallStreetsDownload(pipeline);
+      final success = await pipeline.dynamicMapService.triggerLocalSmallStreetsDownload(pipeline, radiusKm: radiusKm);
       await _refreshDownloadedFiles();
 
       if (mounted) {
         setState(() {
           _isDownloading = false;
           _downloadProgress = success ? 1.0 : 0.0;
-          _downloadStatus = success ? 'Loaded 300m small street grid!' : 'Download failed';
+          _downloadStatus = success ? 'Loaded $radiusLabel small street grid!' : 'Download failed';
         });
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Loaded 300m small streets & residential lanes (${pipeline.activeRoadBranchCount} roads)!'),
+              content: Text('Loaded $radiusLabel small streets & residential lanes (${pipeline.activeRoadBranchCount} roads)!'),
               backgroundColor: const Color(0xFF10B981),
             ),
           );
@@ -646,7 +649,7 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // 1-Tap 300m Micro-Radius Small Streets Downloader Card
+        // 1-Tap Local Small Streets Downloader Card
         Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(12),
@@ -663,7 +666,7 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
                   const Icon(Icons.flash_on, color: Color(0xFF38BDF8), size: 18),
                   const SizedBox(width: 8),
                   Text(
-                    '1-TAP 300M MICRO-GRID DOWNLOAD',
+                    '1-TAP LOCAL STREET GRID DOWNLOAD',
                     style: GoogleFonts.rajdhani(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
@@ -675,20 +678,89 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
               ),
               const SizedBox(height: 4),
               Text(
-                'Instantly extracts all small streets, residential lanes, living streets, and service alleys within a 300m radius of your vehicle.',
+                'Extracts complete local street grid including residential streets, service alleys, and living streets around your vehicle.',
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   color: const Color(0xFF94A3B8),
                 ),
               ),
+              const SizedBox(height: 8),
+
+              // Radius Selector Chips
+              Row(
+                children: [
+                  Text(
+                    'RADIUS:',
+                    style: GoogleFonts.rajdhani(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                      color: const Color(0xFF94A3B8),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Wrap(
+                      spacing: 6,
+                      children: [
+                        ChoiceChip(
+                          label: const Text('300m'),
+                          selected: _quickRadiusKm == 0.3,
+                          selectedColor: const Color(0xFF0284C7),
+                          backgroundColor: const Color(0xFF1E293B),
+                          labelStyle: GoogleFonts.rajdhani(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: _quickRadiusKm == 0.3 ? Colors.white : const Color(0xFF94A3B8),
+                          ),
+                          onSelected: (sel) {
+                            if (sel) setState(() => _quickRadiusKm = 0.3);
+                          },
+                        ),
+                        ChoiceChip(
+                          label: const Text('1 km (Recommended)'),
+                          selected: _quickRadiusKm == 1.0,
+                          selectedColor: const Color(0xFF10B981),
+                          backgroundColor: const Color(0xFF1E293B),
+                          labelStyle: GoogleFonts.rajdhani(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: _quickRadiusKm == 1.0 ? Colors.white : const Color(0xFF94A3B8),
+                          ),
+                          onSelected: (sel) {
+                            if (sel) setState(() => _quickRadiusKm = 1.0);
+                          },
+                        ),
+                        ChoiceChip(
+                          label: const Text('2 km'),
+                          selected: _quickRadiusKm == 2.0,
+                          selectedColor: const Color(0xFF0284C7),
+                          backgroundColor: const Color(0xFF1E293B),
+                          labelStyle: GoogleFonts.rajdhani(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: _quickRadiusKm == 2.0 ? Colors.white : const Color(0xFF94A3B8),
+                          ),
+                          onSelected: (sel) {
+                            if (sel) setState(() => _quickRadiusKm = 2.0);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: _isDownloading ? null : () => _download300mSmallStreets(pipeline),
+                  onPressed: _isDownloading ? null : () => _downloadLocalSmallStreets(pipeline, radiusKm: _quickRadiusKm),
                   icon: const Icon(Icons.download, size: 16),
                   label: Text(
-                    _isDownloading ? 'DOWNLOADING MICRO-GRID...' : 'DOWNLOAD 300M SMALL STREETS',
+                    _isDownloading
+                        ? 'DOWNLOADING GRID...'
+                        : 'DOWNLOAD ${_quickRadiusKm < 1.0 ? "${(_quickRadiusKm * 1000).round()}M" : "${_quickRadiusKm.toStringAsFixed(_quickRadiusKm % 1 == 0 ? 0 : 1)}KM"} SMALL STREETS',
                     style: GoogleFonts.rajdhani(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
@@ -696,7 +768,7 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0284C7),
+                    backgroundColor: _quickRadiusKm == 1.0 ? const Color(0xFF059669) : const Color(0xFF0284C7),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -726,15 +798,36 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
               backgroundColor: const Color(0xFF064E3B),
               side: const BorderSide(color: Color(0xFF10B981)),
               label: Text(
-                '📍 300m GPS Micro-Radius',
+                '📍 1km GPS Radius (Recommended)',
                 style: GoogleFonts.rajdhani(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF34D399)),
+              ),
+              onPressed: () {
+                final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat ?? 18.520;
+                final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon ?? 73.856;
+                const dDeg = 0.0090; // ~1.0 km
+                setState(() {
+                  _nameController.text = 'streets_1km_${lat.toStringAsFixed(3)}_${lon.toStringAsFixed(3)}';
+                  _southController.text = (lat - dDeg).toStringAsFixed(4);
+                  _northController.text = (lat + dDeg).toStringAsFixed(4);
+                  _westController.text = (lon - dDeg).toStringAsFixed(4);
+                  _eastController.text = (lon + dDeg).toStringAsFixed(4);
+                  _selectedLevel = RoadLevel.minorRoads;
+                });
+              },
+            ),
+            ActionChip(
+              backgroundColor: const Color(0xFF1E293B),
+              side: const BorderSide(color: Color(0xFF38BDF8)),
+              label: Text(
+                '📍 300m Micro-Radius',
+                style: GoogleFonts.rajdhani(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF38BDF8)),
               ),
               onPressed: () {
                 final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat ?? 18.520;
                 final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon ?? 73.856;
                 const dDeg = 0.0027; // ~300 meters
                 setState(() {
-                  _nameController.text = 'micro_300m_${lat.toStringAsFixed(3)}_${lon.toStringAsFixed(3)}';
+                  _nameController.text = 'streets_300m_${lat.toStringAsFixed(3)}_${lon.toStringAsFixed(3)}';
                   _southController.text = (lat - dDeg).toStringAsFixed(4);
                   _northController.text = (lat + dDeg).toStringAsFixed(4);
                   _westController.text = (lon - dDeg).toStringAsFixed(4);

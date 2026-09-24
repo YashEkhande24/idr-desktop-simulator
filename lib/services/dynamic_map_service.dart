@@ -177,12 +177,13 @@ class DynamicMapService extends ChangeNotifier {
     }
   }
 
-  /// Downloads a 300m micro-grid of small streets (residential, service, alleys) around current vehicle position.
-  Future<bool> trigger300mSmallStreetsDownload(IdrPipeline pipeline) async {
+  /// Downloads a local grid of small streets (residential, service, alleys) around current vehicle position.
+  /// Defaults to 1.0 km radius (covers ~3.14 sq km of neighbourhood streets).
+  Future<bool> triggerLocalSmallStreetsDownload(IdrPipeline pipeline, {double radiusKm = 1.0}) async {
     final lat = pipeline.currentLatitude ?? pipeline.sensorService.refLat;
     final lon = pipeline.currentLongitude ?? pipeline.sensorService.refLon;
     if (lat == null || lon == null) {
-      _statusMessage = 'GPS location required for 300m small streets download';
+      _statusMessage = 'GPS location required for small streets download';
       notifyListeners();
       return false;
     }
@@ -190,7 +191,8 @@ class DynamicMapService extends ChangeNotifier {
     if (_isDownloading) return false;
 
     _isDownloading = true;
-    _statusMessage = 'Downloading 300m small street grid...';
+    final radiusLabel = radiusKm < 1.0 ? '${(radiusKm * 1000).round()}m' : '${radiusKm.toStringAsFixed(radiusKm % 1 == 0 ? 0 : 1)}km';
+    _statusMessage = 'Downloading $radiusLabel small street grid...';
     _downloadProgress = 0.1;
     notifyListeners();
 
@@ -198,13 +200,13 @@ class DynamicMapService extends ChangeNotifier {
       final latStr = lat.toStringAsFixed(3).replaceAll('.', '_');
       final lonStr = lon.toStringAsFixed(3).replaceAll('.', '_');
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final mapName = 'micro_300m_${latStr}_${lonStr}_$timestamp';
+      final mapName = 'streets_${radiusLabel}_${latStr}_${lonStr}_$timestamp';
 
       final file = await OsmDownloadService.downloadRadiusArea(
         mapName: mapName,
         centerLat: lat,
         centerLon: lon,
-        radiusKm: 0.3, // 300 meters
+        radiusKm: radiusKm,
         level: RoadLevel.minorRoads, // Includes residential, service lanes, living streets, alleys
         onProgress: (status, progress) {
           _statusMessage = status;
@@ -219,7 +221,7 @@ class DynamicMapService extends ChangeNotifier {
 
       await pipeline.loadOfflineOsmMapFromFile(
         file,
-        mapName: '300m Small Streets (${lat.toStringAsFixed(3)}°, ${lon.toStringAsFixed(3)}°)',
+        mapName: '$radiusLabel Small Streets (${lat.toStringAsFixed(3)}°, ${lon.toStringAsFixed(3)}°)',
         anchorLat: refLat,
         anchorLon: refLon,
         anchorAlt: refAlt,
@@ -230,7 +232,7 @@ class DynamicMapService extends ChangeNotifier {
       _distanceMovedSinceCenterKm = 0.0;
       _currentDynamicMapPath = file.path;
       _lastDownloadTime = DateTime.now();
-      _statusMessage = 'Active 300m small streets (${pipeline.activeRoadBranchCount} roads)';
+      _statusMessage = 'Active $radiusLabel small streets (${pipeline.activeRoadBranchCount} roads)';
       _isDownloading = false;
       _downloadProgress = 1.0;
 
@@ -245,6 +247,14 @@ class DynamicMapService extends ChangeNotifier {
       return false;
     }
   }
+
+  /// Downloads a 1 km radius grid of small streets (primary recommendation).
+  Future<bool> trigger1KmSmallStreetsDownload(IdrPipeline pipeline) =>
+      triggerLocalSmallStreetsDownload(pipeline, radiusKm: 1.0);
+
+  /// Downloads a 300m micro-grid of small streets.
+  Future<bool> trigger300mSmallStreetsDownload(IdrPipeline pipeline) =>
+      triggerLocalSmallStreetsDownload(pipeline, radiusKm: 0.3);
 
   /// Purge all dynamic cached tiles from storage
   Future<int> purgeAllDynamicCache() async {
