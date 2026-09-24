@@ -176,19 +176,25 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
     }
 
     // Vehicle orientation:
-    // Car3DMarker renders a full real-time 3D polygonal vehicle mesh in perspective!
+    // Car3DMarker renders a full real-time 3D aerodynamic sports coupe mesh in perspective!
     final effectiveHeading = widget.isCourseUp ? 0.0 : widget.solution.headingDeg;
+    final pitchDeg = widget.solution.idrState.pitch * (180.0 / math.pi);
+    final rollDeg = widget.solution.idrState.roll * (180.0 / math.pi);
+    final isBraking = widget.solution.idrState.pitch < -0.04 || widget.solution.rawJerk < -1.5;
 
     final List<Marker> markers = [
       Marker(
         point: vehiclePos,
-        width: 72,
-        height: 72,
+        width: 80,
+        height: 80,
         alignment: Alignment.center,
         child: Car3DMarker(
           headingDeg: effectiveHeading,
+          pitchDeg: pitchDeg,
+          rollDeg: rollDeg,
           isCourseUp: widget.isCourseUp,
-          size: 72.0,
+          isBraking: isBraking,
+          size: 80.0,
         ),
       ),
     ];
