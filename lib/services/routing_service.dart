@@ -87,6 +87,7 @@ class RoutingService {
       final accurateEnu = MathUtils.wgs84ToEnu(
         lat: destination.latitude!,
         lon: destination.longitude!,
+        alt: destination.targetEnu.z,
         refLat: refLat,
         refLon: refLon,
       );
@@ -165,7 +166,12 @@ class RoutingService {
           final candidates = spatialGrid[cellKey];
           if (candidates != null) {
             for (final idx in candidates) {
-              if ((nodes[idx] - p).norm < 15.0) {
+              final node = nodes[idx];
+              final dX = node.x - p.x;
+              final dY = node.y - p.y;
+              final dHoriz = math.sqrt(dX * dX + dY * dY);
+              final dVert = (node.z - p.z).abs();
+              if (dHoriz < 2.0 && dVert < 2.5) {
                 return idx;
               }
             }
@@ -310,6 +316,8 @@ class RoutingService {
     final client = HttpClient();
     client.connectionTimeout = const Duration(seconds: 5);
     final request = await client.getUrl(url);
+    request.headers.set('User-Agent', 'IDR-DeadReckoning-SIH2026/1.0 (contact@idr-hackathon.org)');
+    request.headers.set('Accept', 'application/json');
     final response = await request.close();
     if (response.statusCode != 200) {
       client.close();
@@ -342,12 +350,37 @@ class RoutingService {
       enuPoints.add(enu);
     }
 
+    // Precompute cumulative polyline distances along enuPoints for exact step coordinate mapping
+    final polyDists = <double>[0.0];
+    for (int i = 0; i < enuPoints.length - 1; i++) {
+      polyDists.add(polyDists.last + (enuPoints[i + 1] - enuPoints[i]).norm);
+    }
+    final totalPolyLen = polyDists.isNotEmpty ? polyDists.last : 0.0;
+
+    Vec3 interpolatePos(double targetDist) {
+      if (enuPoints.isEmpty) return Vec3.zero;
+      if (targetDist <= 0.0 || enuPoints.length == 1) return enuPoints.first;
+      if (targetDist >= totalPolyLen) return enuPoints.last;
+
+      int idx = 0;
+      while (idx < polyDists.length - 1 && polyDists[idx + 1] < targetDist) {
+        idx++;
+      }
+      final segLen = polyDists[idx + 1] - polyDists[idx];
+      if (segLen <= 1e-6) return enuPoints[idx];
+      final frac = (targetDist - polyDists[idx]) / segLen;
+      return enuPoints[idx] + (enuPoints[idx + 1] - enuPoints[idx]) * frac;
+    }
+
     // Parse OSRM Steps
     final steps = <RouteStep>[];
     final legs = primaryRoute['legs'] as List<dynamic>? ?? [];
+    double currentStepDist = 0.0;
+
     for (final leg in legs) {
       final legSteps = leg['steps'] as List<dynamic>? ?? [];
-      for (final s in legSteps) {
+      for (int sIdx = 0; sIdx < legSteps.length; sIdx++) {
+        final s = legSteps[sIdx];
         final dist = (s['distance'] as num).toDouble();
         final name = (s['name'] as String?)?.trim() ?? 'Connecting Road';
         final maneuverObj = s['maneuver'] as Map<String, dynamic>? ?? {};
@@ -371,12 +404,21 @@ class RoutingService {
 
         final instruction = _formatInstruction(maneuverType, name, dist);
 
+        final stepStartDist = currentStepDist;
+        final stepEndDist = currentStepDist + dist;
+        currentStepDist = stepEndDist;
+
+        final stepStartPos = interpolatePos(stepStartDist);
+        final stepEndPos = (sIdx == legSteps.length - 1 && enuPoints.isNotEmpty)
+            ? enuPoints.last
+            : interpolatePos(stepEndDist);
+
         steps.add(RouteStep(
           instruction: instruction,
           maneuver: maneuverType,
           distanceMeters: dist,
-          startPosEnu: enuPoints.isNotEmpty ? enuPoints.first : Vec3.zero,
-          endPosEnu: enuPoints.isNotEmpty ? enuPoints.last : Vec3.zero,
+          startPosEnu: stepStartPos,
+          endPosEnu: stepEndPos,
           roadName: name.isEmpty ? 'Highway' : name,
           expectedSpeedMps: totalDistance > 0 && totalDuration > 0 ? (totalDistance / totalDuration) : 16.67,
         ));
@@ -443,6 +485,27 @@ class RoutingService {
     required bool isOffline,
     required List<MapBranch> branches,
   }) {
+    if (polyline.length < 2) {
+      return NavRoute(
+        destination: destination,
+        points: polyline,
+        steps: [
+          RouteStep(
+            instruction: 'Arrive at ${destination.name}',
+            maneuver: ManeuverType.arrive,
+            distanceMeters: 0.0,
+            startPosEnu: polyline.isNotEmpty ? polyline.first : destination.targetEnu,
+            endPosEnu: destination.targetEnu,
+            roadName: destination.name,
+            expectedSpeedMps: 0.0,
+          )
+        ],
+        totalDistanceMeters: 0.0,
+        estimatedDurationSeconds: 0.0,
+        isOfflineAStar: isOffline,
+      );
+    }
+
     double totalDist = 0.0;
     for (int i = 0; i < polyline.length - 1; i++) {
       totalDist += (polyline[i + 1] - polyline[i]).norm;
@@ -450,23 +513,16 @@ class RoutingService {
 
     final steps = <RouteStep>[];
 
-    // Depart step
-    final firstSeg = polyline.length >= 2 ? (polyline[1] - polyline[0]) : Vec3(0, 1, 0);
+    // Compute initial bearing for depart step
+    final firstSeg = polyline[1] - polyline[0];
     final initBearing = MathUtils.radToDeg(math.atan2(firstSeg.x, firstSeg.y));
     final initCompass = _bearingToCompassCardinal(initBearing);
     final initialRoadName = _findNearestRoadName(polyline.first, branches);
 
-    steps.add(RouteStep(
-      instruction: 'Head $initCompass on $initialRoadName',
-      maneuver: ManeuverType.depart,
-      distanceMeters: polyline.length >= 2 ? (polyline[1] - polyline[0]).norm : 50.0,
-      startPosEnu: polyline.first,
-      endPosEnu: polyline.length >= 2 ? polyline[1] : polyline.first,
-      roadName: initialRoadName,
-      expectedSpeedMps: 16.67,
-    ));
+    // Identify all intermediate turn maneuver nodes along the polyline
+    final maneuverNodes = <int>[];
+    final maneuverTypes = <ManeuverType>[];
 
-    // Analyze bearing changes between successive segments
     for (int i = 1; i < polyline.length - 1; i++) {
       final pPrev = polyline[i - 1];
       final pCurr = polyline[i];
@@ -475,14 +531,11 @@ class RoutingService {
       final v1 = pCurr - pPrev;
       final v2 = pNext - pCurr;
 
-      final dist = v2.norm;
-      if (dist < 5.0) continue;
+      if (v2.norm < 1.0) continue;
 
       final heading1 = math.atan2(v1.x, v1.y);
       final heading2 = math.atan2(v2.x, v2.y);
       final deltaHeadingDeg = MathUtils.radToDeg(MathUtils.normalizeAngle(heading2 - heading1));
-
-      final roadName = _findNearestRoadName(pCurr, branches);
 
       ManeuverType maneuver;
       if (deltaHeadingDeg > 45.0 && deltaHeadingDeg < 135.0) {
@@ -496,21 +549,83 @@ class RoutingService {
       } else if (deltaHeadingDeg.abs() >= 135.0) {
         maneuver = ManeuverType.uTurn;
       } else {
-        maneuver = ManeuverType.continueStraight;
+        continue;
       }
 
-      if (maneuver != ManeuverType.continueStraight || i == polyline.length - 2) {
-        final instruction = _formatInstruction(maneuver, roadName, dist);
+      maneuverNodes.add(i);
+      maneuverTypes.add(maneuver);
+    }
+
+    // Construct contiguous approach steps leading up to each junction
+    int prevNodeIdx = 0;
+
+    for (int m = 0; m < maneuverNodes.length; m++) {
+      final turnIdx = maneuverNodes[m];
+
+      double segDist = 0.0;
+      for (int k = prevNodeIdx; k < turnIdx; k++) {
+        segDist += (polyline[k + 1] - polyline[k]).norm;
+      }
+
+      final roadName = _findNearestRoadName(polyline[prevNodeIdx], branches);
+
+      if (prevNodeIdx == 0) {
+        final distStr = segDist >= 1000.0 ? '${(segDist / 1000.0).toStringAsFixed(1)} km' : '${segDist.round()} m';
+        steps.add(RouteStep(
+          instruction: 'Head $initCompass on $initialRoadName for $distStr',
+          maneuver: ManeuverType.depart,
+          distanceMeters: segDist > 0 ? segDist : 50.0,
+          startPosEnu: polyline[0],
+          endPosEnu: polyline[turnIdx],
+          roadName: initialRoadName,
+          expectedSpeedMps: 16.67,
+        ));
+      } else {
+        final prevManeuver = maneuverTypes[m - 1];
+        final instruction = _formatInstruction(prevManeuver, roadName, segDist);
         steps.add(RouteStep(
           instruction: instruction,
-          maneuver: maneuver,
-          distanceMeters: dist,
-          startPosEnu: pCurr,
-          endPosEnu: pNext,
+          maneuver: prevManeuver,
+          distanceMeters: segDist,
+          startPosEnu: polyline[prevNodeIdx],
+          endPosEnu: polyline[turnIdx],
           roadName: roadName,
           expectedSpeedMps: 16.67,
         ));
       }
+
+      prevNodeIdx = turnIdx;
+    }
+
+    // Final segment from last turn node to destination
+    double finalDist = 0.0;
+    for (int k = prevNodeIdx; k < polyline.length - 1; k++) {
+      finalDist += (polyline[k + 1] - polyline[k]).norm;
+    }
+
+    final finalRoadName = _findNearestRoadName(polyline[prevNodeIdx], branches);
+    if (prevNodeIdx == 0) {
+      final distStr = finalDist >= 1000.0 ? '${(finalDist / 1000.0).toStringAsFixed(1)} km' : '${finalDist.round()} m';
+      steps.add(RouteStep(
+        instruction: 'Head $initCompass on $initialRoadName for $distStr',
+        maneuver: ManeuverType.depart,
+        distanceMeters: finalDist,
+        startPosEnu: polyline[0],
+        endPosEnu: polyline.last,
+        roadName: initialRoadName,
+        expectedSpeedMps: 16.67,
+      ));
+    } else {
+      final lastTurnManeuver = maneuverTypes.isNotEmpty ? maneuverTypes.last : ManeuverType.continueStraight;
+      steps.add(RouteStep(
+        instruction: _formatInstruction(lastTurnManeuver, finalRoadName, finalDist),
+        maneuver: lastTurnManeuver,
+        distanceMeters: finalDist,
+        startPosEnu: polyline[prevNodeIdx],
+        endPosEnu: polyline.last,
+        roadName: finalRoadName,
+        expectedSpeedMps: 16.67,
+      ));
     }
 
     // Arrive step
@@ -518,8 +633,8 @@ class RoutingService {
       instruction: 'Arrive at ${destination.name}',
       maneuver: ManeuverType.arrive,
       distanceMeters: 0.0,
-      startPosEnu: destination.targetEnu,
-      endPosEnu: destination.targetEnu,
+      startPosEnu: polyline.last,
+      endPosEnu: polyline.last,
       roadName: destination.name,
       expectedSpeedMps: 0.0,
     ));

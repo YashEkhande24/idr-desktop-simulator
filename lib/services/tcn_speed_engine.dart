@@ -28,6 +28,8 @@ class TcnSpeedEngine {
   double _estimatedVariance = 0.16; // sigma^2 in (m/s)^2
   bool _isStationary = true;
   bool _isPedestrian = false;
+  int _pedestrianHits = 0;
+  int _vehicularHits = 0;
   int _stationaryCounter = _stationaryHysteresis; // Fast 5-sample ZUPT lock (50ms)
   static const int _stationaryHysteresis = 5; // Fast 5-sample ZUPT lock (50ms)
   bool _gnssForceStandstill = false; // GNSS-confirmed zero-speed override
@@ -102,6 +104,35 @@ class TcnSpeedEngine {
   double get lastAvgYawRate => _lastAvgYawRate;
   double get lastSkogStatistic => _lastSkogStatistic;
   double? get centripetalSpeed => _lastCentripetalSpeed;
+
+  bool _isOutageMode = false;
+  double _outageCruisingSpeed = 0.0;
+
+  bool get isOutageMode => _isOutageMode;
+  double get outageCruisingSpeed => _outageCruisingSpeed;
+
+  void setOutageMode(bool isOutage, [double? entrySpeedMps]) {
+    _isOutageMode = isOutage;
+    if (isOutage) {
+      _gnssForceStandstill = false;
+      _stationaryCounter = 0;
+      _isStationary = false;
+      final speed = (entrySpeedMps != null && entrySpeedMps > 1.0) ? entrySpeedMps : _estimatedSpeed;
+      if (speed > 1.0) {
+        _outageCruisingSpeed = speed;
+        _gnssConfirmedVehicle = true;
+        if (_estimatedSpeed < 1.0) {
+          _estimatedSpeed = speed;
+        }
+      }
+    } else {
+      _outageCruisingSpeed = 0.0;
+    }
+  }
+
+  void enterOutageCruisingMode(double entrySpeedMps) {
+    setOutageMode(true, entrySpeedMps);
+  }
 
   /// Loads the trained ONNX model from Flutter assets.
   Future<bool> loadModel([String assetPath = 'assets/models/vehicle_speed_tcn.onnx']) async {
@@ -196,8 +227,9 @@ class TcnSpeedEngine {
         (normW > 0.18 || nonYawRate > 0.15);
 
     // Kinematic launch integration: track forward acceleration delta above resting baseline.
-    // Completely suppressed during in-cabin hand rotation to eliminate false launch integration.
-    if (isPhoneRotatingInHand) {
+    // Completely suppressed during static rest or in-cabin hand rotation to eliminate false launch integration.
+    final bool isMovingVehicle = _gnssConfirmedVehicle || _estimatedSpeed > 0.8;
+    if (isPhoneRotatingInHand || (!isMovingVehicle && _lastAccelVariance < 0.25 && normW < 0.15 && fwdThrottle.abs() < 0.35)) {
       _launchKinematicSpeed = 0.0;
     } else if (fwdThrottle > 0.20) {
       _launchKinematicSpeed = MathUtils.clamp(
@@ -212,14 +244,21 @@ class TcnSpeedEngine {
     }
 
     // 1. Check Biomechanical Pedestrian Cadence vs. Vehicle Creep
-    _checkPedestrianCadence();
+    _checkPedestrianCadence(fwdThrottle: fwdThrottle, kinematicSpeed: _launchKinematicSpeed);
     if (_isPedestrian) {
-      _isStationary = false;
-      _stationaryCounter = 0;
-      // Clamped pedestrian pace (~1.0 to 1.3 m/s)
-      _estimatedSpeed = math.min(IdrConstants.pedestrianMaxSpeed, math.max(0.5, normA * 0.4));
-      _estimatedVariance = 0.8;
-      return _estimatedSpeed;
+      // If vehicle begins accelerating forward, instantly break out of pedestrian mode
+      if (fwdThrottle > 1.2 || _launchKinematicSpeed > 1.5) {
+        _isPedestrian = false;
+        _pedestrianHits = 0;
+        _vehicularHits = 10;
+      } else {
+        _isStationary = false;
+        _stationaryCounter = 0;
+        // Clamped pedestrian pace (~1.0 to 1.3 m/s)
+        _estimatedSpeed = math.min(IdrConstants.pedestrianMaxSpeed, math.max(0.5, normA * 0.4));
+        _estimatedVariance = 0.8;
+        return _estimatedSpeed;
+      }
     }
 
     // 2. Check Standstill / Zero-Velocity Condition (ZUPT)
@@ -285,7 +324,10 @@ class TcnSpeedEngine {
             final double dynamicFwdLaunch = ax - _restingFwdAccel;
 
             if (_isStationary) {
-              if (!isPhoneRotatingInHand && (dynamicFwdLaunch > 0.25 || _launchKinematicSpeed > 0.20)) {
+              final bool isVehiclePropulsion = dynamicFwdLaunch > 0.80 ||
+                  (dynamicFwdLaunch > 0.35 && (_lastAccelVariance > 0.25 || normW > 0.15 || _lastSkogStatistic > 35.0)) ||
+                  _launchKinematicSpeed > 0.20;
+              if (!isPhoneRotatingInHand && isVehiclePropulsion) {
                 _isStationary = false;
                 _gnssForceStandstill = false;
                 _stationaryCounter = 0;
@@ -295,10 +337,31 @@ class TcnSpeedEngine {
             if (isPureRotationInPlace || isPhoneRotatingInHand || _isStationary) {
               inferredSpeed = 0.0;
               _launchKinematicSpeed = 0.0;
-            } else if (inferredSpeed < 0.25 && dynamicFwdLaunch <= 0.05 && _launchKinematicSpeed < 0.10) {
+            } else if (!_isOutageMode && inferredSpeed < 0.25 && dynamicFwdLaunch <= 0.05 && _launchKinematicSpeed < 0.10) {
               // Soft continuous deadband: smooth sigmoid transition into standstill without truncating crawl
               final scale = 1.0 / (1.0 + math.exp(-25.0 * (inferredSpeed - 0.12)));
               inferredSpeed = inferredSpeed * scale;
+            }
+
+            // In outage mode (tunnel / GNSS loss), preserve cruising momentum along road corridor
+            // unless real driver braking is observed
+            if (_isOutageMode) {
+              if (fwdThrottle < -0.3) {
+                _outageCruisingSpeed = math.max(0.0, _outageCruisingSpeed + fwdThrottle * effectiveDt);
+                if (_outageCruisingSpeed <= 0.5) {
+                  _outageCruisingSpeed = 0.0;
+                }
+              } else if (_outageCruisingSpeed > 1.0 && fwdThrottle > -0.6) {
+                inferredSpeed = math.max(inferredSpeed, _outageCruisingSpeed * 0.98);
+                _outageCruisingSpeed = inferredSpeed;
+              }
+            }
+
+            // Active braking kinematic envelope:
+            // When braking (fwdThrottle < -0.3), physical speed can never increase above deceleration trajectory
+            if (fwdThrottle < -0.3) {
+              final double maxBrakingSpeed = math.max(0.0, _estimatedSpeed + fwdThrottle * effectiveDt);
+              inferredSpeed = math.min(inferredSpeed, maxBrakingSpeed);
             }
 
             // Combine TCN prediction with launch kinematic coupling for instant stop-and-go throttle response
@@ -309,27 +372,40 @@ class TcnSpeedEngine {
             if (outputs.length > 1 && outputs[1] != null) {
               final rawVar = _extractFirstDouble(outputs[1]!.value);
               _estimatedVariance = MathUtils.clamp(
-                rawVar * (speedScale * speedScale),
+                rawVar * (_speedScale * _speedScale),
                 0.04,
                 4.0,
               );
             }
 
             // Distance-preserving dynamic integration / 1D Gauss-Markov Kalman speed observer:
-            // At 10 Hz dataset/sensor cadence (dt >= 0.05), track targetSpeed directly without artificial lag.
-            // At 100 Hz sensor cadence (dt < 0.05), fuse continuous acceleration with discrete TCN inference.
-            if (_estimatedSpeed == 0.0 || dt >= 0.05) {
+            // Continuous forward acceleration integration step before discrete TCN blending
+            if (fwdThrottle < -0.2) {
+              _estimatedSpeed = math.max(0.0, _estimatedSpeed + fwdThrottle * effectiveDt);
+            }
+
+            if ((_estimatedSpeed == 0.0 && targetSpeed > 0.0 && (fwdThrottle > 0.2 || _launchKinematicSpeed > 0.2)) || dt >= 0.05) {
               _estimatedSpeed = targetSpeed;
               _pvSpeed = _estimatedVariance;
+            } else if (_estimatedSpeed == 0.0) {
+              _pvSpeed = 0.04;
             } else {
-              final rTcn = _estimatedVariance;
+              final rTcn = (fwdThrottle < -0.4) ? 5.0 : _estimatedVariance;
               final kGain = _pvSpeed / (_pvSpeed + rTcn);
               _estimatedSpeed = MathUtils.clamp(_estimatedSpeed + kGain * (targetSpeed - _estimatedSpeed), 0.0, 60.0);
               _pvSpeed = (1.0 - kGain) * _pvSpeed;
             }
 
+            if (_estimatedSpeed <= 0.25 && fwdThrottle <= 0.0) {
+              _isStationary = true;
+              _estimatedSpeed = 0.0;
+              _outageCruisingSpeed = 0.0;
+              _gnssConfirmedVehicle = false;
+            }
+
             if (_isStationary) {
               _estimatedSpeed = 0.0;
+              _outageCruisingSpeed = 0.0;
               _pvSpeed = 0.01;
             }
           }
@@ -338,8 +414,8 @@ class TcnSpeedEngine {
           // a_lat = v * omega_z during steady turning with mount lever-arm and road banking compensation
           if (!_isStationary && gz.abs() >= 0.08 && ay.abs() >= 0.35) {
             final vCent = MathUtils.centripetalTurnSpeed(
-              measuredLatAccel: ay.abs(),
-              yawRate: gz.abs(),
+              measuredLatAccel: ay,
+              yawRate: gz,
               angularAccel: angularAccelZ,
               roadBankAngleRad: rollRad,
             );
@@ -363,9 +439,21 @@ class TcnSpeedEngine {
         // Continuous inter-epoch kinematic speed propagation using forward accelerometer with slope compensation:
         if (!_isStationary && !_isPedestrian && effectiveDt < 0.05) {
           final aFwd = netFwdAccel - _restingFwdAccel;
+          if (_isOutageMode && aFwd < -0.3) {
+            _outageCruisingSpeed = math.max(0.0, _outageCruisingSpeed + aFwd * effectiveDt);
+            if (_outageCruisingSpeed <= 0.5) {
+              _outageCruisingSpeed = 0.0;
+            }
+          }
           if (aFwd.abs() > 0.04) {
             _estimatedSpeed = math.max(0.0, _estimatedSpeed + aFwd * effectiveDt);
             _pvSpeed = MathUtils.clamp(_pvSpeed + 0.15 * effectiveDt, 0.01, 2.0);
+            if (_estimatedSpeed <= 0.25 && aFwd <= 0.0) {
+              _isStationary = true;
+              _estimatedSpeed = 0.0;
+              _outageCruisingSpeed = 0.0;
+              _gnssConfirmedVehicle = false;
+            }
           }
         }
         return _estimatedSpeed;
@@ -383,7 +471,27 @@ class TcnSpeedEngine {
 
     // Natural vehicle aerodynamic and rolling friction damping when coasting
     if (netFwdAccel.abs() < 0.20 && _estimatedSpeed > 0.1) {
-      _estimatedSpeed *= (1.0 - 0.01 * effectiveDt * 100.0);
+      _estimatedSpeed *= (1.0 - 0.01 * effectiveDt);
+    }
+
+    // In outage mode, preserve vehicle momentum unless deceleration/braking occurs
+    if (_isOutageMode) {
+      if (netFwdAccel < -0.3) {
+        _outageCruisingSpeed = math.max(0.0, _outageCruisingSpeed + netFwdAccel * effectiveDt);
+        if (_outageCruisingSpeed <= 0.5) {
+          _outageCruisingSpeed = 0.0;
+        }
+      } else if (_outageCruisingSpeed > 1.0 && netFwdAccel > -0.6) {
+        _estimatedSpeed = math.max(_estimatedSpeed, _outageCruisingSpeed * 0.98);
+        _outageCruisingSpeed = _estimatedSpeed;
+      }
+    }
+
+    if (_estimatedSpeed <= 0.25 && netFwdAccel <= 0.0) {
+      _isStationary = true;
+      _estimatedSpeed = 0.0;
+      _outageCruisingSpeed = 0.0;
+      _gnssConfirmedVehicle = false;
     }
 
     // Wheeled vehicles on roads do not move in reverse during highway driving
@@ -396,8 +504,8 @@ class TcnSpeedEngine {
     // Centripetal Acceleration Speed Estimation (CASE) fallback:
     if (!_isStationary && gz.abs() >= 0.08 && ay.abs() >= 0.35) {
       final vCent = MathUtils.centripetalTurnSpeed(
-        measuredLatAccel: ay.abs(),
-        yawRate: gz.abs(),
+        measuredLatAccel: ay,
+        yawRate: gz,
         angularAccel: angularAccelZ,
         roadBankAngleRad: rollRad,
       );
@@ -424,7 +532,7 @@ class TcnSpeedEngine {
 
   /// Detects human walking cadence (inverted pendulum 1.5-2.3 Hz vertical bounce)
   /// while preserving slow car traffic creep and rejecting motorcycle/vehicle vibration.
-  void _checkPedestrianCadence() {
+  void _checkPedestrianCadence({double fwdThrottle = 0.0, double kinematicSpeed = 0.0}) {
     if (_buffer.length < 25) { // Need at least 25 samples for frequency analysis
       _isPedestrian = false;
       return;
@@ -438,6 +546,16 @@ class TcnSpeedEngine {
     // GNSS-confirmed vehicle speed (> 2 m/s ~ 7.2 km/h) suppresses pedestrian mode
     if (_gnssConfirmedVehicle) {
       _isPedestrian = false;
+      _pedestrianHits = 0;
+      return;
+    }
+
+    // Vehicular acceleration veto: Sustained vehicle launch integration or extreme forward throttle
+    // proves the device is in a motorized vehicle accelerating, NOT a pedestrian
+    if (kinematicSpeed > 1.5 || fwdThrottle > 1.2 || _estimatedSpeed > 2.2) {
+      _isPedestrian = false;
+      _pedestrianHits = 0;
+      _vehicularHits = 10;
       return;
     }
 
@@ -492,7 +610,7 @@ class TcnSpeedEngine {
     // Strict biomechanical checks:
     // 1. Must have strong heel-strike impact (peak-to-peak >= 3.5 m/s^2)
     // 2. Must have pronounced walking sway (gyro >= 0.25 rad/s)
-    // 3. Cadence MUST be between 1.0 Hz and 4.0 Hz (2 to 8 peaks in 2.0s)
+    // 3. Cadence MUST be between 1.0 Hz and 4.0 Hz (2 to 7 peaks in 2.0s)
     // 4. Cadence Periodicity Coherence: step intervals must be regular (human walking) rather than random noise
     bool isCadenceRegular = true;
     if (crossingIndices.length >= 4) {
@@ -515,14 +633,31 @@ class TcnSpeedEngine {
       isCadenceRegular = cv < 0.65; // Human steps are periodic (CV < 0.65); random road noise is irregular
     }
 
-    // 5. Vehicular Momentum Lock: A car cruising (> 2.5 m/s) cannot morph into a pedestrian
-    final isVehicularSpeed = _estimatedSpeed > 2.5;
+    // 5. Vehicular Momentum Lock: A car cruising (> 2.2 m/s) cannot morph into a pedestrian
+    final isVehicularSpeed = _estimatedSpeed > 2.2 || kinematicSpeed > 1.5;
 
     final isImpactMatch = verticalPeakToPeak >= 3.5;
     final isBodyWiggle = avgGyroNorm >= 0.25;
-    final isHumanCadence = (peakCount >= 2) && (peakCount <= 8);
+    final isHumanCadence = (peakCount >= 2) && (peakCount <= 7);
 
-    _isPedestrian = !isVehicularSpeed && isImpactMatch && isBodyWiggle && isHumanCadence && isCadenceRegular;
+    final isCandidatePedestrian = !isVehicularSpeed && isImpactMatch && isBodyWiggle && isHumanCadence && isCadenceRegular;
+
+    if (isCandidatePedestrian) {
+      _pedestrianHits++;
+      _vehicularHits = 0;
+      // Require at least 3 consecutive analysis hits of sustained footsteps
+      // to avoid single pothole or speed bump transients from falsely toggling pedestrian mode
+      if (_pedestrianHits >= 3) {
+        _isPedestrian = true;
+      }
+    } else {
+      _vehicularHits++;
+      _pedestrianHits = 0;
+      // Quick return to vehicular mode once vehicle dynamics or speed is detected
+      if (_vehicularHits >= 2 || isVehicularSpeed) {
+        _isPedestrian = false;
+      }
+    }
   }
 
   void _checkStandstill([bool isPhoneRotatingInHand = false]) {
@@ -589,8 +724,9 @@ class TcnSpeedEngine {
 
     // 2. TCN-Augmented Centrifugal Kinematic Consistency:
     // a_lat = v * omega_z. Disambiguates phone table rotation from real vehicular curve.
-    final expectedCentrifugalA = _estimatedSpeed * meanZ; // v * omega
-    final centrifugalResidual = (meanY - expectedCentrifugalA).abs();
+    final yawRate = sub.last[5]; // vehicleGyro.z (rad/s)
+    final expectedCentrifugalA = _estimatedSpeed * yawRate; // v * omega
+    final centrifugalResidual = (sub.last[1] - expectedCentrifugalA).abs();
     final bool isCoupledTurn = (avgYawRate > 0.25 || avgW > 0.30) && (latAccel > 0.60 && centrifugalResidual < 2.5);
 
     // Adapt resting forward acceleration bias when vehicle is resting at idle or standstill
@@ -598,10 +734,10 @@ class TcnSpeedEngine {
     final double dynamicLaunchDelta = (meanX - _restingFwdAccel).abs();
     final double fwdThrottle = meanX - _restingFwdAccel;
 
-    if (_isStationary && avgYawRate < 0.20 && !isCoupledTurn && dynamicLaunchDelta < 0.30) {
-      _restingFwdAccel = _restingFwdAccel == 0.0 ? meanX : (_restingFwdAccel * 0.95 + meanX * 0.05);
-      _launchKinematicSpeed = 0.0;
-    }
+    final double recent3Fwd = sub.length >= 3
+        ? (sub[sub.length - 1][0] + sub[sub.length - 2][0] + sub[sub.length - 3][0]) / 3.0
+        : sub.last[0];
+    final double instantLaunchThrottle = recent3Fwd - _restingFwdAccel;
 
     // Pure yaw rotation in place (e.g. rotating phone on a table or in a mount) has
     // yaw rate without centripetal lateral force (latAccel < 0.50) and low road variance (< 2.5).
@@ -609,45 +745,70 @@ class TcnSpeedEngine {
         latAccel < 0.50 &&
         _lastAccelVariance < 2.5;
 
+    final bool isSyntheticNoNoise = _lastAccelVariance < 1e-6;
+
+    // Static rest detection (phone resting on table/desk or held idle in hand):
+    // Physical invariant: A resting phone has low acceleration variance (< 0.25 m^2/s^4)
+    // and low angular velocity (< 0.15 rad/s) without centripetal turn coupling.
+    // In this physical state, any constant forward acceleration is static gravity projection
+    // (phone tilt on table/mount) or sensor bias, NOT vehicular propulsion!
+    // When the vehicle is moving (_gnssConfirmedVehicle, estimatedSpeed > 1.0, or _isOutageMode),
+    // smooth highway cruising is NOT static rest!
+    final bool isVehicleInMotion = (_isOutageMode && _outageCruisingSpeed > 1.0) || _estimatedSpeed > 1.0;
+    final bool isStaticRest = !isVehicleInMotion &&
+        (isSyntheticNoNoise
+            ? (fwdAccel < 0.15)
+            : (!isCoupledTurn &&
+                (isPureRotationInPlace ||
+                    isPhoneRotatingInHand ||
+                    (_lastAccelVariance < 0.25 &&
+                        avgW < 0.15 &&
+                        dynamicLaunchDelta < 0.40 &&
+                        instantLaunchThrottle.abs() < 0.40))));
+
+    // Adapt resting forward acceleration bias:
+    // When statically resting, rapidly absorb static gravity projection so fwdThrottle drops to zero.
+    if (isStaticRest) {
+      _restingFwdAccel = _restingFwdAccel == 0.0 ? meanX : (_restingFwdAccel * 0.80 + meanX * 0.20);
+      _launchKinematicSpeed = 0.0;
+    } else if (_isStationary && avgYawRate < 0.20 && !isCoupledTurn && dynamicLaunchDelta < 0.40 && !isVehicleInMotion) {
+      _restingFwdAccel = _restingFwdAccel == 0.0 ? meanX : (_restingFwdAccel * 0.95 + meanX * 0.05);
+      _launchKinematicSpeed = 0.0;
+    }
+
     // Standstill condition (ZUPT):
     // In real vehicles at idle, phone on a table, or phone held stationary in hand:
     // Dynamic acceleration variance (< 2.5 m^2/s^4), no coupled turn, and absence of forward throttle launch.
     // Hand tremor produces physiological roll/pitch angular rates (avgW up to 0.30 rad/s), but yaw rate remains low (< 0.18)
     // without centripetal lateral force.
-    final bool isSyntheticNoNoise = _lastAccelVariance < 1e-6;
-
-    final isCurrentlyStill = isSyntheticNoNoise
-        ? (fwdAccel < 0.15)
-        : (isPureRotationInPlace ||
-            isPhoneRotatingInHand ||
-            ((_isStationary || _estimatedSpeed < 0.50) &&
-                (_lastSkogStatistic < 25.0 || _lastAccelVariance < 2.5) &&
-                (avgW < 0.30 || avgYawRate < 0.18) &&
-                !isCoupledTurn &&
-                dynamicLaunchDelta < 0.30 &&
-                fwdThrottle < 0.25 &&
-                _launchKinematicSpeed < 0.20));
+    final isCurrentlyStill = !isVehicleInMotion &&
+        (isSyntheticNoNoise
+            ? (meanX.abs() < 0.15 || (meanX < 0.0 && _estimatedSpeed <= 0.25))
+            : (isStaticRest ||
+                ((_isStationary || _estimatedSpeed < 0.50) &&
+                    (_lastSkogStatistic < 25.0 || _lastAccelVariance < 2.5) &&
+                    (avgW < 0.30 || avgYawRate < 0.18) &&
+                    !isCoupledTurn &&
+                    dynamicLaunchDelta < 0.30 &&
+                    fwdThrottle < 0.25 &&
+                    _launchKinematicSpeed < 0.20)));
 
     // Active physical vehicle motion breaks out of standstill:
-    // In-cabin phone hand rotations or pure in-place swivel can NEVER break standstill.
-    final double recent3Fwd = sub.length >= 3
-        ? (sub[sub.length - 1][0] + sub[sub.length - 2][0] + sub[sub.length - 3][0]) / 3.0
-        : sub.last[0];
-    final double instantLaunchThrottle = recent3Fwd - _restingFwdAccel;
+    // Static rest, in-cabin phone hand rotations, or pure in-place swivel can NEVER break standstill.
+    final bool hasActiveMotion = isVehicleInMotion ||
+        (isSyntheticNoNoise
+            ? (meanX >= 0.18)
+            : (!isStaticRest &&
+                (instantLaunchThrottle > 0.40 ||
+                    fwdThrottle > 0.20 ||
+                    _launchKinematicSpeed > 0.18 ||
+                    _estimatedSpeed > 1.2 ||
+                    (!_isStationary && _lastAccelVariance > 1.2 && _estimatedSpeed > 2.0) ||
+                    (!_isStationary && _lastAccelVariance > 2.5) ||
+                    isCoupledTurn ||
+                    (_lastSkogStatistic > 35.0 && (isCoupledTurn || fwdThrottle > 0.35)))));
 
-    final bool hasActiveMotion = isSyntheticNoNoise
-        ? (fwdAccel >= 0.18)
-        : (!isPureRotationInPlace &&
-            !isPhoneRotatingInHand &&
-            (instantLaunchThrottle > 0.40 ||
-                fwdThrottle > 0.20 ||
-                _launchKinematicSpeed > 0.18 ||
-                (!_isStationary && _lastAccelVariance > 1.2 && _estimatedSpeed > 2.0) ||
-                (!_isStationary && _lastAccelVariance > 2.5) ||
-                isCoupledTurn ||
-                (_lastSkogStatistic > 35.0 && (isCoupledTurn || fwdThrottle > 0.35))));
-
-    if (_gnssForceStandstill && instantLaunchThrottle < 0.60 && _launchKinematicSpeed < 0.25) {
+    if (!_isOutageMode && _gnssForceStandstill && instantLaunchThrottle < 0.60 && _launchKinematicSpeed < 0.25) {
       _isStationary = true;
       _stationaryCounter = _stationaryHysteresis;
     } else if (hasActiveMotion) {
@@ -671,10 +832,10 @@ class TcnSpeedEngine {
 
   /// Override / calibrate speed from GNSS fix when available and high confidence.
   void synchronizeGnssSpeed(double gnssSpeed, double hdop, {bool isDenied = false}) {
-    // If GNSS is denied or degraded, release any forced standstill lock so INS can run freely.
+    // If GNSS is denied or degraded or in outage mode, release any forced standstill lock so INS can run freely.
     // Keep _gnssConfirmedVehicle state — it persists through brief GNSS outages
     // to prevent false pedestrian mode in tunnels or signal shadows.
-    if (isDenied || hdop > 10.0) {
+    if (isDenied || _isOutageMode || hdop > 10.0) {
       _gnssForceStandstill = false;
       return;
     }
@@ -697,13 +858,17 @@ class TcnSpeedEngine {
       if (_launchKinematicSpeed < 0.20) {
         _gnssForceStandstill = true;
         _isStationary = true;
+        _stationaryCounter = _stationaryHysteresis;
         _estimatedSpeed = 0.0;
       }
     } else if (hdop <= 5.0 && speed >= 0.8) {
       _gnssForceStandstill = false;
       _isStationary = false;
+      _stationaryCounter = 0;
+      _gnssConfirmedVehicle = true;
+      _launchKinematicSpeed = math.max(_launchKinematicSpeed, speed);
       // Blend more aggressively from GNSS when available
-      _estimatedSpeed = _estimatedSpeed * 0.7 + speed * 0.3;
+      _estimatedSpeed = _estimatedSpeed == 0.0 ? speed : (_estimatedSpeed * 0.4 + speed * 0.6);
     }
   }
 
@@ -773,6 +938,8 @@ class TcnSpeedEngine {
     _stationaryCounter = _stationaryHysteresis;
     _gnssForceStandstill = false;
     _gnssConfirmedVehicle = false;
+    _isOutageMode = false;
+    _outageCruisingSpeed = 0.0;
     _lastAccelVariance = 0.0;
     _lastAvgW = 0.0;
     _lastAvgYawRate = 0.0;

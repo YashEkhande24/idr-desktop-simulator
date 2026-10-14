@@ -25,12 +25,15 @@ void BaselineDeadReckoning::step(double dt, const Vec3& accel, const Vec3& gyro)
 
     // Classic open-loop gyro heading integration (uncompensated for bias)
     yaw_ += gyro.z * dt;
+    while (yaw_ > PI)  yaw_ -= 2.0 * PI;
+    while (yaw_ < -PI) yaw_ += 2.0 * PI;
 
     // Rotate body acceleration to world ENU using raw integrated yaw
+    // Note: accel is cabin-aligned vehicle frame (gravity already subtracted from z)
     double cy = std::cos(yaw_), sy = std::sin(yaw_);
     double axWorld = cy * accel.x - sy * accel.y;
     double ayWorld = sy * accel.x + cy * accel.y;
-    double azWorld = accel.z - GRAVITY_STANDARD; // Gravity subtraction
+    double azWorld = accel.z;
 
     // Double integration: p = p + v*dt + 0.5*a*dt^2
     position_.x += velocity_.x * dt + 0.5 * axWorld * dt * dt;

@@ -33,7 +33,7 @@ Eigen::Matrix3d rotWorldToBody(double roll, double pitch, double yaw) {
 
 Eigen::Vector3d forwardUnitVector(double pitch, double yaw) {
     double cp = std::cos(pitch);
-    return {cp * std::cos(yaw), cp * std::sin(yaw), std::sin(pitch)};
+    return {cp * std::cos(yaw), cp * std::sin(yaw), -std::sin(pitch)};
 }
 
 Eigen::Vector3d eulerRates(double roll, double pitch, const Eigen::Vector3d& gyro) {
@@ -43,7 +43,7 @@ Eigen::Vector3d eulerRates(double roll, double pitch, const Eigen::Vector3d& gyr
 
     double sr = std::sin(roll), cr = std::cos(roll);
     double yaw_dot   = (q * sr + r * cr) / cp;
-    double pitch_dot = -q * cr + r * sr;
+    double pitch_dot = q * cr - r * sr;
     double roll_dot  = p + yaw_dot * std::sin(pitch);
     return {roll_dot, pitch_dot, yaw_dot};
 }
@@ -56,7 +56,7 @@ Eigen::Matrix3d eulerRateJacobian(double roll, double pitch) {
 
     Eigen::Matrix3d J;
     J << 1.0,  tp * sr,    tp * cr,
-         0.0, -cr,         sr,
+         0.0,  cr,        -sr,
          0.0,  sr / cp,    cr / cp;
     return J;
 }
@@ -65,8 +65,8 @@ Eigen::Vector3d bodyRates(double roll, double pitch, const Eigen::Vector3d& eule
     double roll_dot = eulerDot.x(), pitch_dot = eulerDot.y(), yaw_dot = eulerDot.z();
     double a = yaw_dot * std::cos(pitch);
     double sr = std::sin(roll), cr = std::cos(roll);
-    double q = a * sr - pitch_dot * cr;
-    double r = a * cr + pitch_dot * sr;
+    double q = a * sr + pitch_dot * cr;
+    double r = a * cr - pitch_dot * sr;
     double p = roll_dot - yaw_dot * std::sin(pitch);
     return {p, q, r};
 }
@@ -169,7 +169,10 @@ double enuToCompassDeg(double yawEnuRad) {
 
 double compassToEnuRad(double compassDeg) {
     double enuDeg = 90.0 - compassDeg;
-    return deg2rad(enuDeg);
+    double rad = deg2rad(enuDeg);
+    while (rad > PI)  rad -= 2.0 * PI;
+    while (rad < -PI) rad += 2.0 * PI;
+    return rad;
 }
 
 double computeTiltCompensatedHeading(const Vec3& magUt, const Vec3& accel) {
@@ -288,9 +291,9 @@ Eigen::Vector3d apparentAcceleration(const Eigen::Vector3d& vNav, double latDeg,
     double wUp = 2.0 * earthRotationRate * sinPhi + wEnUp;
 
     return {
-        wUp * vNav.y() - wNorth * vNav.z(),
-        wEast * vNav.z() - wUp * vNav.x(),
-        wNorth * vNav.x() - wEast * vNav.y()
+        wNorth * vNav.z() - wUp * vNav.y(),
+        wUp * vNav.x() - wEast * vNav.z(),
+        wEast * vNav.y() - wNorth * vNav.x()
     };
 }
 

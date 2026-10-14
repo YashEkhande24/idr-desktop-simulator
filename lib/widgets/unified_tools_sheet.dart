@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../services/idr_pipeline.dart';
 import '../services/sensor_service.dart';
+import '../services/secret_bt_receiver.dart';
 import '../widgets/oscilloscope_widget.dart';
 import '../widgets/telemetry_hud.dart';
 import '../widgets/offline_map_sheet.dart';
+import '../widgets/secret_bt_sheet.dart';
 import '../screens/calibration_screen.dart';
 import '../screens/comparison_screen.dart';
 
@@ -246,6 +248,13 @@ class _ControlsTab extends StatelessWidget {
 
           const SizedBox(height: 16),
 
+          // Ghost Mode Section
+          _buildSectionLabel('SHADOW LINK // GHOST GPS (PHONE 2)'),
+          const SizedBox(height: 8),
+          _buildGhostModeCard(context, pipeline),
+
+          const SizedBox(height: 16),
+
           // Offline Maps Section
           _buildSectionLabel('OFFLINE MAPS & ROAD DATA'),
           const SizedBox(height: 8),
@@ -479,18 +488,250 @@ class _ControlsTab extends StatelessWidget {
     );
   }
 
+  Widget _buildGhostModeCard(BuildContext context, IdrPipeline pipeline) {
+    final isGhostActive = pipeline.isSecretDemoModeActive;
+    final receiver = pipeline.secretBtReceiver;
+    final status = receiver.connectionStatus;
+    final isConnected = status == GhostConnectionStatus.connected;
+    final isListening = status == GhostConnectionStatus.listening;
+
+    Color accentColor;
+    String badgeText;
+    IconData icon;
+    String subtitleText;
+
+    if (isGhostActive && isConnected) {
+      accentColor = const Color(0xFF10B981);
+      badgeText = 'CONNECTED (${receiver.packetRateHz.toStringAsFixed(1)} HZ)';
+      icon = Icons.bluetooth_connected_rounded;
+      subtitleText = 'Active override from ${receiver.latestPacket?.sender ?? "Phone 2"}';
+    } else if (isGhostActive && isListening) {
+      accentColor = const Color(0xFFF59E0B);
+      badgeText = 'SCANNING UDP 8989';
+      icon = Icons.bluetooth_searching_rounded;
+      subtitleText = receiver.isSimulating
+          ? 'Single-device simulation active'
+          : 'Listening for companion app broadcast...';
+    } else {
+      accentColor = const Color(0xFF64748B);
+      badgeText = 'STANDBY';
+      icon = Icons.radar_rounded;
+      subtitleText = 'Silently override pipeline with remote Phone 2 GPS';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isGhostActive
+            ? accentColor.withValues(alpha: 0.08)
+            : const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isGhostActive
+              ? accentColor.withValues(alpha: 0.6)
+              : const Color(0xFF1E293B),
+          width: isGhostActive ? 1.5 : 1.0,
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: accentColor, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 2,
+                        children: [
+                          Text(
+                            'GHOST MODE OVERRIDE',
+                            style: GoogleFonts.rajdhani(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: accentColor.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: accentColor.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: Text(
+                              badgeText,
+                              style: GoogleFonts.rajdhani(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: accentColor,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitleText,
+                        style: GoogleFonts.rajdhani(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: isGhostActive,
+                  activeColor: const Color(0xFF10B981),
+                  activeTrackColor:
+                      const Color(0xFF059669).withValues(alpha: 0.5),
+                  onChanged: (val) {
+                    pipeline.toggleSecretDemoMode(val);
+                  },
+                ),
+              ],
+            ),
+          ),
+          if (isGhostActive) ...[
+            const Divider(color: Color(0xFF1E293B), height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => SecretBtSheet(pipeline: pipeline),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFF334155)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.tune,
+                                size: 14, color: Color(0xFF38BDF8)),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'DRIFT & TELEMETRY',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.rajdhani(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF38BDF8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () {
+                      receiver.toggleSimulation();
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: receiver.isSimulating
+                            ? const Color(0xFF10B981).withValues(alpha: 0.15)
+                            : const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: receiver.isSimulating
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFF334155),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            receiver.isSimulating
+                                ? Icons.pause_circle_outline
+                                : Icons.play_circle_outline,
+                            size: 14,
+                            color: receiver.isSimulating
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFF94A3B8),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            receiver.isSimulating ? 'STOP' : 'SIMULATE',
+                            style: GoogleFonts.rajdhani(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: receiver.isSimulating
+                                  ? const Color(0xFF10B981)
+                                  : const Color(0xFF94A3B8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionLabel(String text) {
     return Row(
       children: [
         Container(width: 3, height: 14, color: const Color(0xFF38BDF8)),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: GoogleFonts.rajdhani(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
-            color: const Color(0xFF94A3B8),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.rajdhani(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+              color: const Color(0xFF94A3B8),
+            ),
           ),
         ),
       ],

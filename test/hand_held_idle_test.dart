@@ -179,6 +179,65 @@ void main() {
       }
     });
 
+    test('Steep hand tilt (pitch up to 60° creating 8.5 m/s^2 gravity) firmly maintains 0.0 km/h', () {
+      final aligner = CabinAligner();
+      final tcn = TcnSpeedEngine();
+      final ekf = Ekf3D();
+
+      // Simulate steep 60° tilt in hand with physiological tremor
+      final pitch60 = 60.0 * math.pi / 180.0;
+      final cp = math.cos(pitch60);
+      final sp = math.sin(pitch60);
+      final rPitch = Mat3([
+        cp,  0.0, sp,
+        0.0, 1.0, 0.0,
+        -sp, 0.0, cp,
+      ]);
+      final trueG = const Vec3(0, 0, 9.80665);
+      final phoneG = rPitch.transpose.transform(trueG);
+
+      for (int i = 0; i < 200; i++) {
+        final t = i * 0.01;
+        final tremorAx = 0.08 * math.sin(2 * math.pi * 8.5 * t);
+        final tremorAy = 0.09 * math.cos(2 * math.pi * 9.0 * t);
+        final tremorAz = 0.06 * math.sin(2 * math.pi * 8.0 * t);
+
+        final tremorGx = 0.04 * math.sin(2 * math.pi * 8.5 * t);
+        final tremorGy = 0.06 * math.cos(2 * math.pi * 9.0 * t);
+        final tremorGz = 0.02 * math.sin(2 * math.pi * 7.5 * t);
+
+        final rawAccel = phoneG + Vec3(tremorAx, tremorAy, tremorAz);
+        final rawGyro = Vec3(tremorGx, tremorGy, tremorGz);
+
+        aligner.ingest(rawAccel, rawGyro, dt: 0.01);
+        final aVeh = aligner.transformAccel(rawAccel);
+        final wVeh = aligner.transformGyro(rawGyro);
+
+        final speed = tcn.predict(
+          vehicleAccel: aVeh,
+          vehicleGyro: wVeh,
+          isShockGateActive: false,
+          dt: 0.01,
+        );
+
+        if (tcn.isStationary) {
+          ekf.applyStandstill(wVeh.z, aVeh.x);
+        } else {
+          ekf.predict(
+            vehicleAccel: aVeh,
+            vehicleGyro: wVeh,
+            dt: 0.01,
+            vTcn: speed,
+          );
+        }
+
+        expect(tcn.isStationary, isTrue, reason: 'Steep 60° tilt must remain stationary at step $i');
+        expect(tcn.estimatedSpeed, equals(0.0), reason: 'Speed must stay 0.0 at step $i');
+      }
+
+      expect(ekf.state.position.norm, lessThan(0.001));
+    });
+
     test('Real vehicle throttle launch breaks out cleanly from stationary hand-held state', () {
       final aligner = CabinAligner();
       final tcn = TcnSpeedEngine();
@@ -206,12 +265,14 @@ void main() {
       }
       expect(tcn.isStationary, isTrue);
 
-      // 2. Real vehicle throttle launch (+1.5 m/s^2 forward acceleration sustained for 0.5s)
+      // 2. Real vehicle throttle launch (+1.5 m/s^2 forward acceleration sustained for 0.5s with engine rumble)
       for (int i = 0; i < 50; i++) {
-        final rawAccel = const Vec3(1.5, 0.02, 9.807);
+        final t = i * 0.01;
+        final engineRumble = 0.35 * math.sin(2 * math.pi * 14.0 * t);
+        final rawAccel = Vec3(1.5 + engineRumble, 0.02, 9.807);
         final rawGyro = const Vec3(0.01, 0.01, 0.01);
 
-        aligner.ingest(rawAccel, rawGyro, dt: 0.01);
+        aligner.ingest(rawAccel, rawGyro, vTcn: tcn.estimatedSpeed, tcnVariance: tcn.estimatedVariance, dt: 0.01);
         final aVeh = aligner.transformAccel(rawAccel);
         final wVeh = aligner.transformGyro(rawGyro);
 

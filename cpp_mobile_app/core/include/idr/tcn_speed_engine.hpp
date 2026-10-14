@@ -12,7 +12,8 @@ public:
 
     // Update with vehicle-frame IMU sample
     // gnssSpeedMps: optional GNSS speed aiding (-1.0 if not available)
-    void update(const Vec3& alignedAccel, const Vec3& alignedGyro, double dt, double gnssSpeedMps = -1.0);
+    // pitchRad: vehicle cabin tilt pitch in radians for slope gravity compensation
+    void update(const Vec3& alignedAccel, const Vec3& alignedGyro, double dt, double gnssSpeedMps = -1.0, double pitchRad = 0.0);
 
     // Feed external AI prediction (e.g., from Dart ONNX runtime)
     void setExternalSpeed(double speedMps, double variance = 0.05);
@@ -38,6 +39,11 @@ public:
     double accelVariance() const { return accelVariance_; }
     double estimatedVariance() const { return estimatedVariance_; }
 
+    // Outage cruising mode
+    void setOutageMode(bool outage, double entrySpeedMps = 0.0);
+    bool isOutageMode() const { return isOutageMode_; }
+    void clearStandstill();
+
     void reset();
 
 private:
@@ -50,6 +56,8 @@ private:
     bool isStandstill_ = true;
     int quietCount_ = 5;
     bool isPedestrian_ = false;
+    bool isOutageMode_ = false;
+    double outageCruisingSpeed_ = 0.0;
     double accelVariance_ = 0.0;
     double speedBias_ = 0.0;
 

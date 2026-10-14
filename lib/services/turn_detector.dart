@@ -44,12 +44,14 @@ class TurnDetector {
       _roadCurvature = omegaYawRadPerSec / vTcn;
       _centripetalAccel = vTcn * omegaYawRadPerSec;
     } else {
-      _roadCurvature = omegaYawRadPerSec;
+      _roadCurvature = 0.0;
       _centripetalAccel = 0.0;
     }
 
     if (omegaYawRadPerSec.abs() >= yawRateThreshold) {
-      _consecutiveTurnSamples++;
+      if (_consecutiveTurnSamples < minTurnConsecutiveSamples) {
+        _consecutiveTurnSamples++;
+      }
       _accumulatedTurnAngleRad += omegaYawRadPerSec * dt;
 
       if (_consecutiveTurnSamples >= minTurnConsecutiveSamples) {
@@ -94,12 +96,16 @@ class TurnDetector {
       for (int i = 0; i < branch.points.length - 1; i++) {
         final a = branch.points[i];
         final b = branch.points[i + 1];
-        final mid = Vec3(
-          (a.x + b.x) * 0.5,
-          (a.y + b.y) * 0.5,
-          (a.z + b.z) * 0.5,
-        );
-        final dist = (vehiclePos - mid).norm;
+        final ab = b - a;
+        final lenSq = ab.normSquared;
+        double dist;
+        if (lenSq < 1e-6) {
+          dist = (vehiclePos - a).norm;
+        } else {
+          final t = MathUtils.clamp((vehiclePos - a).dot(ab) / lenSq, 0.0, 1.0);
+          final proj = a + ab * t;
+          dist = (vehiclePos - proj).norm;
+        }
         if (dist < minSegDist) {
           minSegDist = dist;
           segHeadingRad = math.atan2(b.y - a.y, b.x - a.x);
@@ -108,7 +114,7 @@ class TurnDetector {
 
       // Heading agreement score: cos(delta_psi)
       final headingDiff = MathUtils.normalizeAngle(segHeadingRad - vehicleHeadingRad);
-      final headingAgreement = math.cos(headingDiff);
+      final headingAgreement = branch.oneWay ? math.cos(headingDiff) : math.cos(headingDiff).abs();
 
       // Distance penalty (normalized by 50m search radius)
       final distPenalty = math.max(0.0, 1.0 - minSegDist / 50.0);

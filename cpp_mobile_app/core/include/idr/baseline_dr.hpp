@@ -15,6 +15,8 @@ public:
     // Synchronize state with nominal GNSS (holds drift at 0.0 m)
     void syncWithGnss(const Vec3& position, const Vec3& velocity, double yaw);
 
+    void translatePosition(const Vec3& delta) { position_ += delta; }
+
     void reset(const Vec3& initPos = {0, 0, 0}, double initYaw = 0.0);
 
     Vec3 position() const { return position_; }

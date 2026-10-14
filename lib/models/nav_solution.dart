@@ -40,6 +40,7 @@ class NavSolution {
   final bool isMapMatched;
   final String? matchedRoadName;
   final double crossTrackMeters;
+  final double? roadHeadingRad;
 
   final double? gnssSpeed; // m/s from GNSS receiver
   final double drDistanceTraveled; // meters accumulated during active GNSS outage
@@ -48,6 +49,8 @@ class NavSolution {
 
   final double? latitude; // WGS-84 Latitude in degrees
   final double? longitude; // WGS-84 Longitude in degrees
+  final double? classicLatitude; // WGS-84 Latitude for Classical Double Integration DR
+  final double? classicLongitude; // WGS-84 Longitude for Classical Double Integration DR
   final double? accuracyMeters; // GPS fix accuracy radius in meters
   final String? gpsStatusMessage; // Diagnostic message (e.g. "Locked ±2.5m", "GPS Disabled")
 
@@ -77,35 +80,44 @@ class NavSolution {
     this.isMapMatched = false,
     this.matchedRoadName,
     this.crossTrackMeters = 0.0,
+    this.roadHeadingRad,
     this.gnssSpeed,
     this.drDistanceTraveled = 0.0,
     this.drOutageDurationSec = 0.0,
     this.isTcnModelLoaded = false,
     this.latitude,
     this.longitude,
+    this.classicLatitude,
+    this.classicLongitude,
     this.accuracyMeters,
     this.gpsStatusMessage,
   });
+
+  /// Master navigation speed in m/s
+  double get speedMps => speedKmh / 3.6;
 
   /// Master navigation speed in km/h.
   /// 1. Standstill / Zero Confirmed: returns 0.0.
   /// 2. Nominal GNSS: anchors to high-precision GNSS Doppler ground speed (0.05 m/s accuracy).
   /// 3. GNSS Denied / Dead Reckoning (tunnels): returns calibrated EKF forward velocity.
   double get speedKmh {
-    // 1. Standstill confirmation: if EKF velocity is 0.0 or GNSS confirms stopped (< 0.5 m/s)
-    if (idrState.speed == 0.0 || (gnssSpeed != null && gnssSpeed! < 0.5 && hdop <= 4.0)) {
-      return 0.0;
-    }
-
-    // 2. High-precision GNSS Doppler speed during nominal reception
+    // 1. High-precision GNSS Doppler speed during nominal reception
     if (!isGnssDenied && gnssSpeed != null && hdop <= 5.0) {
       final s = gnssSpeed! * 3.6;
       return s < 0.8 ? 0.0 : s;
     }
 
-    // 3. Inertial Dead Reckoning during GNSS outage
-    final s = idrState.speedKmh;
-    return s < 0.8 ? 0.0 : s;
+    // 2. Standstill confirmation when GNSS is available and confirms stop
+    if (gnssSpeed != null && gnssSpeed! < 0.5 && hdop <= 5.0) {
+      return 0.0;
+    }
+
+    // 3. Inertial Dead Reckoning during GNSS outage or degraded signal
+    final ekfKmh = idrState.speedKmh;
+    if (ekfKmh >= 0.8) return ekfKmh;
+    final tcnKmh = tcnSpeedKmh;
+    if (tcnKmh >= 0.8) return tcnKmh;
+    return 0.0;
   }
   double get tcnSpeedKmh => tcnEstimatedSpeed * 3.6;
   double? get gnssSpeedKmh => gnssSpeed != null ? gnssSpeed! * 3.6 : null;
@@ -117,7 +129,14 @@ class NavSolution {
   }
 
   /// Navigational compass heading in degrees [0, 360): 0 = North, 90 = East, 180 = South, 270 = West.
-  double get headingDeg => MathUtils.enuToCompassDeg(idrState.yaw);
+  /// When vehicle is map-matched and stationary/crawling (< 4.0 km/h), align smoothly with the road segment
+  /// tangent to avoid compass jitter from misaligning the vehicle across traffic lanes.
+  double get headingDeg {
+    if (isMapMatched && roadHeadingRad != null && speedKmh < 4.0) {
+      return MathUtils.enuToCompassDeg(roadHeadingRad!);
+    }
+    return MathUtils.enuToCompassDeg(idrState.yaw);
+  }
 }
 
 

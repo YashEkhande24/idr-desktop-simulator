@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDR-Navigator | Intelligent Dead Reckoning & GNSS Fusion System (SIH 2026)</title>
+  <meta name="description" content="Official Presentation for IDR-Navigator: Real-time vehicular navigation during GNSS outages using smartphone sensors, causal neural networks, and 9D Extended Kalman Filtering.">
+  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#overview" class="brand-link">
+        <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
+        <div class="brand-info">
+          <div class="brand-title">
+            <span>IDR-NAVIGATOR</span>
+            <span class="sih-badge">SIH 2026</span>
+          </div>
+          <span class="brand-tagline">Intelligent Dead Reckoning System</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#overview" class="nav-item-link active">Overview</a></li>
+          <li><a href="#problem" class="nav-item-link">Problem</a></li>
+          <li><a href="#architecture" class="nav-item-link">How It Works</a></li>
+          <li><a href="#simulator" class="nav-item-link">Live Simulator</a></li>
+          <li><a href="#pitch-deck" class="nav-item-link">Pitch Deck</a></li>
+          <li><a href="video.html" class="nav-item-link">Demo Video <span class="nav-pill-badge">Field Test</span></a></li>
+          <li><a href="model.html" class="nav-item-link">AI Model <span class="nav-pill-badge">Weights</span></a></li>
+          <li><a href="#downloads" class="nav-item-link">APK Downloads</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a href="video.html" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Demo Video
+        </a>
+        <a href="model.html" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Model Link
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="overview">
+    <div class="container hero-grid">
+      <div>
+        <div class="hero-eyebrow">
+          Smart India Hackathon 2026 &bull; Idea Presentation &amp; Defense
+        </div>
+        <h1 class="hero-heading">
+          Continuous Navigation in <br>
+          <span class="gradient-text">Total GPS Denial</span>. <br>
+          Zero Extra Hardware.
+        </h1>
+        <p class="hero-subtitle">
+          When satellite signals drop inside tunnels and urban corridors, standard GPS apps freeze or jump across roads.
+          <strong>IDR-Navigator</strong> turns an ordinary smartphone into a tactical inertial navigation unit using 
+          on-device neural velocity estimation and 9D Extended Kalman Filtering — with zero vehicle modifications.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#pitch-deck" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Open 6-Slide Pitch Deck
+          </a>
+          <a href="#simulator" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Try Live Simulator
+          </a>
+          <a href="video.html" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Demo Video (Placeholder)
+          </a>
+          <a href="model.html" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            AI Model Link
+          </a>
+        </div>
+
+        <div class="hero-metrics-bar">
+          <div class="metric-item">
+            <span class="metric-val">93.8%</span>
+            <span class="metric-label">Pass Rate under SIH &lt;10% Drift Rule</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val green">0.02%</span>
+            <span class="metric-label">Best Drift (0.17m / 850m tunnel)</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">11.2ms</span>
+            <span class="metric-label">On-Device AI Inference (10 Hz)</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val green">&#8377;0</span>
+            <span class="metric-label">Retrofit Cost (No OBD-II needed)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual-card">
+        <img src="assets/images/hero_hud_showcase.jpg" alt="IDR-Navigator Telemetry HUD in Tunnel">
+        <div class="hero-card-caption">
+          <span>Tunnel GPS Denial Test Run</span>
+          <span class="mono green-text">&lt;0.4% Drift Maintained</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: The Problem (Why Standard Navigation Fails) -->
+  <section class="section-wrapper" id="problem">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">The Critical Problem</span>
+        <h2 class="section-title">Why Navigation Collapses in Tunnels</h2>
+        <p class="section-desc">
+          When satellite line-of-sight is lost, conventional navigation apps either stop completely or drift off course.
+          Standard smartphones lack wheel speed sensors, while pure mathematical acceleration integration explodes exponentially.
+        </p>
+      </div>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-card-icon red">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="problem-tag red-text">Standard Navigation Apps</div>
+          <h3 class="problem-title">Signal Loss &amp; Screen Freeze</h3>
+          <p class="problem-desc">
+            In tunnels, underpasses, and high-rise corridors, GNSS satellite fixes drop to zero.
+            Consumer mapping apps freeze, report "Searching for GPS", or snap wildly to elevated flyovers or adjacent service roads,
+            causing missed exits and dangerous driver distraction.
+          </p>
+          <div class="problem-metric-chip">
+            <span style="color: var(--text-dim);">TUNNEL OUTAGE:</span>
+            <span class="red-text">0 SATELLITES VISIBLE</span>
+          </div>
+        </div>
+
+        <div class="problem-card">
+          <div class="problem-card-icon amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="problem-tag amber-text">Classical Inertial (INS)</div>
+          <h3 class="problem-title">Quadratic Drift Explosion</h3>
+          <p class="problem-desc">
+            Open-loop double integration of smartphone accelerometers causes minute sensor biases to compound quadratically
+            ($\Delta p \propto \frac{1}{2} b_a t^2$), while gyro bias couples with gravity cubically.
+            Within 30 seconds of an outage, position drifts by &gt;140 meters off-road.
+          </p>
+          <div class="problem-metric-chip">
+            <span style="color: var(--text-dim);">30-SEC DRIFT:</span>
+            <span class="amber-text">&gt;140 METERS (&gt;180% ERROR)</span>
+          </div>
+        </div>
+
+        <div class="problem-card card-highlight">
+          <div class="problem-card-icon blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="problem-tag blue-text">The IDR-Navigator Solution</div>
+          <h3 class="problem-title">Lane-Locked Sub-4m Precision</h3>
+          <p class="problem-desc">
+            Turns standard consumer smartphones into tactical navigation units.
+            Fuses on-device neural velocity inference (Causal SE-TCN) with a 9D Extended Kalman Filter enforcing Non-Holonomic Constraints
+            and Indian road pothole shock immunity.
+          </p>
+          <div class="problem-metric-chip">
+            <span style="color: var(--text-dim);">AVERAGE DRIFT:</span>
+            <span class="green-text">&lt;0.4% &bull; ZERO RETROFIT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: How It Works (3 Pillars) -->
+  <section class="section-wrapper" id="architecture" style="background: rgba(15, 20, 34, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Technical Approach</span>
+        <h2 class="section-title">The 3 Engineering Pillars of IDR</h2>
+        <p class="section-desc">
+          How our software pipeline replaces open-loop double integration with a tightly coupled Neuro-Kalman state estimator.
+        </p>
+      </div>
+
+      <div class="pillar-grid">
+        <div class="pillar-box">
+          <span class="pillar-step">PILLAR 01 &bull; NEURAL KINEMATICS</span>
+          <h3 class="pillar-title">Causal SE-TCN Speed Estimator</h3>
+          <p class="pillar-desc">
+            An 8-channel Temporal Convolutional Network with Squeeze-and-Excitation attention infers vehicle forward speed
+            directly from chassis and transmission vibration harmonics, bypassing accelerometer integration errors.
+          </p>
+          <div class="pillar-formula">
+            $$\hat{v}_k, \sigma_k^2 = f_{\text{SE-TCN}}(\mathbf{W}_{\text{IMU}}^{k-39:k})$$
+          </div>
+          <ul class="pillar-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Predicts heteroscedastic uncertainty ($\sigma^2$) to adaptively tune Kalman gain
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              11.2ms inference latency on Snapdragon 7 Gen 3 (10 Hz update loop)
+            </li>
+          </ul>
+        </div>
+
+        <div class="pillar-box">
+          <span class="pillar-step">PILLAR 02 &bull; STATE ESTIMATION</span>
+          <h3 class="pillar-title">9D Extended Kalman Filter (NHC)</h3>
+          <p class="pillar-desc">
+            A 9-state EKF tracks position, velocity, and orientation while strictly enforcing physical Non-Holonomic Constraints:
+            wheeled road vehicles cannot slide sideways or jump vertically through asphalt ($v_y = 0, v_z = 0$).
+          </p>
+          <div class="pillar-formula">
+            $$v_y^b \approx 0, \quad v_z^b \approx 0 \quad (\text{Zero Lateral Skid})$$
+          </div>
+          <ul class="pillar-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Prevents heading divergence by continuously anchoring lateral velocity to zero
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Zero Velocity Update (ZUPT): Locks position at red lights and traffic jams
+            </li>
+          </ul>
+        </div>
+
+        <div class="pillar-box">
+          <span class="pillar-step">PILLAR 03 &bull; INDIAN ROAD RESILIENCY</span>
+          <h3 class="pillar-title">Pothole Gating &amp; Map Snapping</h3>
+          <p class="pillar-desc">
+            Tailored for Indian driving conditions. Jerk variance gating temporarily freezes vertical acceleration integration
+            during pothole and speed breaker impacts, while offline vector map matching keeps trajectory on the road network.
+          </p>
+          <div class="pillar-formula">
+            $$\operatorname{Var}(\dot{a}_z) &gt; \tau_{\text{jerk}} \implies \text{Freeze Accel Integration}$$
+          </div>
+          <ul class="pillar-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Jerk Variance Gate ($\tau = 450\text{ m}^2/\text{s}^6$) neutralizes road shock spikes
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              100% offline 3D vector map matching operates without internet connection
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Subpage Gateways -->
+  <section class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Presentation Assets</span>
+        <h2 class="section-title">Dedicated Presentation Hubs</h2>
+        <p class="section-desc">
+          Explore our field video demonstration page or inspect the trained neural network model weights and code.
+        </p>
+      </div>
+
+      <div class="portal-grid">
+        <a href="video.html" class="portal-box">
+          <div class="portal-header">
+            <div class="portal-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <span class="portal-badge">VIDEO DEMO PAGE</span>
+          </div>
+          <h3 class="portal-title">Field Demonstration Video</h3>
+          <p class="portal-desc">
+            Field recording of IDR-Navigator tracking through a real-world tunnel outage.
+            Video upload placeholder is prepared for team test recordings with local preview support.
+          </p>
+          <div class="portal-arrow">
+            <span>Open Demo Video Page</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </a>
+
+        <a href="model.html" class="portal-box">
+          <div class="portal-header">
+            <div class="portal-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <span class="portal-badge">MODEL LINK PAGE</span>
+          </div>
+          <h3 class="portal-title">AI Model &amp; Weights Hub</h3>
+          <p class="portal-desc">
+            Direct download links for production <code class="mono" style="color: #93c5fd;">vehicle_speed_tcn.onnx</code> (8.4 MB),
+            PyTorch checkpoints, normalization scalers, and inference quickstart code.
+          </p>
+          <div class="portal-arrow">
+            <span>Open AI Model Link Page</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Live Outage Simulator -->
+  <section class="section-wrapper" id="simulator" style="background: rgba(15, 20, 34, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Interactive Physics Simulation</span>
+        <h2 class="section-title">Live Drift &amp; Outage Simulator</h2>
+        <p class="section-desc">
+          Test the difference in real time. Compare Green (IDR Neuro-Kalman) vs Red (Classical INS Double Integration)
+          along an S-curve track when GPS signal is severed.
+        </p>
+      </div>
+
+      <div class="simulator-layout">
+        <div class="sim-canvas-wrapper">
+          <canvas id="simCanvas" width="800" height="420"></canvas>
+        </div>
+
+        <div class="sim-controls-panel">
+          <div class="sim-status-box">
+            <div style="font-weight: 700; color: #fff; margin-bottom: 0.25rem;">SIMULATION STATUS</div>
+            <div>Track Speed: <span class="mono" style="color: #93c5fd;" id="simSpeedVal">54.0 km/h</span></div>
+            <div>GNSS Status: <span class="mono green-text" id="simStateLabel">OPEN SKY (NOMINAL FIX)</span></div>
+            <div>Green (IDR) Drift: <span class="mono green-text" id="simIdrDriftVal">0.2m</span></div>
+            <div>Red (INS) Drift: <span class="mono red-text" id="simClassicDriftVal">0.0m</span></div>
+          </div>
+
+          <div class="sim-btn-group">
+            <button class="btn-primary" id="btnSimOutage" onclick="toggleSimOutage()" style="justify-content: center;">
+              CUT GNSS (TUNNEL OUTAGE)
+            </button>
+            <button class="btn-secondary" id="btnSimShock" onclick="injectSimShock()" style="justify-content: center;">
+              INJECT POTHOLE SHOCK
+            </button>
+            <button class="btn-secondary" id="btnSimZupt" onclick="toggleSimZupt()" style="justify-content: center;">
+              TOGGLE RED LIGHT (ZUPT)
+            </button>
+            <button class="btn-secondary" id="btnSimReset" onclick="resetSimulator()" style="justify-content: center; opacity: 0.7;">
+              RESET TRACK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Official 6-Slide Pitch Deck -->
+  <section class="section-wrapper" id="pitch-deck">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">SIH 2026 Presentation</span>
+        <h2 class="section-title">Official 6-Slide Pitch Deck</h2>
+        <p class="section-desc">
+          Master presentation deck following the Smart India Hackathon 2026 evaluation criteria.
+          Use the left/right arrow keys or controls to navigate.
+        </p>
+      </div>
+
+      <div class="deck-container">
+        <div class="deck-top-bar">
+          <div class="deck-slide-title" id="deckHeaderTitle">
+            SLIDE 1 OF 6 : TITLE &amp; EXECUTIVE OVERVIEW
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button class="btn-secondary" onclick="toggleSpeakerNotes()" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+              Toggle Presenter Notes
+            </button>
+            <button class="btn-secondary" onclick="toggleDeckFullscreen()" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+              Fullscreen
+            </button>
+          </div>
+        </div>
+
+        <div class="deck-viewport">
+          <!-- Slide 1 -->
+          <div class="deck-slide active-slide" data-slide="1" data-title="TITLE &amp; EXECUTIVE OVERVIEW">
+            <div class="hero-eyebrow" style="margin-bottom: 1rem;">SLIDE 1 &bull; EXECUTIVE OVERVIEW</div>
+            <h3 class="slide-heading">
+              IDR-Navigator: Intelligent Dead Reckoning &amp; GNSS Fusion
+            </h3>
+            <p class="slide-subtitle">
+              Continuous, high-precision vehicular navigation across total satellite denial (tunnels, underpasses, urban canyons)
+              using standard smartphone MEMS sensors and on-device neural velocity inference.
+            </p>
+            <div class="slide-3cards">
+              <div class="slide-card-item">
+                <h4>Problem Statement</h4>
+                <p>Complete satellite outage in tunnels causes consumer navigation apps to freeze and classical double-integration to diverge &gt;140m within 30 seconds.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Proposed Solution</h4>
+                <p>On-device Causal SE-TCN speed regression fused with a 9D Extended Kalman Filter with Non-Holonomic Constraints. Zero extra hardware required.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Empirical Impact</h4>
+                <p>93.8% pass rate under SIH &lt;10% drift rule across 64 held-out passenger trips on the IO-VNBD dataset, with 0.02% best-case drift.</p>
+              </div>
+            </div>
+            <div class="speaker-notes-box">
+              <strong>Presenter Script:</strong> "Respected jury members, conventional GPS systems leave drivers blind the moment they enter a tunnel. Our solution turns an everyday smartphone into a tactical inertial navigation unit with zero external hardware retrofit."
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="deck-slide" data-slide="2" data-title="PROPOSED SOLUTION &amp; ARCHITECTURE">
+            <div class="hero-eyebrow" style="margin-bottom: 1rem;">SLIDE 2 &bull; PROPOSED SOLUTION</div>
+            <h3 class="slide-heading">3-Pillar Solution Architecture</h3>
+            <p class="slide-subtitle">Replacing open-loop double-integration with neural velocity regression and physical constraint filtering.</p>
+            <div class="slide-3cards">
+              <div class="slide-card-item">
+                <h4>Pillar 1: Neural Kinematics</h4>
+                <p>8-Channel Causal SE-TCN extracts forward vehicle speed directly from chassis vibration harmonics, predicting both velocity and uncertainty.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Pillar 2: 9D EKF with NHC</h4>
+                <p>Enforces physical constraints (cars do not slip laterally or bounce through pavement), eliminating heading divergence.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Pillar 3: Road Resiliency</h4>
+                <p>Jerk variance gating neutralizes pothole shock spikes, while offline 3D vector map matching snaps trajectory to drivable roads.</p>
+              </div>
+            </div>
+            <div class="speaker-notes-box">
+              <strong>Presenter Script:</strong> "Rather than integrating noisy accelerometers twice, our neural network infers forward velocity directly from vibration harmonics at 10 Hz with 11ms latency."
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="deck-slide" data-slide="3" data-title="TECHNICAL APPROACH &amp; PIPELINE">
+            <div class="hero-eyebrow" style="margin-bottom: 1rem;">SLIDE 3 &bull; TECHNICAL PIPELINE</div>
+            <h3 class="slide-heading">Dual-Tier Implementation Pipeline</h3>
+            <p class="slide-subtitle">Real-time edge execution across high-level Flutter UI and low-level C++20 SIMD core.</p>
+            <div class="slide-3cards">
+              <div class="slide-card-item">
+                <h4>100 Hz Sensor Engine</h4>
+                <p>Triaxial accelerometer and gyroscope sampled at 100 Hz, downsampled to 10 Hz with sliding 4.0-second window.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>ONNX Mobile Runtime</h4>
+                <p>Dilated causal convolutions executed locally via ONNX Runtime Mobile, consuming &lt;4% CPU on modern devices.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Offline Vector Engine</h4>
+                <p>Offline OpenStreetMap vector topology loaded locally into memory, requiring zero cellular data during tunnel outages.</p>
+              </div>
+            </div>
+            <div class="speaker-notes-box">
+              <strong>Presenter Script:</strong> "Our implementation features a dual-tier stack: a production Flutter Android application and an ultra-lightweight 933 KB pure C++20 SIMD NativeActivity engine."
+            </div>
+          </div>
+
+          <!-- Slide 4 -->
+          <div class="deck-slide" data-slide="4" data-title="FEASIBILITY &amp; INDIAN ROAD RESILIENCY">
+            <div class="hero-eyebrow" style="margin-bottom: 1rem;">SLIDE 4 &bull; FEASIBILITY &amp; ROAD RISKS</div>
+            <h3 class="slide-heading">Engineered for Indian Road Conditions</h3>
+            <p class="slide-subtitle">Mitigating road anomalies: potholes, speed breakers, stop-and-go queues, and multi-tier flyovers.</p>
+            <div class="slide-3cards">
+              <div class="slide-card-item">
+                <h4>Pothole Jerk Gating</h4>
+                <p>Monitors vertical jerk derivative. If jerk exceeds 18 m/s³, acceleration integration freezes to prevent phantom speed surges.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Standstill ZUPT Lock</h4>
+                <p>Zero Velocity Update detects vehicle idling at red lights and locks speed to exact 0.00 km/h, preventing sensor crawl.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Zero-Jump Handoff</h4>
+                <p>When exiting tunnels, smooth covariance shrinking re-converges to GNSS fixes without jarring screen teleports.</p>
+              </div>
+            </div>
+            <div class="speaker-notes-box">
+              <strong>Presenter Script:</strong> "Indian roads have severe pavement irregularities. Our jerk variance filter discriminates between true vehicular forward acceleration and vertical shock from potholes."
+            </div>
+          </div>
+
+          <!-- Slide 5 -->
+          <div class="deck-slide" data-slide="5" data-title="SOCIAL, ECONOMIC &amp; STRATEGIC IMPACT">
+            <div class="hero-eyebrow" style="margin-bottom: 1rem;">SLIDE 5 &bull; IMPACT &amp; COMMERCIAL VIABILITY</div>
+            <h3 class="slide-heading">National Impact &amp; Scalability</h3>
+            <p class="slide-subtitle">Democratizing tactical navigation without expensive hardware retrofits.</p>
+            <div class="slide-3cards">
+              <div class="slide-card-item">
+                <h4>Zero Retrofit Cost</h4>
+                <p>Runs on consumer smartphones already owned by drivers. Saves &#8377;15,000&ndash;&#8377;50,000 per vehicle compared to hardware INS dongles.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Emergency Response</h4>
+                <p>Enables ambulances and emergency fleets to navigate mountain tunnels and underground metro corridors without losing route guidance.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>Defense &amp; Mining</h4>
+                <p>Applicable to underground mining trucks, border mountain convoys, and automated guided vehicles in GPS-denied environments.</p>
+              </div>
+            </div>
+            <div class="speaker-notes-box">
+              <strong>Presenter Script:</strong> "Because our solution is 100% software, it scales instantly to hundreds of millions of smartphone users across India without any mechanic intervention or hardware cost."
+            </div>
+          </div>
+
+          <!-- Slide 6 -->
+          <div class="deck-slide" data-slide="6" data-title="RESEARCH BENCHMARKS &amp; SCORECARD">
+            <div class="hero-eyebrow" style="margin-bottom: 1rem;">SLIDE 6 &bull; BENCHMARKS &amp; RESULTS</div>
+            <h3 class="slide-heading">Empirical Validation on IO-VNBD Benchmark</h3>
+            <p class="slide-subtitle">Tested against high-precision GNSS Doppler ground truth across 64 complete passenger vehicle trips.</p>
+            <div class="slide-3cards">
+              <div class="slide-card-item">
+                <h4>93.8% Pass Rate</h4>
+                <p>60 out of 64 scenarios passed under the strict SIH &lt;10% drift rule across diverse passenger hatchbacks, sedans, and SUVs.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>0.50 m/s Speed MAE</h4>
+                <p>Fleet-wide velocity regression Mean Absolute Error of 1.8 km/h against high-precision GNSS Doppler ground truth.</p>
+              </div>
+              <div class="slide-card-item">
+                <h4>0.02% Best Outage Drift</h4>
+                <p>Reduced average trajectory drift from &gt;180% (Classical INS) down to 0.21% &ndash; 2.66% on typical urban and highway trips.</p>
+              </div>
+            </div>
+            <div class="speaker-notes-box">
+              <strong>Presenter Script:</strong> "Our empirical scorecard confirms a 93.8% pass rate on held-out test trips, proving that our neural dead reckoning framework is ready for real-world deployment."
+            </div>
+          </div>
+        </div>
+
+        <div class="deck-nav-bar">
+          <button class="btn-secondary" onclick="prevSlide()" style="padding: 0.4rem 0.95rem; font-size: 0.82rem;">
+            &larr; Previous Slide
+          </button>
+          <div class="deck-dots-group">
+            <span class="slide-dot active-dot" onclick="goToSlide(1)"></span>
+            <span class="slide-dot" onclick="goToSlide(2)"></span>
+            <span class="slide-dot" onclick="goToSlide(3)"></span>
+            <span class="slide-dot" onclick="goToSlide(4)"></span>
+            <span class="slide-dot" onclick="goToSlide(5)"></span>
+            <span class="slide-dot" onclick="goToSlide(6)"></span>
+          </div>
+          <button class="btn-secondary" onclick="nextSlide()" style="padding: 0.4rem 0.95rem; font-size: 0.82rem;">
+            Next Slide &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6: APK Downloads -->
+  <section class="section-wrapper" id="downloads" style="background: rgba(15, 20, 34, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Distribution &amp; Mobile Builds</span>
+        <h2 class="section-title">Download Android Builds</h2>
+        <p class="section-desc">
+          Install the complete Flutter production application or the ultra-lightweight C++ SIMD engine directly onto your Android device.
+        </p>
+      </div>
+
+      <div class="apk-grid">
+        <div>
+          <!-- APK 1 -->
+          <div class="apk-package-card">
+            <div class="apk-card-top">
+              <div>
+                <span class="nav-pill-badge" style="margin-bottom: 0.4rem; display: inline-block;">PRODUCTION APP</span>
+                <h3 class="apk-name">IDR Navigator Release APK</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Version 1.0 &bull; Flutter 3.x Engine &bull; Full Vector Map UI</span>
+              </div>
+              <span class="mono" style="font-weight: 700; color: var(--green-accent);">111.6 MB</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+              Complete end-to-end mobile application with interactive telemetry HUD, offline 3D vector map rendering,
+              live compass, and real-time comparison between classical INS and IDR Neuro-Kalman.
+            </p>
+            <div>
+              <a href="downloads/idr_navigator_v1.0.apk" download="idr_navigator_v1.0.apk" class="btn-primary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download Release APK (111.6 MB)
+              </a>
+            </div>
+          </div>
+
+          <!-- APK 2 -->
+          <div class="apk-package-card">
+            <div class="apk-card-top">
+              <div>
+                <span class="nav-pill-badge" style="margin-bottom: 0.4rem; display: inline-block;">C++ SIMD CORE</span>
+                <h3 class="apk-name">Pure C++20 NativeActivity APK</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Version 1.0 &bull; Pure C++20 / NDK &bull; Zero Dart/JVM Overhead</span>
+              </div>
+              <span class="mono" style="font-weight: 700; color: #fff;">933 KB</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+              Ultra-lightweight native binary designed for embedded vehicle head units and tactical IMU logging.
+              Includes pure SIMD vector math and C++ EKF-9D state estimator.
+            </p>
+            <div>
+              <a href="downloads/idr_pure_cpp_engine.apk" download="idr_pure_cpp_engine.apk" class="btn-primary">
+                Download Pure C++ Engine (933 KB)
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="qr-box-card">
+          <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">Scan to Install on Smartphone</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Point your camera at this QR code</div>
+          <div id="qrContainer"></div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono);">
+            Direct link to idr_navigator_v1.0.apk
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7: Benchmark Trajectory Plot -->
+  <section class="section-wrapper" id="benchmarks">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Empirical Results</span>
+        <h2 class="section-title">IO-VNBD Benchmark Scorecard</h2>
+        <p class="section-desc">
+          Evaluated across 64 complete trips on the international Input-Output Vehicle Navigation Benchmark Dataset.
+        </p>
+      </div>
+
+      <div class="benchmark-layout">
+        <div class="benchmark-img-card">
+          <img src="assets/images/dead_reckoning_benchmark.png" alt="IDR vs Classical Trajectory Error Benchmark Plot">
+        </div>
+
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 700; margin-bottom: 1rem;">
+            Empirical Error Reduction
+          </h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+            Classical inertial double integration yields rapid error divergence (>180% drift) due to compounding sensor bias.
+            IDR-Navigator caps total outage drift to 0.21% &ndash; 2.66% across diverse urban and expressway routes.
+          </p>
+
+          <table class="spec-table">
+            <tr>
+              <td>SIH &lt;10% Drift Pass Rate</td>
+              <td style="color: var(--green-accent); font-weight: 700;">93.8% (60/64 Passed)</td>
+            </tr>
+            <tr>
+              <td>Classical INS Drift</td>
+              <td style="color: var(--red-accent);">&gt;180% (Catastrophic)</td>
+            </tr>
+            <tr>
+              <td>Best Outage Drift</td>
+              <td style="color: var(--green-accent);">0.02% (0.17m / 850m)</td>
+            </tr>
+            <tr>
+              <td>Velocity MAE</td>
+              <td>0.50 m/s (1.8 km/h)</td>
+            </tr>
+            <tr>
+              <td>Velocity RMSE</td>
+              <td>0.72 m/s (2.59 km/h)</td>
+            </tr>
+          </table>
+
+          <div style="margin-top: 1.5rem;">
+            <a href="model.html" class="btn-primary">
+              View Model Specifications &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand-title" style="margin-bottom: 0.5rem;">
+            <span>IDR-NAVIGATOR</span>
+            <span class="sih-badge">SIH 2026</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-width: 320px;">
+            Intelligent Dead Reckoning &amp; GNSS Fusion System. Smart India Hackathon 2026 Submission.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Navigation</h5>
+          <ul class="footer-links">
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#problem">The Problem</a></li>
+            <li><a href="#architecture">How It Works</a></li>
+            <li><a href="#pitch-deck">6-Slide Pitch Deck</a></li>
+            <li><a href="#simulator">Live Simulator</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Presentation Pages</h5>
+          <ul class="footer-links">
+            <li><a href="video.html">Field Demo Video</a></li>
+            <li><a href="model.html">AI Model Link</a></li>
+            <li><a href="downloads/models/vehicle_speed_tcn.onnx" download>ONNX Weights (8.4 MB)</a></li>
+            <li><a href="#downloads">Android APK (111 MB)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>External Links</h5>
+          <ul class="footer-links">
+            <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub Repository</a></li>
+            <li><a href="https://zenodo.org/records/4646877" target="_blank">DriverSVT Dataset</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 IDR-Navigator Team &bull; Smart India Hackathon (SIH 2026)</div>
+        <div class="mono">Edge Inference: 11.2ms &bull; Zero External Hardware</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="simulator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

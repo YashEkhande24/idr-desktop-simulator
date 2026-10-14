@@ -1,0 +1,53 @@
+{
+  "model_name": "IDR-NeuroSpeed-TCN",
+  "version": "2.1.0-production",
+  "event": "Smart India Hackathon (SIH 2026)",
+  "track": "AI/ML, Cloud Computing, IoT & Electronics",
+  "application": "Zero-Hardware Intelligent Dead Reckoning & GNSS Fusion",
+  "architecture": {
+    "type": "1D Dilated Causal Temporal Convolutional Network with Squeeze-and-Excitation Attention",
+    "total_parameters": 2107394,
+    "input_channels": 8,
+    "channel_names": [
+      "accel_x (m/s^2)",
+      "accel_y (m/s^2)",
+      "accel_z (m/s^2)",
+      "gyro_yaw (rad/s)",
+      "gyro_pitch (rad/s)",
+      "gyro_roll (rad/s)",
+      "norm_accel (m/s^2)",
+      "norm_gyro (rad/s)"
+    ],
+    "input_sequence_length": 40,
+    "input_duration_seconds": 4.0,
+    "sampling_frequency_hz": 10.0,
+    "hidden_channels": [96, 192, 256, 384],
+    "dilation_factors": [1, 2, 4, 8],
+    "receptive_field_steps": 40,
+    "dual_head_outputs": {
+      "pred_speed": "Estimated forward vehicle velocity (scale: 25.0 m/s)",
+      "pred_var": "Heteroscedastic predictive variance (sigma^2) for Kalman R covariance"
+    }
+  },
+  "runtime_specifications": {
+    "onnx_model_file": "idr_neurospeed_tcn.onnx",
+    "pytorch_weights_file": "idr_neurospeed_tcn.pth",
+    "file_size_mb": 8.43,
+    "target_platforms": ["Android (NNAPI / CPU)", "iOS (CoreML)", "Linux / Windows Edge", "Embedded C++20"],
+    "mobile_inference_latency_ms": 11.2,
+    "target_pipeline_hz": 10.0
+  },
+  "benchmark_scorecard": {
+    "dataset": "IO-VNBD (Inertial Odometry Vehicle Navigation Benchmark Dataset)",
+    "evaluation_scenarios": 64,
+    "sih_pass_rate_under_10_percent_drift": "93.8%",
+    "fleet_mean_absolute_error_mps": 0.50,
+    "fleet_mean_drift_percent": 2.10,
+    "best_case_tunnel_drift_percent": 0.02
+  },
+  "normalization": {
+    "mean": [-0.02365945, -0.06469031, 0.01274203, -0.00004271, -0.00518811, -0.00053543, 1.83050895, 0.18634985],
+    "std": [1.68240917, 1.64495146, 0.73317313, 0.13121276, 0.23679392, 0.11545657, 1.65169442, 0.22786571],
+    "speed_scale": 25.0
+  }
+}

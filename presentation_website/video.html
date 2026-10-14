@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDR-Navigator | Demo Video (SIH 2026)</title>
+  <meta name="description" content="Field test demonstration video for IDR-Navigator: Vehicular navigation during GNSS tunnel outages using smartphone inertial sensors.">
+  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand-link">
+        <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
+        <div class="brand-info">
+          <div class="brand-title">
+            <span>IDR-NAVIGATOR</span>
+            <span class="sih-badge">SIH 2026</span>
+          </div>
+          <span class="brand-tagline">Intelligent Dead Reckoning System</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-item-link">Overview</a></li>
+          <li><a href="index.html#problem" class="nav-item-link">Problem &amp; Solution</a></li>
+          <li><a href="index.html#architecture" class="nav-item-link">How It Works</a></li>
+          <li><a href="index.html#pitch-deck" class="nav-item-link">Pitch Deck</a></li>
+          <li><a href="index.html#simulator" class="nav-item-link">Simulator</a></li>
+          <li><a href="video.html" class="nav-item-link active">Demo Video</a></li>
+          <li><a href="model.html" class="nav-item-link">AI Model &amp; Weights</a></li>
+          <li><a href="index.html#downloads" class="nav-item-link">APK Downloads</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a href="model.html" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Model Link
+        </a>
+        <a href="index.html" class="btn-primary">
+          Back to Presentation
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="subpage-hero">
+    <div class="container">
+      <nav class="breadcrumb-nav">
+        <a href="index.html">Presentation Home</a>
+        <span>/</span>
+        <span style="color: #fff;">Field Demo Video</span>
+      </nav>
+
+      <h1 class="subpage-title">Field Demonstration <span class="gradient-text">Video</span></h1>
+      <p class="subpage-desc">
+        Real-world test recording of IDR-Navigator tracking vehicle position through complete satellite denial.
+        Demonstrates the contrast between classical inertial divergence and our neural dead reckoning engine.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Video Presentation Section -->
+  <main class="section-wrapper" style="padding-top: 2.5rem;">
+    <div class="container">
+
+      <!-- Video Card: Clean Placeholder / Local Upload Switcher -->
+      <div id="videoContainerBox">
+
+        <!-- Default State: Placeholder Frame -->
+        <div class="video-placeholder-frame" id="placeholderFrame">
+          <div class="placeholder-play-circle">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+
+          <div class="placeholder-badge">DEMO VIDEO &bull; UPLOAD PENDING</div>
+          <h2 class="placeholder-title">Field Recording Video Placeholder</h2>
+          <p class="placeholder-desc">
+            The official field demonstration video (recorded tunnel blackout trial with real-time dashboard telemetry) 
+            is currently being finalized by the team and will be uploaded here shortly.
+          </p>
+
+          <div class="local-upload-btn-row">
+            <input type="file" id="localVideoPicker" accept="video/mp4,video/webm,video/mov,video/quicktime,video/x-matroska" style="display: none;">
+            <label for="localVideoPicker" class="btn-primary" style="cursor: pointer;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Upload / Preview Video File
+            </label>
+            <button class="btn-secondary" onclick="loadSampleClip()">
+              Preview Recorded Test Clip
+            </button>
+          </div>
+
+          <div id="uploadStatusMsg" style="margin-top: 1rem; font-size: 0.8rem; font-family: var(--font-mono); color: var(--green-accent);"></div>
+        </div>
+
+        <!-- Video Player (Revealed when a video is loaded or chosen) -->
+        <div id="activePlayerBox" style="display: none; background: #060910; border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden;">
+          <video id="mainVideoPlayer" controls class="video-player-real">
+            Your browser does not support HTML5 video.
+          </video>
+          <div style="padding: 1rem 1.5rem; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="font-size: 0.82rem; color: var(--text-muted);">
+              Active Video: <span class="mono" style="color: #fff;" id="activeVideoNameDisplay">demo_recording.mp4</span>
+            </div>
+            <button class="btn-secondary" onclick="returnToPlaceholder()" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;">
+              Back to Placeholder
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Test Breakdown & Milestones -->
+      <div style="margin-top: 3.5rem;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin-bottom: 1.25rem;">
+          What This Field Demonstration Demonstrates
+        </h3>
+
+        <div class="problem-grid">
+          <div class="problem-card">
+            <div class="problem-tag blue-text">Phase 1 &bull; 00:00 &ndash; 00:15</div>
+            <h4 class="problem-title">Open-Sky Baseline Calibration</h4>
+            <p class="problem-desc">
+              Vehicle travels on open highway with healthy satellite coverage. The system calibrates phone cabin mounting attitude
+              and initializes the 9D Extended Kalman Filter state against GNSS Doppler velocity.
+            </p>
+          </div>
+
+          <div class="problem-card">
+            <div class="problem-tag amber-text">Phase 2 &bull; 00:15 &ndash; 00:45</div>
+            <h4 class="problem-title">Tunnel Entry &amp; GPS Denial</h4>
+            <p class="problem-desc">
+              Satellite signal drops completely to 0 satellites. Classical double-integration quickly diverges into tunnel walls (>140m error).
+              IDR-Navigator switches to on-device neural speed estimation and locks to the driving lane.
+            </p>
+          </div>
+
+          <div class="problem-card">
+            <div class="problem-tag green-text">Phase 3 &bull; 00:45 &ndash; 01:14</div>
+            <h4 class="problem-title">Potholes, Stops &amp; Re-Convergence</h4>
+            <p class="problem-desc">
+              Demonstrates pothole jerk rejection without false acceleration spikes, zero-velocity updates (ZUPT) at standstill,
+              and seamless re-convergence upon tunnel exit without trajectory jumping.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hardware Test Setup Specs -->
+      <div style="margin-top: 2.5rem; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 2rem;">
+        <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">
+          Field Test Hardware &amp; Vehicle Configuration
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; font-size: 0.85rem;">
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Test Vehicle</span>
+            <strong style="color: #fff;">Passenger Sedan</strong>
+            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Front-Wheel Drive</span>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Smartphone</span>
+            <strong style="color: #fff;">OnePlus Nord CE4</strong>
+            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Snapdragon 7 Gen 3</span>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">IMU Chipset</span>
+            <strong style="color: #fff;">Bosch BMI270 (6-DOF)</strong>
+            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Tri-axial Accel + Gyro</span>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Mounting</span>
+            <strong style="color: #fff;">Rigid Windshield Suction</strong>
+            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Zero OBD-II / External Wires</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand-title" style="margin-bottom: 0.5rem;">
+            <span>IDR-NAVIGATOR</span>
+            <span class="sih-badge">SIH 2026</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-width: 320px;">
+            Intelligent Dead Reckoning &amp; GNSS Fusion System. Smart India Hackathon 2026 Submission.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Navigation</h5>
+          <ul class="footer-links">
+            <li><a href="index.html">Presentation Home</a></li>
+            <li><a href="index.html#problem">Problem &amp; Solution</a></li>
+            <li><a href="index.html#pitch-deck">Pitch Deck</a></li>
+            <li><a href="index.html#simulator">Live Simulator</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Artifacts</h5>
+          <ul class="footer-links">
+            <li><a href="video.html">Field Demo Video</a></li>
+            <li><a href="model.html">AI Model Link</a></li>
+            <li><a href="downloads/models/vehicle_speed_tcn.onnx" download>ONNX Weights (8.4 MB)</a></li>
+            <li><a href="index.html#downloads">Android APK (111 MB)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>External Links</h5>
+          <ul class="footer-links">
+            <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub Repository</a></li>
+            <li><a href="https://zenodo.org/records/4646877" target="_blank">DriverSVT Dataset</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 IDR-Navigator Team &bull; Smart India Hackathon (SIH 2026)</div>
+        <div class="mono">Edge Inference: 11.2ms &bull; Zero External Hardware</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const placeholder = document.getElementById('placeholderFrame');
+    const playerBox = document.getElementById('activePlayerBox');
+    const video = document.getElementById('mainVideoPlayer');
+    const nameDisplay = document.getElementById('activeVideoNameDisplay');
+    const statusMsg = document.getElementById('uploadStatusMsg');
+    const picker = document.getElementById('localVideoPicker');
+
+    // Local video picker
+    picker.addEventListener('change', () => {
+      if (picker.files && picker.files[0]) {
+        const file = picker.files[0];
+        const url = URL.createObjectURL(file);
+        video.src = url;
+        nameDisplay.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+        placeholder.style.display = 'none';
+        playerBox.style.display = 'block';
+        video.play();
+      }
+    });
+
+    // Sample clip preview
+    function loadSampleClip() {
+      video.src = 'assets/videos/demo_recording.mp4';
+      nameDisplay.textContent = 'demo_recording.mp4 (Sample Recording &bull; 6.87 MB)';
+      placeholder.style.display = 'none';
+      playerBox.style.display = 'block';
+      video.play();
+    }
+
+    function returnToPlaceholder() {
+      video.pause();
+      playerBox.style.display = 'none';
+      placeholder.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

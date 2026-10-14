@@ -82,6 +82,12 @@ class BaselineDr {
     _pitch = 0.0;
   }
 
+  void translatePosition(Vec3 delta) {
+    _px += delta.x;
+    _py += delta.y;
+    _pz += delta.z;
+  }
+
   void reset({double initYaw = 0.0}) {
     _px = 0.0;
     _py = 0.0;

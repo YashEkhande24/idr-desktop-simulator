@@ -31,7 +31,7 @@ class MapSnapResult {
   final Vec3 snappedPoint;
   final Vec3 normal2D;
   final Vec3 tangent2D;
-  final double crossTrackDistance; // signed meters: positive = right, negative = left
+  final double crossTrackDistance; // signed meters: positive = left, negative = right
   final int segmentIndex;
   final double roadHeadingRad;
   final double confidence; // 0.0 .. 1.0 margin between top candidate branches
@@ -125,7 +125,7 @@ class MapSnapper {
         : maxLateralSnapM;
 
     MapSnapResult? bestResult;
-    final scores = <double>[];
+    final branchBestScores = <String, double>{};
     double bestScore = double.infinity;
 
     for (final branch in branches) {
@@ -200,9 +200,10 @@ class MapSnapper {
           }
         }
 
-        final normal2 = Vec3(-tangent2.y, tangent2.x, 0.0);
-        final signedCrossTrack = dx * normal2.x + dy * normal2.y;
-        final roadHeading = math.atan2(tangent2.y, tangent2.x);
+        var curTangent = tangent2;
+        var curNormal = Vec3(-curTangent.y, curTangent.x, 0.0);
+        var curCrossTrack = dx * curNormal.x + dy * curNormal.y;
+        var curRoadHeading = math.atan2(curTangent.y, curTangent.x);
 
         // 1. HMM Emission Cost: Log-likelihood of spatial orthogonal distance and elevation difference
         final altDiff = (P.z - snapZ).abs();
@@ -210,8 +211,25 @@ class MapSnapper {
 
         if (headingRad != null) {
           final headingVec = Vec3(math.cos(headingRad), math.sin(headingRad), 0.0);
-          final dotHeading = (headingVec.x * tangent2.x + headingVec.y * tangent2.y).abs();
-          emissionCost += headingWeight * (1.0 - dotHeading);
+          final dot = headingVec.x * curTangent.x + headingVec.y * curTangent.y;
+          if (branch.oneWay) {
+            // One-way road: strictly enforce unidirectional flow. Wrong-way receives heavy penalty.
+            if (dot < 0.0) {
+              emissionCost += headingWeight * (1.0 - dot) + 15.0;
+            } else {
+              emissionCost += headingWeight * (1.0 - MathUtils.clamp(dot, 0.0, 1.0));
+            }
+          } else {
+            // Two-way road: allow bidirectional travel. If driving reverse of polyline, flip tangent & heading
+            final dotMag = dot.abs();
+            emissionCost += headingWeight * (1.0 - MathUtils.clamp(dotMag, 0.0, 1.0));
+            if (dot < 0.0) {
+              curTangent = -curTangent;
+              curNormal = -curNormal;
+              curCrossTrack = -curCrossTrack;
+              curRoadHeading = MathUtils.normalizeAngle(curRoadHeading + math.pi);
+            }
+          }
         }
 
         // 2. HMM Transition Cost: Log-likelihood of network route displacement vs INS displacement (Newson & Krumm)
@@ -232,14 +250,14 @@ class MapSnapper {
         }
 
         final score = emissionCost + transitionCost;
-        scores.add(score);
+        branchBestScores[branch.name] = math.min(branchBestScores[branch.name] ?? double.infinity, score);
 
         // Menger Curvature on 3 consecutive polyline points
         double kappa = 0.0;
         if (pts.length >= 3) {
-          final nodeA = i > 0 ? pts[i - 1] : A;
-          final nodeB = A;
-          final nodeC = B;
+          final nodeA = i > 0 ? pts[i - 1] : pts[0];
+          final nodeB = i > 0 ? A : pts[1];
+          final nodeC = i > 0 ? B : pts[2];
           kappa = MathUtils.mengerCurvature(nodeA, nodeB, nodeC);
         }
 
@@ -248,11 +266,11 @@ class MapSnapper {
           bestResult = MapSnapResult(
             branchName: branch.name,
             snappedPoint: snapPos,
-            normal2D: normal2,
-            tangent2D: tangent2,
-            crossTrackDistance: signedCrossTrack,
+            normal2D: curNormal,
+            tangent2D: curTangent,
+            crossTrackDistance: curCrossTrack,
             segmentIndex: i,
-            roadHeadingRad: roadHeading,
+            roadHeadingRad: curRoadHeading,
             isElevated: branch.isElevated,
             curvature: kappa,
             lanes: branch.lanes,
@@ -271,10 +289,10 @@ class MapSnapper {
 
     // Confidence metric: normalized margin between best and second-best candidate branches
     double confidence = 1.0;
-    if (scores.length > 1) {
-      scores.sort();
-      final gap = scores[1] - scores[0];
-      confidence = MathUtils.clamp(gap / math.max(scores[1], 1e-6), 0.0, 1.0);
+    final distinctScores = branchBestScores.values.toList()..sort();
+    if (distinctScores.length > 1) {
+      final gap = distinctScores[1] - distinctScores[0];
+      confidence = MathUtils.clamp(gap / math.max(distinctScores[1], 1e-6), 0.0, 1.0);
     }
 
     final finalResult = MapSnapResult(

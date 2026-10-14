@@ -305,7 +305,8 @@ class MathUtils {
     final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(degToRad(lat1)) * math.cos(degToRad(lat2)) *
         math.sin(dLon / 2) * math.sin(dLon / 2);
-    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    final aClamped = clamp(a, 0.0, 1.0);
+    final c = 2 * math.atan2(math.sqrt(aClamped), math.sqrt(clamp(1.0 - aClamped, 0.0, 1.0)));
     return earthRadiusWgs84 * c;
   }
 
@@ -462,13 +463,14 @@ class MathUtils {
     // Use the latest 5 samples: n-5, n-4, n-3, n-2, n-1
     final y0 = window[n - 5];
     final y1 = window[n - 4];
+    final y2 = window[n - 3];
     final y3 = window[n - 2];
     final y4 = window[n - 1];
 
-    // Central quadratic polynomial derivative evaluated at middle with smooth projection:
-    // ( -2*y0 - 1*y1 + 1*y3 + 2*y4 ) / (10 * dt)
-    final num = (y4 * 2.0) + y3 - y1 - (y0 * 2.0);
-    return num / (10.0 * dt);
+    // Causal endpoint 2nd-degree Savitzky-Golay 1st derivative filter evaluated at current sample y4:
+    // (54*y4 - 13*y3 - 40*y2 - 27*y1 + 26*y0) / (70 * dt)
+    final num = (y4 * 54.0) - (y3 * 13.0) - (y2 * 40.0) - (y1 * 27.0) + (y0 * 26.0);
+    return num / (70.0 * dt);
   }
 
   /// Second-order discrete 2-sample Bortz coning correction vector:
@@ -560,6 +562,7 @@ class MathUtils {
   /// Coriolis acceleration vector a_coriolis in local ENU frame (m/s^2)
   /// for vehicle velocity [vNav] = [v_East, v_North, v_Up] at geodetic latitude [latDeg].
   /// omega_ie^n = [0, omega_E * cos(phi), omega_E * sin(phi)]^T.
+  /// Evaluates 2 * (omega_ie^n x vNav) to be subtracted from specific force.
   static Vec3 coriolisAcceleration(Vec3 vNav, double latDeg) {
     final phi = degToRad(latDeg);
     final cosPhi = math.cos(phi);
@@ -568,9 +571,9 @@ class MathUtils {
     final wSin = earthRotationRate * sinPhi;
 
     return Vec3(
-      2.0 * (wSin * vNav.y - wCos * vNav.z),
-      -2.0 * (wSin * vNav.x),
-      2.0 * (wCos * vNav.x),
+      2.0 * (wCos * vNav.z - wSin * vNav.y),
+      2.0 * (wSin * vNav.x),
+      -2.0 * (wCos * vNav.x),
     );
   }
 
@@ -597,7 +600,7 @@ class MathUtils {
 
   /// Total apparent acceleration (Coriolis + Transport Rate / Eötvös effect)
   /// in local ENU frame (m/s^2) to be subtracted from navigation-frame specific force:
-  /// a_apparent = (2 * omega_ie^n + omega_en^n) x vNav.
+  /// a_apparent = (2 * omega_ie^n + omega_en^n) x vNav = W x vNav.
   static Vec3 apparentAcceleration({
     required Vec3 vNav,
     required double latDeg,
@@ -621,11 +624,11 @@ class MathUtils {
     final wNorth = 2.0 * earthRotationRate * cosPhi + wEnNorth;
     final wUp = 2.0 * earthRotationRate * sinPhi + wEnUp;
 
-    // Subtracted apparent acceleration (matching coriolisAcceleration sign convention)
+    // Cross-product: a_apparent = W x vNav
     return Vec3(
-      wUp * vNav.y - wNorth * vNav.z,
-      wEast * vNav.z - wUp * vNav.x,
-      wNorth * vNav.x - wEast * vNav.y,
+      wNorth * vNav.z - wUp * vNav.y,
+      wUp * vNav.x - wEast * vNav.z,
+      wEast * vNav.y - wNorth * vNav.x,
     );
   }
 
@@ -662,7 +665,7 @@ class MathUtils {
     final aRatio = absA / 9.80665;
     final vRatio = v / 25.0; // 25 m/s ~ 90 km/h reference highway speed
     final inflation = 1.0 + 4.5 * (aRatio * aRatio) + 1.2 * (vRatio * vRatio * aRatio);
-    return MathUtils.clamp(nominalVar * inflation, nominalVar, 0.45);
+    return MathUtils.clamp(nominalVar * inflation, nominalVar, nominalVar * 8.0);
   }
 
   /// Robust 3D Hard-Iron magnetic field center offset estimator via minimum bounding sphere centroid.
@@ -728,9 +731,14 @@ class MathUtils {
     final absW = yawRate.abs();
     if (absW < 0.06) return null;
 
+    // In vehicle frame: left turn is +omegaZ, right turn is -omegaZ
+    final turnSign = yawRate >= 0 ? 1.0 : -1.0;
+    // Ensure lateral acceleration has correct sign matching vehicle kinematics
+    final effectiveLatA = measuredLatAccel.abs() * turnSign;
+
     final tangentialMountA = angularAccel * mountOffsetForward;
-    final bankGravityA = gravity * math.sin(roadBankAngleRad);
-    final netAxleCentripetalA = (measuredLatAccel - tangentialMountA - bankGravityA).abs();
+    final bankGravityA = gravity * math.sin(roadBankAngleRad) * turnSign;
+    final netAxleCentripetalA = (effectiveLatA - tangentialMountA - bankGravityA).abs();
 
     final v = netAxleCentripetalA / absW;
     if (v >= 0.8 && v <= 55.0) {
@@ -752,7 +760,7 @@ class MathUtils {
 
   /// Savitzky-Golay 5-point causal quadratic derivative filter for scalar sequences (e.g. barometric altitude).
   /// Computes derivative at the most recent sample over 5 consecutive points [y0, y1, y2, y3, y4] separated by dt.
-  /// Formula: (2*y4 + y3 - y1 - 2*y0) / (10 * dt).
+  /// Exact causal endpoint polynomial formula: (54*y4 - 13*y3 - 40*y2 - 27*y1 + 26*y0) / (70 * dt).
   static double savitzkyGolayDerivative5Scalar(List<double> window, double dt) {
     if (window.length < 5 || dt <= 0.0) {
       if (window.length >= 2 && dt > 0.0) {
@@ -763,9 +771,10 @@ class MathUtils {
     final n = window.length;
     final y0 = window[n - 5];
     final y1 = window[n - 4];
+    final y2 = window[n - 3];
     final y3 = window[n - 2];
     final y4 = window[n - 1];
-    return (y4 * 2.0 + y3 - y1 - y0 * 2.0) / (10.0 * dt);
+    return ((y4 * 54.0) - (y3 * 13.0) - (y2 * 40.0) - (y1 * 27.0) + (y0 * 26.0)) / (70.0 * dt);
   }
 
   /// Exact continuous-discrete Van Loan double-integration process noise covariance blocks
@@ -998,14 +1007,18 @@ class CubicSpline3D {
 
     final u = (clampedS - s0) / ds;
 
-    // Catmull-Rom Hermite interpolation with zero acceleration at boundaries
+    // Catmull-Rom Hermite interpolation with chord-length weighted tangents to prevent overshoots
     final p0 = i > 0 ? points[i - 1] : points[i];
     final p1 = points[i];
     final p2 = points[i + 1];
     final p3 = i < points.length - 2 ? points[i + 2] : points[i + 1];
 
-    final m1 = (p2 - p0) * 0.5;
-    final m2 = (p3 - p1) * 0.5;
+    final d12 = ds;
+    final d01 = i > 0 ? (_arcLengths[i] - _arcLengths[i - 1]) : 0.0;
+    final d23 = i < points.length - 2 ? (_arcLengths[i + 2] - _arcLengths[i + 1]) : 0.0;
+
+    final m1 = (d01 + d12 > 1e-6) ? (p2 - p0) * (d12 / (d01 + d12)) : (p2 - p1);
+    final m2 = (d12 + d23 > 1e-6) ? (p3 - p1) * (d12 / (d12 + d23)) : (p2 - p1);
 
     final u2 = u * u;
     final u3 = u2 * u;
@@ -1033,7 +1046,7 @@ class CubicSpline3D {
     return deriv.normalized;
   }
 
-  /// Evaluates 2D horizontal unit normal n(s) pointing to the right of travel direction.
+  /// Evaluates 2D horizontal unit normal n(s) pointing to the left (CCW) of travel direction.
   Vec3 evaluateNormal2D(double s) {
     final t = evaluateTangent(s);
     return Vec3(-t.y, t.x, 0.0);
@@ -1042,13 +1055,15 @@ class CubicSpline3D {
   /// Evaluates analytical curvature kappa(s) = ||p' x p''|| / ||p'||^3 along spline.
   double evaluateCurvature(double s) {
     const eps = 0.10;
-    final sM = MathUtils.clamp(s, eps, totalLength - eps);
-    final pPrev = evaluatePosition(sM - eps);
+    final effEps = math.min(eps, totalLength * 0.25);
+    if (effEps < 1e-6) return 0.0;
+    final sM = MathUtils.clamp(s, effEps, totalLength - effEps);
+    final pPrev = evaluatePosition(sM - effEps);
     final pCurr = evaluatePosition(sM);
-    final pNext = evaluatePosition(sM + eps);
+    final pNext = evaluatePosition(sM + effEps);
 
-    final d1 = (pNext - pPrev) / (2.0 * eps);
-    final d2 = (pNext - pCurr * 2.0 + pPrev) / (eps * eps);
+    final d1 = (pNext - pPrev) / (2.0 * effEps);
+    final d2 = (pNext - pCurr * 2.0 + pPrev) / (effEps * effEps);
 
     final cross = d1.cross(d2);
     final d1Norm = d1.norm;

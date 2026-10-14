@@ -86,8 +86,8 @@ void main() {
         );
       }
 
-      // Cross-covariance P03 or P13 must be non-zero to reflect heading-position coupling
-      expect(ekf.crossCovarianceP03.abs() + ekf.crossCovarianceP13.abs(), greaterThan(0.001));
+      // Cross-covariance P08 (px <-> yaw) or P18 (py <-> yaw) must be non-zero to reflect heading-position coupling
+      expect(ekf.crossCovariancePxYaw.abs() + ekf.crossCovariancePyYaw.abs(), greaterThan(0.001));
     });
 
     test('Chi-square gating protects barometer from abrupt pressure spikes', () {
@@ -147,6 +147,86 @@ void main() {
       // Chord distance across 0.5 rad arc of radius 20m: 2 * R * sin(theta/2) = 40 * sin(0.25) = 9.896m
       expect(chordDist, closeTo(9.896, 0.3));
       expect(ekf.state.py, greaterThan(2.0)); // turned North (+Y)
+    });
+
+    test('3D elevation propagates accurately on inclined road climb during forward speed prediction', () {
+      const pitchSlope = 0.10; // ~5.73 degrees incline
+      const forwardSpeed = 10.0; // 10 m/s
+      const dt = 0.02;
+
+      final ekf = Ekf3D(initPitch: pitchSlope);
+
+      for (int i = 0; i < 50; i++) {
+        ekf.predict(
+          vehicleAccel: Vec3.zero,
+          vehicleGyro: Vec3.zero,
+          vTcn: forwardSpeed,
+          dt: dt,
+        );
+      }
+
+      // Expected vertical climb speed = 10.0 * sin(0.10) = 0.99833 m/s
+      // Over 1.0 second (50 steps of 0.02s), expected elevation gain = ~0.9983 m
+      expect(ekf.climbRate, closeTo(10.0 * math.sin(pitchSlope), 0.05));
+      expect(ekf.state.pz, closeTo(10.0 * math.sin(pitchSlope) * 1.0, 0.05));
+    });
+
+    test('Full 9x9 telemetry covariance matrix exports off-diagonal cross-covariances', () {
+      final ekf = Ekf3D();
+
+      for (int i = 0; i < 50; i++) {
+        ekf.predict(
+          vehicleAccel: const Vec3(1.0, 0.0, 0.0),
+          vehicleGyro: const Vec3(0.0, 0.0, 0.10),
+          vTcn: 10.0,
+          dt: 0.02,
+        );
+      }
+
+      final cov = ekf.state.covariance;
+      expect(cov.length, equals(81));
+
+      // Row 0, Col 3: P(px, vx)
+      final p03 = cov[0 * 9 + 3];
+      // Row 1, Col 4: P(py, vy)
+      final p14 = cov[1 * 9 + 4];
+      // Row 0, Col 8: P(px, yaw)
+      final p08 = cov[0 * 9 + 8];
+
+      expect(p03.abs(), greaterThan(1e-4));
+      expect(p14.abs() + p08.abs(), greaterThan(1e-5));
+    });
+
+    test('Iterated map matching preserves covariance conditioning across iterations', () {
+      final ekf1 = Ekf3D();
+      final ekf2 = Ekf3D();
+
+      const normal = Vec3(0.0, 1.0, 0.0);
+      const crossTrack = 4.0;
+      const sigma = 1.5;
+
+      // Single-pass update
+      ekf1.updateMapMatching(
+        normal2D: normal,
+        crossTrackDistance: crossTrack,
+        sigma: sigma,
+      );
+
+      // Iterated update with 2 Gauss-Newton iterations
+      ekf2.updateMapMatchingIterated(
+        normal2D: normal,
+        crossTrackDistance: crossTrack,
+        sigma: sigma,
+        maxIterations: 2,
+      );
+
+      // Verify state convergence is improved or comparable
+      expect(ekf2.state.py.abs(), greaterThanOrEqualTo(ekf1.state.py.abs() * 0.95));
+
+      // Covariance reduction in iterated MM should not artificially halve variance via double-counting
+      final pY1 = ekf1.state.covariance[1 * 9 + 1];
+      final pY2 = ekf2.state.covariance[1 * 9 + 1];
+      expect(pY2, closeTo(pY1, 0.05));
     });
   });
 }

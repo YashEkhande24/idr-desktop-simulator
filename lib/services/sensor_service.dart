@@ -85,6 +85,7 @@ class SensorService {
     try {
       _accelSub = accelerometerEventStream(samplingPeriod: SensorInterval.gameInterval).listen(
         (event) {
+          if (event.x.isNaN || event.y.isNaN || event.z.isNaN) return;
           _lastRawAccel = Vec3(event.x, event.y, event.z);
           _emitImuSample();
         },
@@ -98,6 +99,7 @@ class SensorService {
     try {
       _gyroSub = gyroscopeEventStream(samplingPeriod: SensorInterval.gameInterval).listen(
         (event) {
+          if (event.x.isNaN || event.y.isNaN || event.z.isNaN) return;
           _lastRawGyro = Vec3(event.x, event.y, event.z);
         },
         onError: (err) => debugPrint('Gyro stream error: $err'),
@@ -110,6 +112,7 @@ class SensorService {
     try {
       _magSub = magnetometerEventStream(samplingPeriod: SensorInterval.gameInterval).listen(
         (event) {
+          if (event.x.isNaN || event.y.isNaN || event.z.isNaN) return;
           _lastRawMag = Vec3(event.x, event.y, event.z);
           _emitMagSample();
         },
@@ -329,22 +332,28 @@ class SensorService {
     _refLon ??= pos.longitude;
     _refAlt ??= pos.altitude;
 
-    // Convert WGS84 lat/lon to local ENU meters
-    const double rEarth = 6378137.0; // meters
-    final latRad = MathUtils.degToRad(pos.latitude);
-    final refLatRad = MathUtils.degToRad(_refLat!);
+    // Convert WGS84 lat/lon to local ENU meters via ellipsoidal geodesy
+    final enu = MathUtils.wgs84ToEnu(
+      lat: pos.latitude,
+      lon: pos.longitude,
+      alt: pos.altitude,
+      refLat: _refLat!,
+      refLon: _refLon!,
+      refAlt: _refAlt!,
+    );
+    final localX = enu.x;
+    final localY = enu.y;
+    final localZ = enu.z;
 
-    final dLat = latRad - refLatRad;
-    final dLon = MathUtils.degToRad(pos.longitude - _refLon!);
-
-    final localX = dLon * rEarth * math.cos(refLatRad);
-    final localY = dLat * rEarth;
-    final localZ = pos.altitude - _refAlt!;
+    // Sanitize Android location telemetry against negative/NaN invalid values
+    final safeSpeed = (pos.speed.isNaN || pos.speed < 0.0) ? 0.0 : pos.speed;
+    final safeHeading = pos.heading.isNaN ? 0.0 : ((pos.heading % 360.0) + 360.0) % 360.0;
+    final safeAccuracy = (pos.accuracy.isNaN || pos.accuracy <= 0.0) ? 5.0 : pos.accuracy;
 
     // Convert horizontal accuracy to HDOP approximation
     // Android accuracy is 68th-percentile radius. HDOP ≈ accuracy / UERE.
     // Use UERE ~5.0m (conservative for modern multi-constellation receivers).
-    final approxHdop = math.max(1.0, pos.accuracy / 5.0);
+    final approxHdop = math.max(1.0, safeAccuracy / 5.0);
 
     _gnssController.add(GnssSample(
       timestamp: nowSec,
@@ -352,18 +361,11 @@ class SensorService {
       latitude: pos.latitude,
       longitude: pos.longitude,
       altitude: pos.altitude,
-      speed: pos.speed,
-      heading: pos.heading,
+      speed: safeSpeed,
+      heading: safeHeading,
       hdop: approxHdop,
-      accuracy: pos.accuracy,
+      accuracy: safeAccuracy,
       isDenied: false,
-    ));
-
-    // Emit altitude sample to barometer channel
-    _baroController.add(BaroSample(
-      timestamp: nowSec,
-      pressureHpa: 1013.25,
-      altitude: localZ,
     ));
 
     // Persist position to disk for instant cold-boot map loading
@@ -451,6 +453,14 @@ class SensorService {
     _refLat = null;
     _refLon = null;
     _refAlt = null;
+  }
+
+  void emitImuForTesting(ImuSample sample) => _imuController.add(sample);
+  void emitGnssForTesting(GnssSample sample) => _gnssController.add(sample);
+  void emitGpsStatusForTesting(GpsHardwareStatus status, [String? message]) {
+    _gpsStatus = status;
+    _lastGpsMessage = message;
+    _gpsStatusController.add(status);
   }
 
   void dispose() {

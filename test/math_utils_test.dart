@@ -142,12 +142,11 @@ void main() {
       // Vehicle driving East (v_x = 20 m/s) at Mumbai (19.07 deg N)
       final vNav = const Vec3(20.0, 0.0, 0.0);
       final aCor = MathUtils.coriolisAcceleration(vNav, 19.076);
-      // a_x = 0
-      // a_y = -2 * w * sin(19.07 deg) * v_x < 0 (pushes South in Northern hemisphere)
-      // a_z = 2 * w * cos(19.07 deg) * v_x > 0 (Eötvös effect: upward lift for Eastbound motion)
+      // aCor is the Coriolis term (2*W x v) to be subtracted in strapdown kinematics:
+      // Subtraction -aCor gives Southward deflection (-aCor.y < 0) and upward Eötvös lift (-aCor.z > 0)
       expect(aCor.x, equals(0.0));
-      expect(aCor.y, lessThan(0.0));
-      expect(aCor.z, greaterThan(0.0));
+      expect(aCor.y, greaterThan(0.0));
+      expect(aCor.z, lessThan(0.0));
     });
 
     test('Adaptive NHC lateral variance relaxes under cornering tire slip', () {

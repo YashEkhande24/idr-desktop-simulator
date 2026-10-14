@@ -72,6 +72,12 @@ flutter:
     - assets/models/
     - assets/maps/
     - assets/images/
+    - assets/images/truck/
+    - assets/images/cars/red/
+    - assets/images/cars/blue/
+    - assets/images/cars/black/
+    - assets/images/cars/silver/
+    - assets/images/cars/yellow/
 
 
 

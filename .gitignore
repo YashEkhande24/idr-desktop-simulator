@@ -3,6 +3,8 @@
 *.log
 *.pyc
 *.pyo
+*.aux
+*.zip
 __pycache__/
 *.swp
 .DS_Store
@@ -35,22 +37,20 @@ model/*.onnx
 *.iws
 .idea/
 .metadata
-android/.gradle/
-android/app/build/
-android/build/
+**/.gradle/
+**/build/
+**/generated/
 android/local.properties
-android/**/generated/
 *.apk
 *.aab
 
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
-.dart_tool/
+**/.dart_tool/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
 /coverage/
 
 # Symbolication related
@@ -63,3 +63,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+

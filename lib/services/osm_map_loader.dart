@@ -69,6 +69,17 @@ class OsmMapLoader {
             refAlt = pt.length >= 3 ? (pt[2] as num).toDouble() : 0.0;
             break;
           }
+        } else if (geomType == 'MultiLineString' && coords.first is List) {
+          final firstLine = coords.first as List;
+          if (firstLine.isNotEmpty && firstLine.first is List) {
+            final pt = firstLine.first as List;
+            if (pt.length >= 2) {
+              refLon = (pt[0] as num).toDouble();
+              refLat = (pt[1] as num).toDouble();
+              refAlt = pt.length >= 3 ? (pt[2] as num).toDouble() : 0.0;
+              break;
+            }
+          }
         }
       }
     }

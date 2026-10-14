@@ -27,7 +27,7 @@ void main() {
     await tester.pump();
 
     // Verify Navigation UI elements
-    expect(find.text('IDR NAVIGATOR'), findsOneWidget);
+    expect(find.text('IDR v2.4 ACTIVE'), findsOneWidget);
     expect(find.text('KM/H'), findsOneWidget);
   });
 
@@ -57,7 +57,7 @@ void main() {
     await tester.pump();
 
     // Verify Navigation UI elements
-    expect(find.text('IDR NAVIGATOR'), findsOneWidget);
+    expect(find.text('IDR v2.4 ACTIVE'), findsOneWidget);
     expect(find.text('KM/H'), findsOneWidget);
 
     pipeline.pause();

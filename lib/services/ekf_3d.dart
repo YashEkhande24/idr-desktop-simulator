@@ -56,6 +56,7 @@ class Ekf3D {
   Vec3 _prevRotVec = Vec3.zero;
   Vec3 _prevDv = Vec3.zero;
   Vec3 _lastVehicleGyro = Vec3.zero;
+  double _prevYawRate = 0.0;
 
   // Default mount lever-arm relative to vehicle rear axle [x_fwd, y_lat, z_up]
   Vec3 mountLeverArm = const Vec3(1.25, 0.0, 0.45);
@@ -85,14 +86,24 @@ class Ekf3D {
   final List<double> _K = List<double>.filled(15, 0.0);
   final List<double> _dx = List<double>.filled(15, 0.0);
 
-  Ekf3D({double initYaw = 0.0}) {
-    reset(initYaw: initYaw);
+  Ekf3D({double initYaw = 0.0, double initPitch = 0.0, double initRoll = 0.0}) {
+    reset(initYaw: initYaw, initPitch: initPitch, initRoll: initRoll);
   }
 
   // --- Public Getters ---
   double get gyroBiasZ => _bg.z;
   double get accelBiasX => _ba.x;
+  double get crossCovariancePxYaw => _P[0 * 15 + 8]; // px <-> yaw (row 0, col 8)
+  double get crossCovariancePyYaw => _P[1 * 15 + 8]; // py <-> yaw (row 1, col 8)
+  double get crossCovariancePxVx => _P[0 * 15 + 3];  // px <-> vx (row 0, col 3)
+  double get crossCovariancePyVy => _P[1 * 15 + 4];  // py <-> vy (row 1, col 4)
+  double get crossCovarianceP08 => _P[0 * 15 + 8];   // px <-> yaw
+  double get crossCovarianceP18 => _P[1 * 15 + 8];   // py <-> yaw
+
+  /// Legacy aliases preserved for backwards compatibility with tests and callers
+  @Deprecated('Use crossCovariancePxYaw or crossCovarianceP08 instead.')
   double get crossCovarianceP03 => _P[0 * 15 + 8]; // px <-> yaw
+  @Deprecated('Use crossCovariancePyYaw or crossCovarianceP18 instead.')
   double get crossCovarianceP13 => _P[1 * 15 + 8]; // py <-> yaw
 
   double get forwardSpeed => _forwardSpeed;
@@ -100,37 +111,19 @@ class Ekf3D {
   double get climbRate => _v.z;
   double get covarianceTrace => _P[0 * 15 + 0] + _P[1 * 15 + 1] + _P[2 * 15 + 2];
 
-  /// Current 3D navigation state formatted as EkfState (with 9x9 telemetry covariance)
+  /// Current 3D navigation state formatted as EkfState (with full 9x9 telemetry covariance)
   EkfState get state {
     final euler = _q.toEuler();
     final cov = List<double>.filled(81, 0.0);
 
-    // Position variances (0..2)
-    cov[0 * 9 + 0] = _P[0 * 15 + 0];
-    cov[1 * 9 + 1] = _P[1 * 15 + 1];
-    cov[2 * 9 + 2] = _P[2 * 15 + 2];
-
-    // Velocity variances (3..5)
-    cov[3 * 9 + 3] = _P[3 * 15 + 3];
-    cov[4 * 9 + 4] = _P[4 * 15 + 4];
-    cov[5 * 9 + 5] = _P[5 * 15 + 5];
-
-    // Attitude variances (6..8: roll, pitch, yaw)
-    cov[6 * 9 + 6] = _P[6 * 15 + 6];
-    cov[7 * 9 + 7] = _P[7 * 15 + 7];
-    cov[8 * 9 + 8] = _P[8 * 15 + 8];
-
-    // Cross-covariances: px <-> heading (row 0, col 8) and py <-> heading (row 1, col 8)
-    cov[0 * 9 + 8] = _P[0 * 15 + 8];
-    cov[8 * 9 + 0] = _P[0 * 15 + 8];
-    cov[1 * 9 + 8] = _P[1 * 15 + 8];
-    cov[8 * 9 + 1] = _P[1 * 15 + 8];
-
-    // Cross-covariances: px <-> vx and py <-> vy
-    cov[0 * 9 + 3] = _P[0 * 15 + 3];
-    cov[3 * 9 + 0] = _P[0 * 15 + 3];
-    cov[1 * 9 + 4] = _P[1 * 15 + 4];
-    cov[4 * 9 + 1] = _P[1 * 15 + 4];
+    // Export full 9x9 submatrix (position, velocity, attitude) from 15x15 covariance
+    for (int i = 0; i < 9; i++) {
+      final i15 = i * 15;
+      final i9 = i * 9;
+      for (int j = 0; j < 9; j++) {
+        cov[i9 + j] = _P[i15 + j];
+      }
+    }
 
     return EkfState(
       position: _p,
@@ -144,19 +137,39 @@ class Ekf3D {
   void initializeHeading(double headingRad) {
     final euler = _q.toEuler();
     _q = Quaternion.fromEuler(euler.roll, euler.pitch, MathUtils.normalizeAngle(headingRad));
+    _resetStateVariance(8, 0.01);
+  }
+
+  /// Initialize full 3D vehicle attitude (roll, pitch, yaw).
+  void initializeAttitude({double roll = 0.0, double pitch = 0.0, double yaw = 0.0}) {
+    _q = Quaternion.fromEuler(roll, pitch, MathUtils.normalizeAngle(yaw));
+    _resetStateVariance(6, 0.001);
+    _resetStateVariance(7, 0.001);
+    _resetStateVariance(8, 0.01);
+  }
+
+  /// Translates navigation position by delta vector (used during map anchor re-projection)
+  void translatePosition(Vec3 delta) {
+    _p = _p + delta;
+  }
+
+  /// Sets navigation position directly (used during nominal GNSS anchoring)
+  void setPosition(Vec3 pos) {
+    _p = pos;
   }
 
   /// Reset filter state and covariance matrix to default initial values.
-  void reset({double initYaw = 0.0}) {
+  void reset({double initYaw = 0.0, double initPitch = 0.0, double initRoll = 0.0}) {
     _p = Vec3.zero;
     _v = Vec3.zero;
-    _q = Quaternion.fromEuler(0.0, 0.0, MathUtils.normalizeAngle(initYaw));
+    _q = Quaternion.fromEuler(initRoll, initPitch, MathUtils.normalizeAngle(initYaw));
     _bg = Vec3.zero;
     _ba = Vec3.zero;
     _forwardSpeed = 0.0;
     _prevRotVec = Vec3.zero;
     _prevDv = Vec3.zero;
     _lastVehicleGyro = Vec3.zero;
+    _prevYawRate = 0.0;
     _sageHusaScale = 1.0;
 
     for (int i = 0; i < 225; i++) {
@@ -214,8 +227,10 @@ class Ekf3D {
     final currRotVec = wUnbiased * effectiveDt;
     final coning = MathUtils.bortzConingVector(_prevRotVec, currRotVec);
     final effectiveRotVec = currRotVec + coning;
+    final oldRotVec = _prevRotVec;
     _prevRotVec = currRotVec;
 
+    final startYaw = headingRad;
     final dq = Quaternion.fromRotationVector(effectiveRotVec);
     _q = (_q * dq).normalized;
 
@@ -235,7 +250,7 @@ class Ekf3D {
 
     // Second-order 2-sample sculling velocity correction
     final currDv = (fUnbiased ?? aUnbiased) * effectiveDt;
-    final scullBody = MathUtils.scullingCorrection(_prevRotVec, currRotVec, _prevDv, currDv);
+    final scullBody = MathUtils.scullingCorrection(oldRotVec, currRotVec, _prevDv, currDv);
     _prevDv = currDv;
     final scullNav = R.transform(scullBody);
 
@@ -249,22 +264,31 @@ class Ekf3D {
       }
       _forwardSpeed = vFused;
 
-      // In vehicle body frame, forward axis is +X: column 0 of R
       final fwdNav = Vec3(R.m00, R.m10, R.m20);
-      _v = fwdNav * vFused + Vec3(0.0, 0.0, _v.z);
+      final pitch = _q.toEuler().pitch;
+      final vH = vFused * math.cos(pitch);
+      final vZClimb = vFused * math.sin(pitch);
+      
+      // Preserve Kalman filter cross-track/vertical velocity corrections (e.g. from GNSS Doppler, NHC)
+      // by adjusting forward velocity delta along vehicle heading rather than discarding orthogonal states
+      final curFwdSpeed = fwdNav.dot(_v);
+      final fwdDelta = vFused - curFwdSpeed;
+      _v = _v + fwdNav * fwdDelta;
+      _v = Vec3(_v.x, _v.y, vZClimb * 0.5 + _v.z * 0.5);
 
-      // Exact SE(2) circular arc integration around vertical yaw rate
-      final currentYaw = headingRad;
+      // Exact SE(2) circular arc integration around true 3D quaternion yaw rate
+      final deltaYaw = MathUtils.normalizeAngle(headingRad - startYaw);
+      final effOmegaZ = effectiveDt > 1e-4 ? (deltaYaw / effectiveDt) : wUnbiased.z;
       final arc = MathUtils.arcStepSE2(
-        speed: vFused,
-        yaw: currentYaw,
-        omegaZ: wUnbiased.z,
+        speed: vH,
+        yaw: startYaw,
+        omegaZ: effOmegaZ,
         dt: effectiveDt,
       );
-      _p = Vec3(_p.x + arc.dx, _p.y + arc.dy, _p.z + _v.z * effectiveDt);
+      _p = Vec3(_p.x + arc.dx, _p.y + arc.dy, _p.z + vZClimb * effectiveDt);
     } else {
-      // Pure strapdown double integration with sculling correction
-      _p = _p + _v * effectiveDt + aNav * (0.5 * effectiveDt * effectiveDt);
+      // Pure strapdown double integration with sculling velocity correction
+      _p = _p + _v * effectiveDt + (aNav * effectiveDt + scullNav) * (0.5 * effectiveDt);
       _v = _v + aNav * effectiveDt + scullNav;
       _forwardSpeed = math.max(0.0, R.m00 * _v.x + R.m10 * _v.y + R.m20 * _v.z);
     }
@@ -282,17 +306,24 @@ class Ekf3D {
     _F[1 * 15 + 4] = effectiveDt;
     _F[2 * 15 + 5] = effectiveDt;
 
-    // Position from heading error: -[v_nav]x * dt
+    // Position from attitude error: -[v_nav]x * dt
+    _F[0 * 15 + 7] = _v.z * effectiveDt;
     _F[0 * 15 + 8] = -_v.y * effectiveDt;
+    _F[1 * 15 + 6] = -_v.z * effectiveDt;
     _F[1 * 15 + 8] = _v.x * effectiveDt;
+    _F[2 * 15 + 6] = _v.y * effectiveDt;
+    _F[2 * 15 + 7] = -_v.x * effectiveDt;
 
-    // Velocity from attitude error: -[a_nav]x * dt
-    _F[3 * 15 + 7] = aNav.z * effectiveDt;
-    _F[3 * 15 + 8] = -aNav.y * effectiveDt;
-    _F[4 * 15 + 6] = -aNav.z * effectiveDt;
-    _F[4 * 15 + 8] = aNav.x * effectiveDt;
-    _F[5 * 15 + 6] = aNav.y * effectiveDt;
-    _F[5 * 15 + 7] = -aNav.x * effectiveDt;
+    // Velocity from attitude error: -[f_nav]x * dt (specific force, coupling gravity into pitch/roll)
+    final fForF = (fUnbiased != null)
+        ? R.transform(fUnbiased)
+        : (R.transform(aUnbiased) + const Vec3(0.0, 0.0, IdrConstants.gravity));
+    _F[3 * 15 + 7] = fForF.z * effectiveDt;
+    _F[3 * 15 + 8] = -fForF.y * effectiveDt;
+    _F[4 * 15 + 6] = -fForF.z * effectiveDt;
+    _F[4 * 15 + 8] = fForF.x * effectiveDt;
+    _F[5 * 15 + 6] = fForF.y * effectiveDt;
+    _F[5 * 15 + 7] = -fForF.x * effectiveDt;
 
     // Velocity from accel bias: -R * dt
     _F[3 * 15 + 12] = -R.m00 * effectiveDt;
@@ -305,14 +336,8 @@ class Ekf3D {
     _F[5 * 15 + 13] = -R.m21 * effectiveDt;
     _F[5 * 15 + 14] = -R.m22 * effectiveDt;
 
-    // Attitude error propagation on Lie algebra so(3): F[6..8, 6..8] = I - [w_nav]x * dt
-    final wNav = R.transform(wUnbiased);
-    _F[6 * 15 + 7] = wNav.z * effectiveDt;
-    _F[6 * 15 + 8] = -wNav.y * effectiveDt;
-    _F[7 * 15 + 6] = -wNav.z * effectiveDt;
-    _F[7 * 15 + 8] = wNav.x * effectiveDt;
-    _F[8 * 15 + 6] = wNav.y * effectiveDt;
-    _F[8 * 15 + 7] = -wNav.x * effectiveDt;
+    // Attitude error propagation: in navigation-frame error state (dq * q), d(delta_theta)/dt = -R*delta_bg + R*wg.
+    // The Jacobian d(delta_theta_dot) / d(delta_theta) is identically 0, so F[6..8, 6..8] = I_3x3.
 
     // Attitude from gyro bias: -R * dt
     _F[6 * 15 + 9] = -R.m00 * effectiveDt;
@@ -381,17 +406,18 @@ class Ekf3D {
     final sa = IdrConstants.qVelStd * IdrConstants.qVelStd;
     final vl = MathUtils.vanLoanProcessNoise(sa: sa, dt: effectiveDt, scale: qScale);
     final qVel = vl.qvv;
-    final qPos = vl.qpp + (IdrConstants.qPosStd * effectiveDt) * (IdrConstants.qPosStd * effectiveDt) * qScale * 0.1;
-    final qAtt = (IdrConstants.qAttStd * effectiveDt) * (IdrConstants.qAttStd * effectiveDt) * qScale;
+    // Van Loan double-integration process noise: qpp = (1/3)*Sa*dt^3
+    // Chassis suspension travel / road surface jitter continuous position noise: Sp * dt
+    final qPosSuspension = (IdrConstants.qPosStd * IdrConstants.qPosStd) * effectiveDt * qScale * 0.01;
+    final qPos = vl.qpp + qPosSuspension;
+    final qAtt = (IdrConstants.qAttStd * IdrConstants.qAttStd) * effectiveDt * qScale;
     // Speed-dependent heading process noise scheduling:
     // Yaw uncertainty tightens at higher vehicle speed due to strong non-holonomic kinematic directionality,
     // and relaxes at low speed / crawl where turning maneuvers dominate.
     final double speedFactor = math.max(0.35, 1.0 / (1.0 + 0.08 * _forwardSpeed));
     final double qYaw = qAtt * speedFactor;
-    final qGyrB = (IdrConstants.qGyroBiasStd * math.sqrt(effectiveDt)) *
-        (IdrConstants.qGyroBiasStd * math.sqrt(effectiveDt));
-    final qAccB = (IdrConstants.qAccelBiasStd * math.sqrt(effectiveDt)) *
-        (IdrConstants.qAccelBiasStd * math.sqrt(effectiveDt));
+    final qGyrB = (IdrConstants.qGyroBiasStd * IdrConstants.qGyroBiasStd) * effectiveDt;
+    final qAccB = (IdrConstants.qAccelBiasStd * IdrConstants.qAccelBiasStd) * effectiveDt;
 
     _P[0 * 15 + 0] += qPos;
     _P[1 * 15 + 1] += qPos;
@@ -436,8 +462,18 @@ class Ekf3D {
     }
   }
 
+  /// Safely resets state variance for [idx] to [varValue] and zeros out its cross-covariances
+  /// to maintain positive semi-definiteness.
+  void _resetStateVariance(int idx, double varValue) {
+    for (int j = 0; j < 15; j++) {
+      _P[idx * 15 + j] = 0.0;
+      _P[j * 15 + idx] = 0.0;
+    }
+    _P[idx * 15 + idx] = varValue;
+  }
+
   /// Universal ESKF scalar Kalman measurement update with error state injection.
-  bool _correctScalar(List<double> H, double innov, double R) {
+  bool _correctScalar(List<double> H, double innov, double R, {bool updateCovariance = true}) {
     // 1. V = P * H^T (15-vector)
     for (int i = 0; i < 15; i++) {
       final i15 = i * 15;
@@ -479,21 +515,23 @@ class Ekf3D {
     // P_new = (I - K*H) * P * (I - K*H)^T + K * R * K^T
     // For scalar update: P_new = P - K*V^T - V*K^T + K*S*K^T
     // Guaranteed to remain positive semi-definite under finite floating-point precision
-    for (int i = 0; i < 15; i++) {
-      final i15 = i * 15;
-      final ki = _K[i];
-      final vi = _V[i];
-      for (int j = i; j < 15; j++) {
-        final kj = _K[j];
-        final vj = _V[j];
-        final val = _P[i15 + j] - ki * vj - vi * kj + (ki * kj) * S;
-        _P[i15 + j] = val;
-        if (i != j) {
-          _P[j * 15 + i] = val;
+    if (updateCovariance) {
+      for (int i = 0; i < 15; i++) {
+        final i15 = i * 15;
+        final ki = _K[i];
+        final vi = _V[i];
+        for (int j = i; j < 15; j++) {
+          final kj = _K[j];
+          final vj = _V[j];
+          final val = _P[i15 + j] - ki * vj - vi * kj + (ki * kj) * S;
+          _P[i15 + j] = val;
+          if (i != j) {
+            _P[j * 15 + i] = val;
+          }
         }
-      }
-      if (_P[i15 + i] < 1e-8) {
-        _P[i15 + i] = 1e-8;
+        if (_P[i15 + i] < 1e-8) {
+          _P[i15 + i] = 1e-8;
+        }
       }
     }
 
@@ -560,17 +598,14 @@ class Ekf3D {
     );
 
     // 1. Lateral Constraint: v_lat_axle = eLat . v - vLatInduced ~ 0
+    // Pure velocity constraint along body lateral axis (eliminating inverted attitude coupling)
     final vLat = eLat.dot(_v);
     final innovLat = vLatInduced - vLat;
-    final hThetaLat = eLat.cross(_v);
 
     _clearH();
     _H[3] = eLat.x;
     _H[4] = eLat.y;
     _H[5] = eLat.z;
-    _H[6] = hThetaLat.x;
-    _H[7] = hThetaLat.y;
-    _H[8] = hThetaLat.z;
 
     _correctScalar(_H, innovLat, dynamicSigmaLat2);
 
@@ -580,18 +615,15 @@ class Ekf3D {
     _v = _v - eLat * (vLatResid * slipFactor);
 
     // 2. Vertical Constraint: v_vert_axle = eVert . v - vVertInduced ~ verticalReference
+    // Pure velocity constraint along body vertical axis
     final vVert = eVert.dot(_v);
     final targetVVert = verticalReference + vVertInduced;
     final innovVert = targetVVert - vVert;
-    final hThetaVert = eVert.cross(_v);
 
     _clearH();
     _H[3] = eVert.x;
     _H[4] = eVert.y;
     _H[5] = eVert.z;
-    _H[6] = hThetaVert.x;
-    _H[7] = hThetaVert.y;
-    _H[8] = hThetaVert.z;
 
     _correctScalar(_H, innovVert, IdrConstants.sigmaNhcVert2);
 
@@ -608,6 +640,7 @@ class Ekf3D {
     double? roadElevation,
     double sigmaAlt = 2.5,
     double laneDeadbandM = 1.75,
+    bool updateCovariance = true,
   }) {
     final rMap = sigma * sigma;
     _clearH();
@@ -625,9 +658,15 @@ class Ekf3D {
         deadbandHalfWidthM: laneDeadbandM,
         k: 2.5,
       );
-      final inn = -db.effectiveResidual;
+      // M-estimator robust formulation:
+      // The innovation is the geometric excess displacement outside the lane deadband,
+      // and measurement variance is inflated by 1 / huberWeight (matching updateTcnSpeed / updateTurnVelocity)
+      // to avoid double-attenuation and prevent false covariance shrinkage on outliers.
+      final w = math.max(db.weight, 1e-6);
+      final signedExcess = db.weight > 0 ? (db.effectiveResidual / w) : 0.0;
+      final inn = -signedExcess;
       if (inn.abs() > 1e-4) {
-        _correctScalar(_H, inn, rMap / db.weight);
+        _correctScalar(_H, inn, rMap / w, updateCovariance: updateCovariance);
       }
     }
 
@@ -641,7 +680,7 @@ class Ekf3D {
         if (MathUtils.passChiSquareGate(nisZ, 1, pValue: 0.0027)) {
           _clearH();
           _H[2] = 1.0;
-          _correctScalar(_H, innZ, rAlt);
+          _correctScalar(_H, innZ, rAlt, updateCovariance: updateCovariance);
         }
       }
     }
@@ -659,6 +698,11 @@ class Ekf3D {
     double laneDeadbandM = 1.75,
     int maxIterations = 2,
   }) {
+    final bool hasSecondIteration = maxIterations > 1 && crossTrackDistance.abs() > 3.0;
+    final pBefore = Vec3(_p.x, _p.y, _p.z);
+
+    // If second iteration will be performed, update state only on first iteration,
+    // and update covariance on the final iteration to prevent artificial covariance shrinkage.
     updateMapMatching(
       normal2D: normal2D,
       crossTrackDistance: crossTrackDistance,
@@ -666,19 +710,38 @@ class Ekf3D {
       roadElevation: roadElevation,
       sigmaAlt: sigmaAlt,
       laneDeadbandM: laneDeadbandM,
+      updateCovariance: !hasSecondIteration,
     );
 
-    // If large residual on non-linear curve, run second iteration with re-linearized residual
-    if (maxIterations > 1 && crossTrackDistance.abs() > 3.0) {
-      final remainingCrossTrack = crossTrackDistance * 0.35;
-      updateMapMatching(
-        normal2D: normal2D,
-        crossTrackDistance: remainingCrossTrack,
-        sigma: sigma * 1.5,
-        roadElevation: roadElevation,
-        sigmaAlt: sigmaAlt,
-        laneDeadbandM: laneDeadbandM,
-      );
+    // If large residual on non-linear curve, run second iteration with re-linearized geometric residual
+    if (hasSecondIteration) {
+      final dp = _p - pBefore;
+      // Re-linearize cross-track distance at the updated position along road normal
+      final remainingCrossTrack = crossTrackDistance + (normal2D.x * dp.x + normal2D.y * dp.y);
+      if (remainingCrossTrack.abs() > laneDeadbandM) {
+        updateMapMatching(
+          normal2D: normal2D,
+          crossTrackDistance: remainingCrossTrack,
+          sigma: sigma,
+          roadElevation: roadElevation,
+          sigmaAlt: sigmaAlt,
+          laneDeadbandM: laneDeadbandM,
+          updateCovariance: true,
+        );
+      } else {
+        // Apply final covariance update for the map observation
+        _clearH();
+        _H[0] = normal2D.x;
+        _H[1] = normal2D.y;
+        final rMap = sigma * sigma;
+        _correctScalar(_H, 0.0, rMap, updateCovariance: true);
+        if (roadElevation != null) {
+          final rAlt = sigmaAlt * sigmaAlt;
+          _clearH();
+          _H[2] = 1.0;
+          _correctScalar(_H, 0.0, rAlt, updateCovariance: true);
+        }
+      }
     }
   }
 
@@ -734,7 +797,7 @@ class Ekf3D {
       _H[4] = eFwd.y;
       _H[5] = eFwd.z;
 
-      _correctScalar(_H, inn * huberW, rTcn / huberW);
+      _correctScalar(_H, inn, rTcn / huberW);
       _forwardSpeed = math.max(0.0, eFwd.dot(_v));
     }
   }
@@ -768,7 +831,7 @@ class Ekf3D {
       _H[4] = eFwd.y;
       _H[5] = eFwd.z;
 
-      _correctScalar(_H, inn * huberW, rTvu / huberW);
+      _correctScalar(_H, inn, rTvu / huberW);
       _forwardSpeed = math.max(0.0, eFwd.dot(_v));
     }
   }
@@ -780,7 +843,7 @@ class Ekf3D {
     if (s > 1e-9) {
       if (_p.z == 0.0 && _P[2 * 15 + 2] >= 1.5) {
         _p = Vec3(_p.x, _p.y, zBaro);
-        _P[2 * 15 + 2] = rBaro;
+        _resetStateVariance(2, rBaro);
         return;
       }
 
@@ -804,7 +867,7 @@ class Ekf3D {
     if (s > 1e-9) {
       if (_v.z == 0.0 && _P[5 * 15 + 5] >= 0.15) {
         _v = Vec3(_v.x, _v.y, vZBaro);
-        _P[5 * 15 + 5] = rVz;
+        _resetStateVariance(5, rVz);
         return;
       }
       final inn = vZBaro - _v.z;
@@ -829,9 +892,9 @@ class Ekf3D {
   }) {
     if (isDenied || hdop >= 20.0) return;
 
-    final alpha = 4.0;
-    final tau = 2.0;
-    final scale = 1.0 + math.exp(MathUtils.clamp(alpha * (hdop - tau), -20.0, 50.0));
+    // Sigmoidal HDOP inflation (unified with C++ core: bounded scale in [1.0, 101.0])
+    final s = 1.0 / (1.0 + math.exp(-2.0 * (hdop - 3.5)));
+    final scale = 1.0 + 100.0 * s;
     final rBase = IdrConstants.rNominalGnss;
     final rGnss = rBase * scale;
 
@@ -848,29 +911,31 @@ class Ekf3D {
     final dz = effZ - _p.z;
     final dist2 = dx * dx + dy * dy;
 
-    // Fast Acquisition / Snap on GPS teleport or large initial movement
-    if (hdop <= 5.0 && (dist2 > 15.0 * 15.0 || (_p.x == 0.0 && _p.y == 0.0 && (effX != 0.0 || effY != 0.0)))) {
+    // Fast Acquisition / Snap on GPS teleport or vehicle launch movement
+    if (hdop <= 5.0 && (dist2 > 4.0 * 4.0 || (_p.x == 0.0 && _p.y == 0.0 && (effX != 0.0 || effY != 0.0)))) {
       _p = Vec3(effX, effY, effZ);
-      _P[0 * 15 + 0] = rGnss;
-      _P[1 * 15 + 1] = rGnss;
-      _P[2 * 15 + 2] = rGnss * 3.0;
-      for (int k = 3; k < 15; k++) {
-        _P[0 * 15 + k] = 0.0;
-        _P[k * 15 + 0] = 0.0;
-        _P[1 * 15 + k] = 0.0;
-        _P[k * 15 + 1] = 0.0;
-        _P[2 * 15 + k] = 0.0;
-        _P[k * 15 + 2] = 0.0;
-      }
+      _resetStateVariance(0, rGnss);
+      _resetStateVariance(1, rGnss);
+      _resetStateVariance(2, rGnss * 3.0);
       return;
     }
 
     // 3D Chi-Square Mahalanobis Innovation Gating (3 DOF, critical = 14.16 for 3-sigma)
-    final sX = _P[0 * 15 + 0] + rGnss;
-    final sY = _P[1 * 15 + 1] + rGnss;
+    // Evaluates exact horizontal correlated 2x2 innovation covariance block S_2D = P_pos + R_gnss * I
+    final sXX = _P[0 * 15 + 0] + rGnss;
+    final sYY = _P[1 * 15 + 1] + rGnss;
+    final sXY = _P[0 * 15 + 1]; // P_01 horizontal cross-covariance
     final sZ = _P[2 * 15 + 2] + (rGnss * 3.0);
 
-    final dM2 = (dx * dx) / sX + (dy * dy) / sY + (dz * dz) / sZ;
+    final detS2D = sXX * sYY - sXY * sXY;
+    double dM2;
+    if (detS2D > 1e-9) {
+      final dM2Horizontal = (sYY * dx * dx - 2.0 * sXY * dx * dy + sXX * dy * dy) / detS2D;
+      dM2 = dM2Horizontal + (dz * dz) / sZ;
+    } else {
+      dM2 = (dx * dx) / sXX + (dy * dy) / sYY + (dz * dz) / sZ;
+    }
+
     if (!MathUtils.passChiSquareGate(dM2, 3, pValue: 0.0027) && scale > 5.0) {
       return;
     }
@@ -878,32 +943,42 @@ class Ekf3D {
     // Sequential scalar position updates along X, Y, Z
     _clearH();
     _H[0] = 1.0;
-    _correctScalar(_H, dx, rGnss);
+    _correctScalar(_H, effX - _p.x, rGnss);
 
     _clearH();
     _H[1] = 1.0;
-    _correctScalar(_H, dy, rGnss);
+    _correctScalar(_H, effY - _p.y, rGnss);
 
     _clearH();
     _H[2] = 1.0;
-    _correctScalar(_H, dz, rGnss * 3.0);
+    _correctScalar(_H, effZ - _p.z, rGnss * 3.0);
   }
 
   /// Online Dynamic Mount Lever-Arm Adaptation:
   /// Estimates physical sensor lever-arm offset relative to the vehicle's rear axle
-  /// during sustained steady-state cornering under reliable GNSS tracking:
-  /// a_lat = v * omega_z + dot_omega_z * r_x
+  /// during sustained cornering under reliable GNSS tracking:
+  /// a_lat = v * omega_z + dot_omega_z * r_x  =>  r_x = (a_lat - v * omega_z) / dot_omega_z
   void adaptMountLeverArm({
     required double measuredLatAccel,
     required double yawRate,
     required double gnssSpeed,
     double dt = 0.01,
   }) {
-    if (gnssSpeed < 4.0 || yawRate.abs() < 0.12) return;
+    if (gnssSpeed < 4.0 || yawRate.abs() < 0.12) {
+      _prevYawRate = yawRate;
+      return;
+    }
+
+    final effDt = MathUtils.clamp(dt, 0.005, 0.10);
+    final dOmegaAbs = (yawRate.abs() - _prevYawRate.abs()) / effDt;
+    _prevYawRate = yawRate;
+
     final expectedLatA = gnssSpeed * yawRate.abs();
     final excessA = measuredLatAccel.abs() - expectedLatA;
-    if (excessA.abs() > 0.05 && excessA.abs() < 2.5) {
-      final impliedRx = MathUtils.clamp(1.25 + excessA * 0.15, 0.20, 2.50);
+
+    // Rigid body kinematics: excess lateral acceleration during angular rate change is dot_omega_z * r_x
+    if (excessA.abs() > 0.05 && excessA.abs() < 2.5 && dOmegaAbs.abs() > 0.15 && (excessA * dOmegaAbs) > 0) {
+      final impliedRx = MathUtils.clamp(excessA / dOmegaAbs, 0.20, 2.50);
       mountLeverArm = Vec3(
         mountLeverArm.x * 0.995 + impliedRx * 0.005,
         mountLeverArm.y,
@@ -918,22 +993,35 @@ class Ekf3D {
     _v = Vec3.zero;
 
     // Velocity uncertainty drops to near zero
-    _P[3 * 15 + 3] = 0.0001;
-    _P[4 * 15 + 4] = 0.0001;
-    _P[5 * 15 + 5] = 0.0001;
+    _resetStateVariance(3, 0.0001);
+    _resetStateVariance(4, 0.0001);
+    _resetStateVariance(5, 0.0001);
 
-    // Position variances contract towards 0.01 m^2 floor without starvation
-    _P[0 * 15 + 0] = math.max(0.01, _P[0 * 15 + 0] * 0.992);
-    _P[1 * 15 + 1] = math.max(0.01, _P[1 * 15 + 1] * 0.992);
-    _P[2 * 15 + 2] = math.max(0.01, _P[2 * 15 + 2] * 0.992);
+    // Position variances contract towards 0.20 m^2 floor via congruent transformation
+    // scaling both diagonal and cross-covariance rows/columns to preserve positive semi-definiteness.
+    // Floor is bounded at 0.20 m^2 so the filter does not suffer from covariance starvation (K -> 0)
+    // when vehicle movement resumes.
+    for (int k = 0; k < 3; k++) {
+      if (_P[k * 15 + k] > 0.20) {
+        const double scale = 0.9959919678; // sqrt(0.992)
+        for (int j = 0; j < 15; j++) {
+          _P[k * 15 + j] *= scale;
+          _P[j * 15 + k] *= scale;
+        }
+      }
+    }
 
     // Gyro bias calibration: stationary gyro reading is pure bias
     final newGz = MathUtils.clamp(_bg.z * 0.95 + rawGyroZ * 0.05, -0.08, 0.08);
     _bg = Vec3(_bg.x, _bg.y, newGz);
     _P[11 * 15 + 11] = math.max(1e-6, _P[11 * 15 + 11] * 0.99);
 
-    // Forward accel bias calibration
-    final newAx = MathUtils.clamp(_ba.x * 0.95 + rawAccelX * 0.05, -0.20, 0.20);
+    // Forward accel bias calibration with pitch slope gravity compensation
+    final dynamicFwd = MathUtils.slopeCompensatedForwardAccel(
+      measuredFwdAccel: rawAccelX,
+      pitchRad: _q.toEuler().pitch,
+    );
+    final newAx = MathUtils.clamp(_ba.x * 0.95 + dynamicFwd * 0.05, -0.20, 0.20);
     _ba = Vec3(newAx, _ba.y, _ba.z);
     _P[12 * 15 + 12] = math.max(1e-6, _P[12 * 15 + 12] * 0.99);
   }
@@ -942,28 +1030,26 @@ class Ekf3D {
   /// When vehicle is cruising on expressway straightaways (v >= 8 m/s, Var(omega_z) < 0.0004),
   /// true yaw rate is identically 0. Continuously calibrates gyro z-bias in real time.
   void applyZaru(double rawGyroZ, double dt) {
-    final inn = -(rawGyroZ - _bg.z);
+    final inn = rawGyroZ - _bg.z;
     _clearH();
     _H[11] = 1.0;
     const double rZaru = 0.002;
     _correctScalar(_H, inn, rZaru);
-
-    final newGz = MathUtils.clamp(_bg.z * 0.98 + rawGyroZ * 0.02, -0.08, 0.08);
-    _bg = Vec3(_bg.x, _bg.y, newGz);
   }
 
   /// Straight-Line Zero Acceleration Update (ZACU):
   /// When vehicle is cruising on expressways at steady speed (v >= 10 m/s, Var(speed) < 0.04 m^2/s^2),
   /// true dynamic forward acceleration is near 0. Continuously calibrates forward accelerometer bias b_ax.
   void applyZacu(double rawAccelX, double dt) {
-    final inn = rawAccelX - _ba.x;
+    final dynamicFwd = MathUtils.slopeCompensatedForwardAccel(
+      measuredFwdAccel: rawAccelX,
+      pitchRad: _q.toEuler().pitch,
+    );
+    final inn = dynamicFwd - _ba.x;
     _clearH();
     _H[12] = 1.0;
     const double rZacu = 0.02;
     _correctScalar(_H, inn, rZacu);
-
-    final newAx = MathUtils.clamp(_ba.x * 0.98 + rawAccelX * 0.02, -0.25, 0.25);
-    _ba = Vec3(newAx, _ba.y, _ba.z);
   }
 
   /// Fuses high-accuracy GNSS Doppler ground speed directly into forward velocity.
@@ -973,9 +1059,9 @@ class Ekf3D {
     if (speedMps < 0.5 && hdop <= 4.0) {
       _forwardSpeed = 0.0;
       _v = Vec3.zero;
-      _P[3 * 15 + 3] = 0.0001;
-      _P[4 * 15 + 4] = 0.0001;
-      _P[5 * 15 + 5] = 0.0001;
+      _resetStateVariance(3, 0.0001);
+      _resetStateVariance(4, 0.0001);
+      _resetStateVariance(5, 0.0001);
       return;
     }
 
@@ -1001,19 +1087,27 @@ class Ekf3D {
     final euler = _q.toEuler();
     final resid = MathUtils.normalizeAngle(courseRad - euler.yaw);
 
-    final rCourse = 0.04 * math.max(1.0, hdop);
+    // Initial heading bootstrap: if heading uncertainty is high (P88 >= 0.008 rad^2 ~ 5.1° std)
+    // and receiving reliable moving GNSS fix, snap heading directly to prevent permanent 45° gating deadlock
+    if (_P[8 * 15 + 8] >= 0.008 && hdop <= 4.0 && speed > 1.0) {
+      initializeHeading(courseRad);
+      return;
+    }
+
+    // Innovation gating: reject > 45 deg yaw jump from reverse gear or multi-path
+    if (resid.abs() > 0.785) return;
+
+    final speedFactor = math.max(0.2, speed / 3.0);
+    final rCourse = (0.04 / (speedFactor * speedFactor)) * math.max(1.0, hdop);
+    final s = _P[8 * 15 + 8] + rCourse;
+    if (s <= 1e-9) return;
+    final nis = (resid * resid) / s;
+    if (!MathUtils.passChiSquareGate(nis, 1, pValue: 0.0027)) return;
 
     _clearH();
     _H[8] = 1.0; // Observes yaw error delta_theta_z
 
     _correctScalar(_H, resid, rCourse);
-
-    // Continuous vertical gyro bias calibration from ground-track course residual
-    // When cruising with reliable GNSS, course-to-heading residual directly observes vertical gyro bias
-    if (hdop <= 3.0 && speed >= 2.0) {
-      final calibratedBiasZ = math.max(-0.08, math.min(0.08, _bg.z - 0.015 * resid));
-      _bg = Vec3(_bg.x, _bg.y, calibratedBiasZ);
-    }
   }
 
   /// Unified 2D/3D GNSS Doppler Velocity Vector Update.
@@ -1031,23 +1125,20 @@ class Ekf3D {
     final rVel = 0.04 * math.max(1.0, hdop);
 
     // East velocity update (State 3: v_x)
-    final innE = vEast - _v.x;
     _clearH();
     _H[3] = 1.0;
-    _correctScalar(_H, innE, rVel);
+    _correctScalar(_H, vEast - _v.x, rVel);
 
     // North velocity update (State 4: v_y)
-    final innN = vNorth - _v.y;
     _clearH();
     _H[4] = 1.0;
-    _correctScalar(_H, innN, rVel);
+    _correctScalar(_H, vNorth - _v.y, rVel);
 
     // Optional Up velocity update (State 5: v_z)
     if (vUp != null) {
-      final innU = vUp - _v.z;
       _clearH();
       _H[5] = 1.0;
-      _correctScalar(_H, innU, rVel * 2.5);
+      _correctScalar(_H, vUp - _v.z, rVel * 2.5);
     }
 
     final Rmat = _q.toRotationMatrix();
@@ -1064,8 +1155,8 @@ class Ekf3D {
     final euler = _q.toEuler();
     final resid = MathUtils.normalizeAngle(compassEnuRad - euler.yaw);
 
-    // Angular deadband: skip update on minute magnetic fluctuations (< 0.035 rad ~ 2.0 deg)
-    if (resid.abs() < 0.035) return;
+    // Angular deadband: skip update on minute magnetic fluctuations (< 0.02 rad ~ 1.15 deg)
+    if (resid.abs() < 0.02) return;
 
     _clearH();
     _H[8] = 1.0;

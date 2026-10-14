@@ -13,7 +13,7 @@ public:
     Ekf3D(double initYawRad = 0.0);
 
     // Kinematic propagation step (50-100 Hz) with closed-form SE(2) arc integration
-    void predict(double dt, double vForward, double omegaZ, double pitchRad, double trustWeight = 1.0);
+    void predict(double dt, double vForward, double omegaZ, double pitchRad, double rollRad = 0.0, double trustWeight = 1.0);
 
     // Dynamic Sideslip-Relaxed Non-Holonomic Constraint (NHC)
     void applyNhc(double sigmaNhc = 0.22, double latAccel = 0.0, double forwardSpeed = 0.0);
@@ -57,6 +57,9 @@ public:
 
     // TCN Speed Update with Heteroscedastic Variance Weighting
     void updateTcnSpeed(double vTcn, double variance = -1.0);
+
+    // Translate Cartesian position when reference origin changes
+    void translatePosition(const Vec3& delta);
 
     // Reset filter
     void reset(const Vec3& initPos = {0, 0, 0}, double initYaw = 0.0);

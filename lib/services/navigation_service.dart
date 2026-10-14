@@ -132,10 +132,13 @@ class NavigationService extends ChangeNotifier {
     if (!_isNavigating || _route == null || _route!.points.length < 2) return;
 
     final dest = _destination!;
-    final distToDestination = (dest.targetEnu - vehiclePos).norm;
+    final dx = dest.targetEnu.x - vehiclePos.x;
+    final dy = dest.targetEnu.y - vehiclePos.y;
+    final dz = (dest.targetEnu.z - vehiclePos.z).abs();
+    final dist2d = math.sqrt(dx * dx + dy * dy);
 
-    // 1. Destination Arrival Check (< 25m)
-    if (distToDestination < 25.0) {
+    // 1. Destination Arrival Check (< 25m horizontal and < 40m vertical, or full 3D norm < 25m)
+    if ((dist2d < 25.0 && dz < 40.0) || (dest.targetEnu - vehiclePos).norm < 25.0) {
       _hasArrived = true;
       _remainingDistanceMeters = 0.0;
       _distanceToNextManeuverMeters = 0.0;
@@ -148,6 +151,7 @@ class NavigationService extends ChangeNotifier {
     double minCrossTrack = double.infinity;
     int closestSegmentIdx = 0;
     final pts = _route!.points;
+    Vec3 closestProjPoint = pts.isNotEmpty ? pts.first : vehiclePos;
 
     for (int i = 0; i < pts.length - 1; i++) {
       final pA = pts[i];
@@ -163,11 +167,16 @@ class NavigationService extends ChangeNotifier {
       if (d < minCrossTrack) {
         minCrossTrack = d;
         closestSegmentIdx = i;
+        closestProjPoint = pProj;
       }
     }
 
-    // If vehicle departed > 65m from route, flag off-route & auto-reroute
-    if (minCrossTrack > 65.0) {
+    // If vehicle departed from route, flag off-route & auto-reroute
+    // During GNSS outage/denial, relax cross-track tolerance to 120m to accommodate normal DR drift
+    final bool isOutage = pipeline.latestSolution?.isGnssDenied == true;
+    final double crossTrackThreshold = isOutage ? 120.0 : 65.0;
+
+    if (minCrossTrack > crossTrackThreshold) {
       _isOffRoute = true;
       final now = DateTime.now();
       if (_lastRerouteTime == null || now.difference(_lastRerouteTime!).inSeconds >= 5) {
@@ -182,26 +191,39 @@ class NavigationService extends ChangeNotifier {
     // 3. Step Progression & Maneuver Countdown
     if (_route!.steps.isNotEmpty) {
       final activeStep = currentStep!;
-      final distToEndOfStep = (activeStep.endPosEnu - vehiclePos).norm;
-      _distanceToNextManeuverMeters = distToEndOfStep;
+      final stepDx = activeStep.endPosEnu.x - vehiclePos.x;
+      final stepDy = activeStep.endPosEnu.y - vehiclePos.y;
+      final dist2dToEndOfStep = math.sqrt(stepDx * stepDx + stepDy * stepDy);
+      _distanceToNextManeuverMeters = dist2dToEndOfStep;
 
-      // Advance step when approaching within 25m of junction or past it
-      if (distToEndOfStep < 25.0 && _currentStepIndex < _route!.steps.length - 1) {
+      // Check if vehicle has driven past the junction along step heading
+      final sVec = activeStep.endPosEnu - activeStep.startPosEnu;
+      final pastJunction = sVec.normSquared > 1.0 &&
+          (vehiclePos.x - activeStep.endPosEnu.x) * sVec.x + (vehiclePos.y - activeStep.endPosEnu.y) * sVec.y > 0.0;
+
+      // Advance step when approaching within 25m of junction, or when past it within corridor (preventing high-speed skipped junction lock)
+      final stepAdvanceThreshold = isOutage ? 35.0 : 25.0;
+      final corridorThreshold = isOutage ? 80.0 : 65.0;
+      if ((dist2dToEndOfStep < stepAdvanceThreshold || (pastJunction && dist2dToEndOfStep < corridorThreshold)) &&
+          _currentStepIndex < _route!.steps.length - 1) {
         _currentStepIndex++;
+        final nextDx = currentStep!.endPosEnu.x - vehiclePos.x;
+        final nextDy = currentStep!.endPosEnu.y - vehiclePos.y;
+        _distanceToNextManeuverMeters = math.sqrt(nextDx * nextDx + nextDy * nextDy);
         debugPrint('[NavigationService] Advanced to maneuver $_currentStepIndex: ${_route!.steps[_currentStepIndex].instruction}');
       }
     }
 
-    // 4. Compute Remaining Distance along Polyline
-    double remDist = (pts[closestSegmentIdx + 1] - vehiclePos).norm;
+    // 4. Compute Remaining Distance along Polyline (along-track from projected point)
+    double remDist = (pts[closestSegmentIdx + 1] - closestProjPoint).norm;
     for (int i = closestSegmentIdx + 1; i < pts.length - 1; i++) {
       remDist += (pts[i + 1] - pts[i]).norm;
     }
     _remainingDistanceMeters = remDist;
 
     // 5. Dynamic ETA
-    final currentSpeed = pipeline.latestSolution?.idrState.speed ?? 0.0;
-    final effectiveSpeed = currentSpeed > 3.0 ? currentSpeed : 16.67; // fallback ~60 km/h
+    final currentSpeed = (pipeline.latestSolution?.speedKmh ?? 0.0) / 3.6;
+    final effectiveSpeed = currentSpeed > 2.0 ? currentSpeed : 13.89; // fallback ~50 km/h
     _remainingTimeSeconds = _remainingDistanceMeters / effectiveSpeed;
 
     notifyListeners();
@@ -212,22 +234,26 @@ class NavigationService extends ChangeNotifier {
     if (!_isNavigating || _destination == null) return;
     final vehiclePos = pipeline.latestSolution?.idrState.position ?? Vec3.zero;
 
-    final newRoute = await RoutingService.calculateRoute(
-      originEnu: vehiclePos,
-      destination: _destination!,
-      roadBranches: pipeline.mapSnapper.branches,
-      refLat: pipeline.sensorService.refLat,
-      refLon: pipeline.sensorService.refLon,
-      originLat: pipeline.currentLatitude,
-      originLon: pipeline.currentLongitude,
-    );
+    try {
+      final newRoute = await RoutingService.calculateRoute(
+        originEnu: vehiclePos,
+        destination: _destination!,
+        roadBranches: pipeline.mapSnapper.branches,
+        refLat: pipeline.sensorService.refLat,
+        refLon: pipeline.sensorService.refLon,
+        originLat: pipeline.currentLatitude,
+        originLon: pipeline.currentLongitude,
+      );
 
-    _route = newRoute;
-    _currentStepIndex = 0;
-    _isOffRoute = false;
-    _remainingDistanceMeters = newRoute.totalDistanceMeters;
-    _remainingTimeSeconds = newRoute.estimatedDurationSeconds;
-    _distanceToNextManeuverMeters = newRoute.steps.isNotEmpty ? newRoute.steps.first.distanceMeters : 0.0;
-    notifyListeners();
+      _route = newRoute;
+      _currentStepIndex = 0;
+      _isOffRoute = false;
+      _remainingDistanceMeters = newRoute.totalDistanceMeters;
+      _remainingTimeSeconds = newRoute.estimatedDurationSeconds;
+      _distanceToNextManeuverMeters = newRoute.steps.isNotEmpty ? newRoute.steps.first.distanceMeters : 0.0;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[NavigationService] Error recalculating route: $e');
+    }
   }
 }

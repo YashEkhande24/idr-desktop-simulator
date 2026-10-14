@@ -43,6 +43,7 @@ class CabinAligner {
   double get mountRollDeg => MathUtils.radToDeg(_mountRoll);
   double get mountPitchDeg => MathUtils.radToDeg(_mountPitch);
   double get mountYawDeg => MathUtils.radToDeg(_mountYaw);
+  double get mountYaw => _mountYaw;
   double get confidence => _confidence;
   bool get isLocked => _locked;
 
@@ -58,6 +59,7 @@ class CabinAligner {
     double dt = IdrConstants.dtImu,
   }) {
     final effectiveDt = MathUtils.clamp(dt, 0.001, 0.10);
+    final wNorm = rawGyro.norm;
 
     _accelWindow.add(rawAccel);
     _gyroWindow.add(rawGyro);
@@ -75,7 +77,6 @@ class CabinAligner {
       _lowPassGravity = rawAccel;
     } else {
       Vec3 gPred = _lowPassGravity!;
-      final wNorm = rawGyro.norm;
       if (wNorm > 1e-4) {
         final wUnit = rawGyro / wNorm;
         // In the body frame, the gravity vector rotates opposite to body angular velocity
@@ -100,7 +101,10 @@ class CabinAligner {
     final aNorm = rawAccel.norm;
     // Only adapt gravity observer if acceleration magnitude is reasonably close to 1g (7.5 to 12.0 m/s^2)
     // to prevent linear acceleration shocks from corrupting tilt.
-    if (aNorm > 7.5 && aNorm < 12.0) {
+    // When locked and wNorm < 0.03, any horizontal deviation is vehicle linear throttle/braking;
+    // do not corrupt the attitude quaternion with linear vehicle acceleration!
+    final bool allowMahonyGravity = !_locked || wNorm > 0.03 || (aNorm - IdrConstants.gravity).abs() < 0.35;
+    if (allowMahonyGravity && aNorm > 7.5 && aNorm < 12.0) {
       final aUnit = rawAccel.normalized;
 
       // Estimated gravity direction in sensor frame via current orientation:
@@ -183,42 +187,50 @@ class CabinAligner {
       final pitch = math.atan2(-gHat.x, math.sqrt(gHat.y * gHat.y + gHat.z * gHat.z));
       final roll = math.atan2(gHat.y, gHat.z);
 
-      _mountPitch = pitch;
-      _mountRoll = roll;
+      if (!_locked || forceLock) {
+        _mountPitch = pitch;
+        _mountRoll = roll;
 
-      final cp = math.cos(pitch);
-      final sp = math.sin(pitch);
-      final cr = math.cos(roll);
-      final sr = math.sin(roll);
+        final cp = math.cos(pitch);
+        final sp = math.sin(pitch);
+        final cr = math.cos(roll);
+        final sr = math.sin(roll);
 
-      final rRoll = Mat3([
-        1.0, 0.0, 0.0,
-        0.0, cr,  -sr,
-        0.0, sr,   cr,
-      ]);
-
-      final rPitch = Mat3([
-        cp,  0.0, sp,
-        0.0, 1.0, 0.0,
-        -sp, 0.0, cp,
-      ]);
-
-      if (_mountYaw.abs() > 1e-4) {
-        final cy = math.cos(_mountYaw);
-        final sy = math.sin(_mountYaw);
-        final rYaw = Mat3([
-          cy, -sy, 0.0,
-          sy,  cy, 0.0,
-          0.0, 0.0, 1.0,
+        final rRoll = Mat3([
+          1.0, 0.0, 0.0,
+          0.0, cr,  -sr,
+          0.0, sr,   cr,
         ]);
-        _rBv = rYaw * (rPitch * rRoll);
+
+        final rPitch = Mat3([
+          cp,  0.0, sp,
+          0.0, 1.0, 0.0,
+          -sp, 0.0, cp,
+        ]);
+
+        if (_mountYaw.abs() > 1e-4) {
+          final cy = math.cos(_mountYaw);
+          final sy = math.sin(_mountYaw);
+          final rYaw = Mat3([
+            cy, -sy, 0.0,
+            sy,  cy, 0.0,
+            0.0, 0.0, 1.0,
+          ]);
+          _rBv = rYaw * (rPitch * rRoll);
+        } else {
+          _rBv = rPitch * rRoll;
+        }
+        _qBv = Quaternion.fromEuler(roll, pitch, _mountYaw);
       } else {
-        _rBv = rPitch * rRoll;
+        // When locked, attitude is actively maintained by the dynamic Mahony SO(3) filter
+        _rBv = _qBv.toRotationMatrix();
+        final euler = _qBv.toEuler();
+        _mountPitch = euler.pitch;
+        _mountRoll = euler.roll;
       }
-      _qBv = Quaternion.fromEuler(roll, pitch, _mountYaw);
     }
 
-    if ((_confidence >= 0.70 || forceLock) && _accelWindow.length >= 20) {
+    if ((!_locked || forceLock) && (_confidence >= 0.70 || forceLock) && _accelWindow.length >= 20) {
       // Module 1 Section 3.2: PCA for horizontal forward axis alignment
       // Condition PCA on vehicle motion if TCN speed is provided
       final bool allowPca = (vTcn == null) || (vTcn > 1.2 && (tcnVariance ?? 0.16) < 0.40);
@@ -234,9 +246,9 @@ class CabinAligner {
     var sumX = 0.0;
     var sumY = 0.0;
     final leveledSamples = <Vec3>[];
-
+    final rTilt = Mat3.fromEuler(_mountRoll, _mountPitch, 0.0);
     for (final rawA in _accelWindow) {
-      final leveled = _rBv.transform(rawA);
+      final leveled = rTilt.transform(rawA);
       leveledSamples.add(leveled);
       sumX += leveled.x;
       sumY += leveled.y;
@@ -288,12 +300,12 @@ class CabinAligner {
           }
         }
 
-        // Centripetal turning confirmation: a_lat = v * omega_z
+        // Centripetal turning confirmation: a_lat = v * omega_z (using leveled vehicle-frame yaw rate)
         double centripetalCorrelation = 0.0;
         if (_gyroWindow.length == leveledSamples.length) {
           for (int i = 0; i < leveledSamples.length; i++) {
             final aLat = -uY * leveledSamples[i].x + uX * leveledSamples[i].y;
-            final wZ = _gyroWindow[i].z;
+            final wZ = rTilt.transform(_gyroWindow[i]).z;
             final v = i < _speedWindow.length ? _speedWindow[i] : 1.0;
             if (v > 1.0 && wZ.abs() > 0.05) {
               centripetalCorrelation += aLat * (v * wZ);
@@ -307,7 +319,9 @@ class CabinAligner {
           uY = -uY;
         }
 
-        _mountYaw = math.atan2(uY, uX);
+        _mountYaw = -math.atan2(uY, uX);
+        _qBv = Quaternion.fromEuler(_mountRoll, _mountPitch, _mountYaw);
+        _rBv = _qBv.toRotationMatrix();
       }
     }
   }

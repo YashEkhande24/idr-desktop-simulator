@@ -57,5 +57,25 @@ void main() {
 
       expect(find.byType(Car3DMarker), findsNWidgets(2));
     });
+
+    testWidgets('renders all 5 curated supercar colorways', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
+                children: VehicleColorway.values.map((c) => Car3DMarker(
+                  headingDeg: 45.0,
+                  colorway: c,
+                  size: 80.0,
+                )).toList(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(Car3DMarker), findsNWidgets(VehicleColorway.values.length));
+    });
   });
 }

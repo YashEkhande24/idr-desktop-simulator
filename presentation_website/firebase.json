@@ -1,0 +1,30 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.bat",
+      "**/*.cmd",
+      "README.md",
+      "**/*.apk"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css|jpg|jpeg|png|svg|webp|onnx|pth|json)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -28,11 +28,13 @@ void IdrPipeline::reset() {
 void IdrPipeline::setTunnelOutage(bool outage) {
     std::lock_guard<std::mutex> lock(mutex_);
     isTunnelOutage_ = outage;
+    tcnEngine_.setOutageMode(outage, ekf_.forwardSpeed());
 }
 
 void IdrPipeline::toggleTunnelOutage() {
     std::lock_guard<std::mutex> lock(mutex_);
     isTunnelOutage_ = !isTunnelOutage_;
+    tcnEngine_.setOutageMode(isTunnelOutage_, ekf_.forwardSpeed());
 }
 
 void IdrPipeline::processImu(const ImuSample& sample) {
@@ -53,16 +55,16 @@ void IdrPipeline::processImu(const ImuSample& sample) {
     double trust = vibrationGate_.trustWeight();
 
     // 3. TCN Speed Engine & ZUPT
-    tcnEngine_.update(aAligned, wAligned, dt);
+    tcnEngine_.update(aAligned, wAligned, dt, -1.0, cabinAligner_.mountPitch());
     double vFwd = tcnEngine_.isStandstill() ? 0.0 : tcnEngine_.speedMps();
 
     if (tcnEngine_.isStandstill()) {
-        ekf_.applyStandstill(sample.gyro.z, aAligned.x);
+        ekf_.applyStandstill(wAligned.z, aAligned.x);
     }
 
     // 4. EKF-3D Kinematic Prediction (freeze position integration at standstill)
     if (!tcnEngine_.isStandstill()) {
-        ekf_.predict(dt, vFwd, wAligned.z, cabinAligner_.mountPitch(), trust);
+        ekf_.predict(dt, vFwd, wAligned.z, cabinAligner_.mountPitch(), cabinAligner_.mountRoll(), trust);
     }
     if (!tcnEngine_.isPedestrian()) {
         ekf_.applyNhc();
@@ -74,7 +76,7 @@ void IdrPipeline::processImu(const ImuSample& sample) {
             baselineDr_.syncWithGnss(baselineDr_.position(), {0, 0, 0}, baselineDr_.yaw());
         } else {
             // GNSS lost or Outage active: Open-loop double integration drifts
-            baselineDr_.step(dt, sample.accel, sample.gyro);
+            baselineDr_.step(dt, aAligned, wAligned);
         }
     } else {
         // Nominal GNSS: Synchronize Baseline DR to current solution (drift = 0.0 m)

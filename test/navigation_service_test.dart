@@ -118,6 +118,44 @@ void main() {
       expect(turnSteps, isNotEmpty);
       expect(route.steps.last.maneuver, equals(ManeuverType.arrive));
     });
+
+    test('Turn-by-turn route steps maintain spatial continuity across adjacent maneuvers', () async {
+      final branch1 = MapBranch(
+        name: 'Main Expressway',
+        points: const [
+          Vec3(0, 0, 0),
+          Vec3(0, 400, 0),
+          Vec3(0, 800, 0),
+        ],
+        speedLimitMps: 22.2,
+      );
+
+      final branch2 = MapBranch(
+        name: 'Service Road',
+        points: const [
+          Vec3(0, 800, 0),
+          Vec3(200, 1000, 0),
+          Vec3(500, 1000, 0),
+        ],
+        speedLimitMps: 13.8,
+      );
+
+      final route = await RoutingService.calculateRoute(
+        originEnu: const Vec3(0, 0, 0),
+        destination: const NavDestination(name: 'Destination Point', targetEnu: Vec3(500, 1000, 0)),
+        roadBranches: [branch1, branch2],
+      );
+
+      expect(route.steps.length, greaterThanOrEqualTo(2));
+
+      // Each step i's endPosEnu must match step i+1's startPosEnu without spatial gaps
+      for (int i = 0; i < route.steps.length - 1; i++) {
+        final currentEnd = route.steps[i].endPosEnu;
+        final nextStart = route.steps[i + 1].startPosEnu;
+        final gap = (nextStart - currentEnd).norm;
+        expect(gap, lessThan(0.01), reason: 'Spatial gap between step $i and step ${i + 1} exceeds 1cm');
+      }
+    });
   });
 
   group('NavigationService Lifecycle & Real-Time Tracking Tests', () {

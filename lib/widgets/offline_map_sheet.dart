@@ -305,6 +305,8 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
       children: [
         _buildDynamicMapEngineCard(pipeline),
         const SizedBox(height: 16),
+        _buildBundledPresetsSection(pipeline),
+        const SizedBox(height: 16),
 
         // User Downloaded Maps Section
         Row(
@@ -396,6 +398,157 @@ class _OfflineMapSheetState extends State<OfflineMapSheet> with SingleTickerProv
               ),
             );
           }),
+      ],
+    );
+  }
+
+  Widget _buildBundledPresetsSection(IdrPipeline pipeline) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.bookmark_added, size: 14, color: Color(0xFF38BDF8)),
+            const SizedBox(width: 6),
+            Text(
+              'BUNDLED REGIONAL PRESETS & BENCHMARKS',
+              style: GoogleFonts.rajdhani(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+                color: const Color(0xFF38BDF8),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ...OsmDownloadService.bundledPresets.map((preset) {
+          return Card(
+            color: const Color(0xFF0F172A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Color(0xFF1E293B)),
+            ),
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          preset.name,
+                          style: GoogleFonts.rajdhani(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0284C7),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          minimumSize: Size.zero,
+                        ),
+                        onPressed: () async {
+                          if (preset.assetPath != null) {
+                            await pipeline.loadOfflineOsmMap(preset.assetPath!, mapName: preset.name);
+                          } else {
+                            pipeline.loadBenchmarkCourse();
+                          }
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Loaded ${preset.name} (${pipeline.activeRoadBranchCount} branches active)!'),
+                                backgroundColor: const Color(0xFF10B981),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          'ACTIVATE',
+                          style: GoogleFonts.rajdhani(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    preset.description,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: const Color(0xFF94A3B8),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${preset.approxSegments} Segments',
+                          style: GoogleFonts.jetBrainsMono(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF38BDF8),
+                          ),
+                        ),
+                      ),
+                      if (preset.hasElevated) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0C4A6E),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '3D Flyovers',
+                            style: GoogleFonts.jetBrainsMono(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF7DD3FC),
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (preset.hasMinorRoads) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF064E3B),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'Minor Streets',
+                            style: GoogleFonts.jetBrainsMono(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF34D399),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
       ],
     );
   }

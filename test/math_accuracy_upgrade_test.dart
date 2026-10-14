@@ -61,10 +61,11 @@ void main() {
       final aApparent = MathUtils.apparentAcceleration(vNav: vNav, latDeg: 19.076);
       final aCoriolis = MathUtils.coriolisAcceleration(vNav, 19.076);
 
-      // Both agree on overall direction (Eötvös lift and Southward deflection)
+      // Subtracted apparent acceleration W x v:
+      // When subtracted (-aApparent), yields Southward deflection (dv_y < 0) and Upward Eötvös lift (dv_z > 0)
       expect(aApparent.x, equals(0.0));
-      expect(aApparent.y, lessThan(0.0));
-      expect(aApparent.z, greaterThan(0.0));
+      expect(aApparent.y, greaterThan(0.0));
+      expect(aApparent.z, lessThan(0.0));
 
       // Apparent acceleration magnitude is slightly larger due to added transport rate term
       expect(aApparent.norm, greaterThan(aCoriolis.norm));

@@ -101,7 +101,7 @@ void CabinAligner::computePcaHeading() {
 
     // Principal component direction theta = 0.5 * atan2(2 * cxy, cxx - cyy)
     double delta_yaw = 0.5 * std::atan2(2.0 * cxy, cxx - cyy);
-    yaw_ += delta_yaw * 0.15; // Faster convergence (was 0.05)
+    yaw_ -= delta_yaw * 0.15; // Stable negative feedback convergence towards vehicle forward
 
     R_mount_ = rotBodyToWorld(roll_, pitch_, yaw_);
 }

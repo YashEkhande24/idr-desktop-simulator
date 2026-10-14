@@ -29,6 +29,7 @@ class VibrationGate {
   bool _shockDetected = false;
   bool _isRoughRoad = false;
   int _holdTicksRemaining = 0;
+  int _cooldownTicksRemaining = 0;
   double _shockThreshold = IdrConstants.jerkVarianceThreshold;
   double _roadRoughnessBaseline = 5.0; // Running noise floor
   double _lastRawJerk = 0.0;
@@ -167,32 +168,40 @@ class VibrationGate {
     final continuousW = math.exp(-_lambda * _lastVariance);
     _trustWeight = MathUtils.clamp(continuousW * huberW * aiConfidence, 0.04, 1.0);
 
+    // Continuous road roughness tracking using clipped variance.
+    // Clips variance contribution so extreme single-sample spikes don't blow up the noise floor,
+    // while sustained rough road chatter smoothly elevates the baseline.
+    final clippedVariance = math.min(_lastVariance, _roadRoughnessBaseline * 2.5 + 40.0);
+    _roadRoughnessBaseline = _roadRoughnessBaseline * 0.96 + clippedVariance * 0.04;
+
     // Evaluate road conditions with hysteresis:
     final maxHoldTicks = math.max(1, (IdrConstants.jerkReboundDurationSec / effectiveDt).round());
 
     // Adaptive outlier detection: shock triggers if variance exceeds shockThreshold
-    // OR exceeds the dynamic road roughness baseline by an adaptive factor (5.0x baseline):
-    final dynamicShockThreshold = math.min(_shockThreshold, math.max(_shockThreshold * 0.75, _roadRoughnessBaseline * 5.0));
+    // AND is a significant statistical outlier above the ambient road roughness baseline (at least 3.0x baseline):
+    final dynamicShockThreshold = math.max(_shockThreshold, _roadRoughnessBaseline * 3.0);
+
+    if (_cooldownTicksRemaining > 0) {
+      _cooldownTicksRemaining--;
+    }
 
     // Pothole enter threshold (statistical outlier detection)
-    if (_lastVariance >= dynamicShockThreshold) {
+    if (_lastVariance >= dynamicShockThreshold && _cooldownTicksRemaining <= 0) {
       _shockDetected = true;
       _holdTicksRemaining = maxHoldTicks;
       _roadCondition = RoadSurfaceCondition.shock;
     } else if (_shockDetected) {
-      // While in shock, count down hold timer and require variance to drop below exit threshold (45%)
-      if (_holdTicksRemaining > 0) {
-        _holdTicksRemaining--;
-      }
-      if (_holdTicksRemaining <= 0 && _lastVariance < (dynamicShockThreshold * 0.45)) {
+      _holdTicksRemaining--;
+      // Rebound duration elapsed: exit shock state once variance drops below shock threshold (80% hysteresis)
+      // or if maximum hold grace period (additional 20 ticks = 200ms) has expired to prevent infinite latching.
+      if ((_holdTicksRemaining <= 0 && _lastVariance < (dynamicShockThreshold * 0.80)) ||
+          _holdTicksRemaining < -20) {
         _shockDetected = false;
+        _cooldownTicksRemaining = 8; // 8 ticks = 80ms settling window after shock exit
       }
     }
 
     if (!_shockDetected) {
-      // Adaptive road roughness baseline update (smooth road vs rough road)
-      _roadRoughnessBaseline = _roadRoughnessBaseline * 0.95 + _lastVariance * 0.05;
-
       if (_lastVariance >= IdrConstants.roughRoadVarianceThreshold ||
           _roadRoughnessBaseline >= IdrConstants.roughRoadVarianceThreshold) {
         _isRoughRoad = true;
@@ -225,6 +234,7 @@ class VibrationGate {
     _shockDetected = false;
     _isRoughRoad = false;
     _holdTicksRemaining = 0;
+    _cooldownTicksRemaining = 0;
     _roadRoughnessBaseline = 5.0;
     _shockThreshold = IdrConstants.jerkVarianceThreshold;
     _lastRawJerk = 0.0;

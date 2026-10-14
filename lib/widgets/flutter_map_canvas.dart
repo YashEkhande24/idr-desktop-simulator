@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../core/math_utils.dart';
 import '../models/nav_solution.dart';
 import '../models/navigation_models.dart';
 import '../services/map_snapper.dart';
@@ -17,8 +19,11 @@ class FlutterMapCanvas extends StatefulWidget {
   final VoidCallback? onToggleCourseUp;
   final NavRoute? activeRoute;
   final void Function(LatLng)? onMapTap;
-
+  final VehicleColorway vehicleColorway;
   final int recenterTrigger;
+  final bool isClassicDr;
+  final List<Vec3>? trajectory;
+  final Color? trajectoryColor;
 
   const FlutterMapCanvas({
     super.key,
@@ -29,7 +34,11 @@ class FlutterMapCanvas extends StatefulWidget {
     this.onToggleCourseUp,
     this.activeRoute,
     this.onMapTap,
+    this.vehicleColorway = VehicleColorway.red,
     this.recenterTrigger = 0,
+    this.isClassicDr = false,
+    this.trajectory,
+    this.trajectoryColor,
   });
 
   @override
@@ -43,6 +52,13 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
   bool _isMapReady = false;
   bool _hasInitialCentered = false;
   double _lastCameraRotation = 0.0;
+  Timer? _recenterTimer;
+
+  @override
+  void dispose() {
+    _recenterTimer?.cancel();
+    super.dispose();
+  }
 
   // Convert ENU coordinates (used by our branches) back to WGS84 LatLng
   LatLng? _enuToLatLng(double x, double y) {
@@ -65,13 +81,23 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
       _recenterOnVehicle();
       return;
     }
-    if (_isMapReady && widget.solution.latitude != null && widget.solution.longitude != null) {
-      final currentPos = LatLng(widget.solution.latitude!, widget.solution.longitude!);
+    final activeLat = widget.isClassicDr
+        ? (widget.solution.classicLatitude ?? widget.solution.latitude)
+        : widget.solution.latitude;
+    final activeLon = widget.isClassicDr
+        ? (widget.solution.classicLongitude ?? widget.solution.longitude)
+        : widget.solution.longitude;
+    final heading = widget.isClassicDr
+        ? MathUtils.enuToCompassDeg(widget.solution.classicDrState.yaw)
+        : widget.solution.headingDeg;
+
+    if (_isMapReady && activeLat != null && activeLon != null) {
+      final currentPos = LatLng(activeLat, activeLon);
       if (!_hasInitialCentered || _autoFollow) {
         _hasInitialCentered = true;
         _mapController.move(currentPos, _currentZoom);
         if (widget.isCourseUp) {
-          _updateCameraHeading(-widget.solution.headingDeg);
+          _updateCameraHeading(-heading);
         } else {
           _updateCameraHeading(0.0);
         }
@@ -97,21 +123,35 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
     setState(() {
       _autoFollow = true;
     });
-    final lat = widget.solution.latitude ?? widget.sensorService.refLat;
-    final lon = widget.solution.longitude ?? widget.sensorService.refLon;
-    if (lat != null && lon != null) {
-      _mapController.move(LatLng(lat, lon), _currentZoom);
-      _lastCameraRotation = widget.isCourseUp ? -widget.solution.headingDeg : 0.0;
+    final activeLat = widget.isClassicDr
+        ? (widget.solution.classicLatitude ?? widget.solution.latitude ?? widget.sensorService.refLat)
+        : (widget.solution.latitude ?? widget.sensorService.refLat);
+    final activeLon = widget.isClassicDr
+        ? (widget.solution.classicLongitude ?? widget.solution.longitude ?? widget.sensorService.refLon)
+        : (widget.solution.longitude ?? widget.sensorService.refLon);
+    final heading = widget.isClassicDr
+        ? MathUtils.enuToCompassDeg(widget.solution.classicDrState.yaw)
+        : widget.solution.headingDeg;
+    if (activeLat != null && activeLon != null) {
+      _mapController.move(LatLng(activeLat, activeLon), _currentZoom);
+      _lastCameraRotation = widget.isCourseUp ? -heading : 0.0;
       _mapController.rotate(_lastCameraRotation);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Current vehicle location
+    // Current vehicle location (switches to unconstrained classical DR during outage if flagged)
     LatLng vehiclePos;
-    if (widget.solution.latitude != null && widget.solution.longitude != null) {
-      vehiclePos = LatLng(widget.solution.latitude!, widget.solution.longitude!);
+    final activeLat = widget.isClassicDr
+        ? (widget.solution.classicLatitude ?? widget.solution.latitude)
+        : widget.solution.latitude;
+    final activeLon = widget.isClassicDr
+        ? (widget.solution.classicLongitude ?? widget.solution.longitude)
+        : widget.solution.longitude;
+
+    if (activeLat != null && activeLon != null) {
+      vehiclePos = LatLng(activeLat, activeLon);
     } else if (widget.sensorService.refLat != null && widget.sensorService.refLon != null) {
       vehiclePos = LatLng(widget.sensorService.refLat!, widget.sensorService.refLon!);
     } else {
@@ -155,6 +195,26 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
       }
     }
 
+    // Trajectory History Polyline (if provided)
+    if (widget.trajectory != null && widget.trajectory!.length >= 2) {
+      final trajPts = widget.trajectory!
+          .map((p) => _enuToLatLng(p.x, p.y))
+          .whereType<LatLng>()
+          .toList();
+      if (trajPts.length >= 2) {
+        polylines.add(
+          Polyline(
+            points: trajPts,
+            color: widget.trajectoryColor ??
+                (widget.isClassicDr ? const Color(0xFFEF4444) : const Color(0xFF10B981)),
+            strokeWidth: 4.0,
+            strokeCap: StrokeCap.round,
+            strokeJoin: StrokeJoin.round,
+          ),
+        );
+      }
+    }
+
     // Prepare active route polyline if present
     final List<Polyline> routePolylines = [];
     if (widget.activeRoute != null) {
@@ -177,10 +237,18 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
 
     // Vehicle orientation:
     // Car3DMarker renders a full real-time 3D aerodynamic sports coupe mesh in perspective!
-    final effectiveHeading = widget.isCourseUp ? 0.0 : widget.solution.headingDeg;
-    final pitchDeg = widget.solution.idrState.pitch * (180.0 / math.pi);
-    final rollDeg = widget.solution.idrState.roll * (180.0 / math.pi);
+    final heading = widget.isClassicDr
+        ? MathUtils.enuToCompassDeg(widget.solution.classicDrState.yaw)
+        : widget.solution.headingDeg;
+    final effectiveHeading = widget.isCourseUp ? 0.0 : heading;
+    final pitchDeg = widget.isClassicDr
+        ? widget.solution.classicDrState.pitch * (180.0 / math.pi)
+        : widget.solution.idrState.pitch * (180.0 / math.pi);
+    final rollDeg = widget.isClassicDr
+        ? widget.solution.classicDrState.roll * (180.0 / math.pi)
+        : widget.solution.idrState.roll * (180.0 / math.pi);
     final isBraking = widget.solution.idrState.pitch < -0.04 || widget.solution.rawJerk < -1.5;
+    final isStationary = widget.solution.speedKmh < 1.0;
 
     final List<Marker> markers = [
       Marker(
@@ -188,13 +256,30 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
         width: 80,
         height: 80,
         alignment: Alignment.center,
-        child: Car3DMarker(
-          headingDeg: effectiveHeading,
-          pitchDeg: pitchDeg,
-          rollDeg: rollDeg,
-          isCourseUp: widget.isCourseUp,
-          isBraking: isBraking,
-          size: 80.0,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (widget.isClassicDr)
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0x35EF4444),
+                  border: Border.all(color: const Color(0x95EF4444), width: 1.5),
+                ),
+              ),
+            Car3DMarker(
+              headingDeg: effectiveHeading,
+              pitchDeg: pitchDeg,
+              rollDeg: rollDeg,
+              isCourseUp: widget.isCourseUp,
+              colorway: widget.isClassicDr ? VehicleColorway.silver : widget.vehicleColorway,
+              isBraking: isBraking,
+              showHeadlightBeam: !isStationary,
+              size: 80.0,
+            ),
+          ],
         ),
       ),
     ];
@@ -255,6 +340,17 @@ class _FlutterMapCanvasState extends State<FlutterMapCanvas> {
               _autoFollow = false;
               _currentZoom = position.zoom;
             });
+            _recenterTimer?.cancel();
+            // Automatically resume following vehicle after 6 seconds of touch inactivity during navigation
+            if (widget.activeRoute != null || widget.isCourseUp) {
+              _recenterTimer = Timer(const Duration(seconds: 6), () {
+                if (mounted) {
+                  setState(() {
+                    _autoFollow = true;
+                  });
+                }
+              });
+            }
           }
         },
         onTap: (tapPosition, point) {

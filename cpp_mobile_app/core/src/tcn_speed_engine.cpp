@@ -1,4 +1,5 @@
 #include "idr/tcn_speed_engine.hpp"
+#include "idr/common.hpp"
 #include <cmath>
 #include <numeric>
 #include <algorithm>
@@ -16,8 +17,33 @@ void TcnSpeedEngine::reset() {
     isStandstill_ = true;
     quietCount_ = 5;
     isPedestrian_ = false;
+    isOutageMode_ = false;
+    outageCruisingSpeed_ = 0.0;
     accelVariance_ = 0.0;
     speedBias_ = 0.0;
+}
+
+void TcnSpeedEngine::setOutageMode(bool outage, double entrySpeedMps) {
+    isOutageMode_ = outage;
+    if (outage) {
+        isStandstill_ = false;
+        quietCount_ = 0;
+        if (entrySpeedMps > 1.0) {
+            outageCruisingSpeed_ = entrySpeedMps;
+            if (estimatedSpeed_ < 1.0) {
+                estimatedSpeed_ = entrySpeedMps;
+            }
+        } else if (estimatedSpeed_ > 1.0) {
+            outageCruisingSpeed_ = estimatedSpeed_;
+        }
+    } else {
+        outageCruisingSpeed_ = 0.0;
+    }
+}
+
+void TcnSpeedEngine::clearStandstill() {
+    isStandstill_ = false;
+    quietCount_ = 0;
 }
 
 void TcnSpeedEngine::setExternalSpeed(double speedMps, double variance) {
@@ -34,7 +60,12 @@ void TcnSpeedEngine::setExternalSpeed(double speedMps, double variance) {
 }
 
 void TcnSpeedEngine::synchronizeGnssSpeed(double speedMps, double hdop, bool isDenied) {
-    if (isDenied || hdop > 5.0 || speedMps < 0.0) return;
+    if (isDenied || isOutageMode_ || hdop > 5.0 || speedMps < 0.0) {
+        if (isDenied || isOutageMode_) {
+            isStandstill_ = false;
+        }
+        return;
+    }
 
     if (speedMps < 0.35 && hdop <= 4.0) {
         // High confidence GNSS lock confirms vehicle is stationary (< 1.2 km/h)
@@ -51,7 +82,7 @@ void TcnSpeedEngine::applyBiasCorrection(double deltaMps) {
     speedBias_ = std::clamp(speedBias_ + deltaMps, -1.5, 1.5);
 }
 
-void TcnSpeedEngine::update(const Vec3& alignedAccel, const Vec3& alignedGyro, double dt, double gnssSpeedMps) {
+void TcnSpeedEngine::update(const Vec3& alignedAccel, const Vec3& alignedGyro, double dt, double gnssSpeedMps, double pitchRad) {
     accelBuffer_.push_back(alignedAccel);
     gyroBuffer_.push_back(alignedGyro);
 
@@ -68,7 +99,10 @@ void TcnSpeedEngine::update(const Vec3& alignedAccel, const Vec3& alignedGyro, d
     }
 
     double effectiveDt = std::clamp(dt, 0.001, 0.10);
-    double aFwd = alignedAccel.x;
+    double netFwdAccel = (std::abs(pitchRad) > 0.01)
+        ? (alignedAccel.x - GRAVITY_STANDARD * std::sin(pitchRad))
+        : alignedAccel.x;
+    double aFwd = netFwdAccel;
     double deltaV = aFwd * effectiveDt;
 
     // Deadband on longitudinal acceleration to reject thermal IMU bias (~0.15 m/s^2)
@@ -80,20 +114,27 @@ void TcnSpeedEngine::update(const Vec3& alignedAccel, const Vec3& alignedGyro, d
 
     // Aerodynamic and rolling friction damping when coasting
     if (std::abs(aFwd) < 0.20 && estimatedSpeed_ > 0.1) {
-        estimatedSpeed_ *= (1.0 - 0.01 * effectiveDt * 100.0);
+        estimatedSpeed_ *= (1.0 - 0.01 * effectiveDt);
+    }
+
+    // Outage Cruising Guard: In outage/tunnel mode, maintain cruising speed along momentum vector
+    // unless real deceleration/braking is observed (aFwd < -0.5)
+    if (isOutageMode_ && outageCruisingSpeed_ > 1.0 && aFwd > -0.5) {
+        estimatedSpeed_ = std::max(estimatedSpeed_, outageCruisingSpeed_ * 0.98);
+        outageCruisingSpeed_ = estimatedSpeed_;
     }
 
     // Wheeled vehicles on roads do not move in reverse during highway driving
     estimatedSpeed_ = std::max(0.0, estimatedSpeed_);
 
     // Soft GNSS blend when GNSS speed is available and confident
-    if (gnssSpeedMps >= 0.5) {
+    if (gnssSpeedMps >= 0.5 && !isOutageMode_) {
         estimatedSpeed_ = estimatedSpeed_ * 0.85 + gnssSpeedMps * 0.15;
     }
 }
 
 void TcnSpeedEngine::checkStandstill(double gnssSpeedMps) {
-    if (gnssSpeedMps >= 0.0 && gnssSpeedMps < 0.35) {
+    if (!isOutageMode_ && gnssSpeedMps >= 0.0 && gnssSpeedMps < 0.35) {
         // High confidence GNSS lock confirms stationary (< 1.2 km/h)
         isStandstill_ = true;
         quietCount_ = 5;
@@ -141,8 +182,10 @@ void TcnSpeedEngine::checkStandstill(double gnssSpeedMps) {
     double lastW = std::sqrt(gyroBuffer_.back().x * gyroBuffer_.back().x +
                              gyroBuffer_.back().y * gyroBuffer_.back().y +
                              gyroBuffer_.back().z * gyroBuffer_.back().z);
-    bool isPhoneRotatingInHand = (estimatedSpeed_ < 1.5 && lastW > 0.20) ||
-        (lastW > 0.25 && (std::abs(gyroBuffer_.back().x) > 0.25 || std::abs(gyroBuffer_.back().y) > 0.25 || latResidual > 1.0));
+    double nonYawW = std::sqrt(gyroBuffer_.back().x * gyroBuffer_.back().x +
+                               gyroBuffer_.back().y * gyroBuffer_.back().y);
+    bool isPhoneRotatingInHand = (estimatedSpeed_ < 0.50 || isStandstill_) &&
+        (nonYawW > 0.18 || (lastW > 0.25 && (nonYawW > 0.20 || latResidual > 1.5)));
 
     bool isCoupledTurn = (avgYaw > 0.25) && (latAccel > 0.60) && (latResidual < 2.0);
 
@@ -155,8 +198,10 @@ void TcnSpeedEngine::checkStandstill(double gnssSpeedMps) {
 
     // Standstill condition: dynamic accel variance (< 2.5 m^2/s^4), no coupled turn,
     // low forward throttle, and accommodating physiological hand tremor (avgW < 0.35 rad/s, avgYaw < 0.18 rad/s).
-    bool isQuiet = (accelVariance_ < 2.5) && !isCoupledTurn && (avgW < 0.35 || avgYaw < 0.18) && (fwdAccel < 0.25);
-    bool hasActiveMotion = (accelVariance_ > 3.0) || isCoupledTurn || (fwdAccel > 0.40) || (!isStandstill_ && accelVariance_ > 1.2 && estimatedSpeed_ > 2.0);
+    // Gated by low speed (< 1.2 m/s) to prevent smooth high-speed highway cruising in tunnels from falsely freezing.
+    bool isQuiet = !isOutageMode_ && (estimatedSpeed_ < 1.2 || isStandstill_) &&
+        (accelVariance_ < 2.5) && !isCoupledTurn && (avgW < 0.35 || avgYaw < 0.18) && (fwdAccel < 0.25);
+    bool hasActiveMotion = isOutageMode_ || (accelVariance_ > 3.0) || isCoupledTurn || (fwdAccel > 0.40) || (!isStandstill_ && accelVariance_ > 1.2 && estimatedSpeed_ > 2.0);
 
     // Fast 5-sample hysteresis to avoid flapping
     if (isQuiet) {
