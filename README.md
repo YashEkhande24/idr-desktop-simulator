@@ -3,12 +3,12 @@
 [![SIH 2026](https://img.shields.io/badge/SIH%202026-Problem%20ID%3A%20SIH26168-blueviolet?style=for-the-badge&logo=target)](https://www.sih.gov.in/)
 [![ISRO](https://img.shields.io/badge/Organization-ISRO%20%7C%20IISU%20%2F%20SAC-orange?style=for-the-badge&logo=spacex)](https://www.isro.gov.in/)
 [![Team Inventor](https://img.shields.io/badge/Team-Inventor%20%28ID%3A%20133715%29-00F0FF?style=for-the-badge)](https://github.com/YashEkhande24/idr-desktop-simulator)
-[![C++20 SIMD](https://img.shields.io/badge/Core%20Engine-C%2B%2B20%20SIMD%20(AVX2%2FNEON)-00599C?style=for-the-badge&logo=c%2B%2B)](file:///e:/inventor/cpp_mobile_app/)
-[![Flutter 3.x](https://img.shields.io/badge/Mobile%20UI-Flutter%203.x%20%40%2010%20Hz-02569B?style=for-the-badge&logo=flutter)](file:///e:/inventor/lib/)
-[![ONNX Runtime INT8](https://img.shields.io/badge/Neural%20Speed-2.1%20MB%20INT8%20ONNX-005CED?style=for-the-badge&logo=onnx)](file:///e:/inventor/idr_model_submission/idr_neurospeed_tcn_int8.onnx)
-[![IO-VNBD Pass Rate](https://img.shields.io/badge/IO--VNBD%20Pass%20Rate-93.8%25%20(60%2F64)-10B981?style=for-the-badge&logo=checkmarx)](file:///e:/inventor/idr_model_submission/results.json)
-[![Min Tunnel Drift](https://img.shields.io/badge/Min%20Tunnel%20Drift-0.02%25%20(0.17%20m)-emerald?style=for-the-badge)](file:///e:/inventor/SIH_PROPOSAL_AI_MODEL_AND_POSITION_PLOTS.md)
-[![Edge Throughput](https://img.shields.io/badge/Edge%20Throughput-Mobile%2010%20Hz%20%7C%20FOG%20200%20Hz-cyan?style=for-the-badge)](file:///e:/inventor/cpp_mobile_app/)
+[![C++20 SIMD](https://img.shields.io/badge/Core%20Engine-C%2B%2B20%20SIMD%20(AVX2%2FNEON)-00599C?style=for-the-badge&logo=c%2B%2B)](cpp_mobile_app/)
+[![Flutter 3.x](https://img.shields.io/badge/Mobile%20UI-Flutter%203.x%20%40%2010%20Hz-02569B?style=for-the-badge&logo=flutter)](lib/)
+[![ONNX Runtime INT8](https://img.shields.io/badge/Neural%20Speed-2.1%20MB%20INT8%20ONNX-005CED?style=for-the-badge&logo=onnx)](idr_model_submission/idr_neurospeed_tcn_int8.onnx)
+[![IO-VNBD Pass Rate](https://img.shields.io/badge/IO--VNBD%20Pass%20Rate-93.8%25%20(60%2F64)-10B981?style=for-the-badge&logo=checkmarx)](idr_model_submission/results.json)
+[![Min Tunnel Drift](https://img.shields.io/badge/Min%20Tunnel%20Drift-0.02%25%20(0.17%20m)-emerald?style=for-the-badge)](SIH_PROPOSAL_AI_MODEL_AND_POSITION_PLOTS.md)
+[![Edge Throughput](https://img.shields.io/badge/Edge%20Throughput-Mobile%2010%20Hz%20%7C%20FOG%20200%20Hz-cyan?style=for-the-badge)](cpp_mobile_app/)
 
 > **Smart India Hackathon 2026 | Problem Statement ID: SIH26168**  
 > **Theme:** Smart Vehicles / Space Technology | **Category:** Software  
@@ -20,14 +20,14 @@
 
 ## ⚡ Quick-Access Evaluator Bar
 
-| Resource | Action Link | Direct File Path | Verification Description |
+| Resource | Action Link | Direct Repository Link | Verification Description |
 | :--- | :--- | :--- | :--- |
-| 📱 **Android Production APK** | [**Download IDR.apk**](file:///e:/inventor/build/app/outputs/flutter-apk/app-release.apk) | [`build/app/outputs/.../app-release.apk`](file:///e:/inventor/build/app/outputs/flutter-apk/) | Self-contained signed release build for real-time in-cabin road evaluation |
-| 🧠 **Quantized AI Engine** | [**Download INT8 ONNX (2.1 MB)**](file:///e:/inventor/idr_model_submission/idr_neurospeed_tcn_int8.onnx) | [`idr_model_submission/idr_neurospeed_tcn_int8.onnx`](file:///e:/inventor/idr_model_submission/idr_neurospeed_tcn_int8.onnx) | 8-Channel Dilated Causal SE-TCN with heteroscedastic uncertainty head ($\sigma_v^2$) |
-| 📊 **Reproduction CLI** | [**Run Benchmark Script**](file:///e:/inventor/scripts/evaluate_iovnbd.py) | [`python scripts/evaluate_iovnbd.py`](file:///e:/inventor/scripts/evaluate_iovnbd.py) | Re-evaluates all 64 IO-VNBD trips + S-Vta23 tunnel outage in one command |
-| 🎥 **Video Demonstration** | [**Watch 2-Min Live Walkthrough**](file:///e:/inventor/Record_2026-09-25-18-51-20_281cd788c2fa2c82e5415ffa998b613e.mp4) | [`Record_2026-09-25-18-51-20_...mp4`](file:///e:/inventor/Record_2026-09-25-18-51-20_281cd788c2fa2c82e5415ffa998b613e.mp4) | In-vehicle screen recording demonstrating tunnel entry, shock rejection & snapping |
-| 🧪 **Automated CI/CD Tests** | [**Inspect 136 Unit Tests**](file:///e:/inventor/test/) | [`flutter test` / `pytest`](file:///e:/inventor/test/) | **136 of 136 automated tests passing** (ZUPT, Jerk Gate, ES-EKF, OSM, FFI Bridge) |
-| 🌐 **Interactive Dashboard** | [**Explore Telemetry Portal**](file:///e:/inventor/docs/index.html) | [`docs/index.html`](file:///e:/inventor/docs/index.html) | Dark-mode aerospace telemetry console with interactive Chart.js trajectory viewer |
+| 📱 **Android Production APK** | [**Download IDR.apk**](presentation_website/downloads/idr_pure_cpp_engine.apk) | [`presentation_website/downloads/`](presentation_website/downloads/) | Self-contained signed release build for real-time in-cabin road evaluation |
+| 🧠 **Quantized AI Engine** | [**Download INT8 ONNX (2.1 MB)**](idr_model_submission/idr_neurospeed_tcn_int8.onnx) | [`idr_model_submission/idr_neurospeed_tcn_int8.onnx`](idr_model_submission/idr_neurospeed_tcn_int8.onnx) | 8-Channel Dilated Causal SE-TCN with heteroscedastic uncertainty head ($\sigma_v^2$) |
+| 📊 **Reproduction CLI** | [**Run Benchmark Script**](scripts/evaluate_iovnbd.py) | [`python scripts/evaluate_iovnbd.py`](scripts/evaluate_iovnbd.py) | Re-evaluates all 64 IO-VNBD trips + S-Vta23 tunnel outage in one command |
+| 🎥 **Video Demonstration** | [**Watch 2-Min Live Walkthrough**](Record_2026-09-25-18-51-20_281cd788c2fa2c82e5415ffa998b613e.mp4) | [`Record_2026-09-25-18-51-20.mp4`](Record_2026-09-25-18-51-20_281cd788c2fa2c82e5415ffa998b613e.mp4) | In-vehicle screen recording demonstrating tunnel entry, shock rejection & snapping |
+| 🧪 **Automated CI/CD Tests** | [**Inspect 136 Unit Tests**](test/) | [`test/`](test/) | **136 of 136 automated tests passing** (ZUPT, Jerk Gate, ES-EKF, OSM, FFI Bridge) |
+| 🌐 **Interactive Dashboard** | [**Launch Telemetry Portal**](https://yashekhande24.github.io/idr-desktop-simulator/) | [`docs/index.html`](docs/index.html) | Dark-mode aerospace telemetry console with interactive Chart.js trajectory viewer |
 
 ---
 
@@ -43,18 +43,18 @@ Standard consumer satellite navigation completely collapses when a vehicle enter
 
 ---
 
-## 🎯 Section B: ISRO Expected Solution & Benchmark Compliance Matrix
+## 🎯 Section B: ISRO Expected Solution & Repository Implementation Mapping
 
-The following matrix directly cross-references every technical specification mandated in ISRO Problem Statement **SIH26168** against our production implementation:
+The following matrix directly cross-references every technical specification mandated in ISRO Problem Statement **SIH26168** against our direct repository source code:
 
-| # | ISRO Mandated Requirement | IDR-Navigator Production Implementation | Mathematical Formulation / Mechanism | Primary Source Code | Compliance Status |
-| :---: | :--- | :--- | :--- | :--- | :---: |
-| **1** | **In-Vehicle Alignment & Dynamic Re-Calibration** (Dashboard, Holder, AC Vent, Unconstrained Mount) | • Mahony $SO(3)$ Gravity Leveling<br>• PCA Forward Azimuth Lock<br>• Mid-drive continuous re-leveling on velocity transitions | $\hat{g} = \frac{\bar{a}}{\|\bar{a}\|}$<br>$C = \frac{1}{N}\sum a_{\text{hor}} a_{\text{hor}}^T$<br>$C v_1 = \lambda_1 v_1$ | [`lib/core/alignment/cabin_alignment.dart`](file:///e:/inventor/lib/core/alignment/cabin_alignment.dart)<br>[`cpp_mobile_app/src/alignment/`](file:///e:/inventor/cpp_mobile_app/) | <span style="color:#10B981;font-weight:bold;">✔ 100% COMPLIANT</span> |
-| **2** | **AI Speed Estimation & Vibration Filter** (Potholes, Rumble Strips, Engine Idling, No OBD-II) | • 8-Channel Dilated Causal SE-TCN ($2.1\text{ MB}$ INT8)<br>• Sliding Jerk Variance Shock Gate<br>• Skog GLRT Zero-Velocity Update (ZUPT) | $[\hat{v}, \sigma_v^2] = f_{\text{TCN}}(X_{t-4s:t})$<br>$\sigma_j^2 > 450\text{ m/s}^6 \implies Q \times 50$<br>$T_L = \frac{1}{N}\sum \frac{\|y_k - g\|^2}{\sigma_a^2} + \frac{\|\omega_k\|^2}{\sigma_g^2} < \gamma$ | [`lib/core/ai/tcn_speed_engine.dart`](file:///e:/inventor/lib/core/ai/tcn_speed_engine.dart)<br>[`lib/core/filters/vibration_gate.dart`](file:///e:/inventor/lib/core/filters/vibration_gate.dart)<br>[`idr_model_submission/model_architecture.py`](file:///e:/inventor/idr_model_submission/model_architecture.py) | <span style="color:#10B981;font-weight:bold;">✔ 100% COMPLIANT</span> |
-| **3** | **Advanced Map-Matching & Kinematic Constraints** (Multi-level flyovers, curved ramps, offline maps) | • 15-State Error-State EKF (ES-EKF)<br>• Non-Holonomic Constraints (NHC)<br>• Orthogonal Vector Projection Map Snapper<br>• Barometric Deck Discriminator | $v_{\text{lat}} \approx 0, \quad v_{\text{vert}} \approx 0$<br>$p_{\text{snap}} = p_0 + \left((p_{\text{raw}} - p_0)\cdot \hat{u}\right)\hat{u}$<br>$\Delta h = 44330\left(1 - \left(\frac{P}{P_0}\right)^{0.1903}\right)$ | [`lib/core/filters/ekf_3d.dart`](file:///e:/inventor/lib/core/filters/ekf_3d.dart)<br>[`lib/core/map/map_matcher.dart`](file:///e:/inventor/lib/core/map/map_matcher.dart)<br>[`scripts/download_osm_roads.py`](file:///e:/inventor/scripts/download_osm_roads.py) | <span style="color:#10B981;font-weight:bold;">✔ 100% COMPLIANT</span> |
-| **4** | **GNSS+INS Fusion Engine** (Tight sensory integration with uncertainty propagation) | • 15-State Error-State Extended Kalman Filter<br>• Heteroscedastic AI dynamic measurement covariance<br>• Joseph-form covariance stabilization | $\delta x = [\delta p, \delta v, \delta \theta, b_a, b_g]^T \in \mathbb{R}^{15}$<br>$R_{\text{pseudo}} = \text{diag}(\sigma_v^2, \sigma_{\text{nhc}}^2, \sigma_{\text{nhc}}^2)$<br>$P^+ = (I-KH)P^-(I-KH)^T + KRK^T$ | [`lib/core/filters/ekf_3d.dart`](file:///e:/inventor/lib/core/filters/ekf_3d.dart)<br>[`cpp_mobile_app/src/fusion/es_ekf.cpp`](file:///e:/inventor/cpp_mobile_app/) | <span style="color:#10B981;font-weight:bold;">✔ 100% COMPLIANT</span> |
-| **5** | **Seamless GNSS Deficit Handler** (Continuous sub-5ms transition during outage ingress & exit) | • Continuous Sigmoidal HDOP gate<br>• Dynamic measurement noise amplification<br>• Prevents map icon jumping / warping | $\lambda(h) = \frac{1}{1 + e^{-1.2(h - 3.5)}}$<br>$R_{\text{eff}} = (1 + 99\lambda(h))R_{\text{GNSS}}$ | [`lib/core/filters/ekf_3d.dart`](file:///e:/inventor/lib/core/filters/ekf_3d.dart)<br>[`lib/core/fusion/hdop_gate.dart`](file:///e:/inventor/lib/core/fusion/) | <span style="color:#10B981;font-weight:bold;">✔ 100% COMPLIANT</span> |
-| **6** | **Performance Benchmark** ($<10\%$ Drift Rule, 10 Hz Mobile UI, 200 Hz Edge Engine) | • **0.02% – 0.05%** blackout drift<br>• **93.8% (60/64)** IO-VNBD pass rate<br>• **10 Hz** Flutter UI / **200 Hz** C++ SIMD Core | Verified on held-out IO-VNBD benchmark, DriverSVT, UAH-DriveSet, and live Mumbai-Pune expressway tunnels | [`idr_model_submission/results.json`](file:///e:/inventor/idr_model_submission/results.json)<br>[`SIH_PROPOSAL_AI_MODEL_AND_POSITION_PLOTS.md`](file:///e:/inventor/SIH_PROPOSAL_AI_MODEL_AND_POSITION_PLOTS.md) | <span style="color:#10B981;font-weight:bold;">✔ 100% COMPLIANT</span> |
+| # | ISRO Mandated Requirement | IDR-Navigator Production Implementation | Mathematical Formulation / Mechanism | Direct Repository Source Links |
+| :---: | :--- | :--- | :--- | :--- |
+| **1** | **In-Vehicle Alignment & Dynamic Re-Calibration** (Dashboard, Holder, AC Vent, Unconstrained Mount) | • Mahony $SO(3)$ Gravity Leveling<br>• PCA Forward Azimuth Lock<br>• Mid-drive continuous re-leveling on velocity transitions | $\hat{g} = \bar{a}/\|\bar{a}\|$, $C = \frac{1}{N}\sum a_{\text{hor}} a_{\text{hor}}^T$, $C v_1 = \lambda_1 v_1$ | • [`lib/services/cabin_alignment.dart`](lib/services/cabin_alignment.dart)<br>• [`cpp_mobile_app/core/src/cabin_aligner.cpp`](cpp_mobile_app/core/src/cabin_aligner.cpp) |
+| **2** | **AI Speed Estimation & Vibration Filter** (Potholes, Rumble Strips, Engine Idling, No OBD-II) | • 8-Channel Dilated Causal SE-TCN ($2.1\text{ MB}$ INT8)<br>• Sliding Jerk Variance Shock Gate<br>• Skog GLRT Zero-Velocity Update (ZUPT) | $[\hat{v}, \sigma_v^2] = f_{\text{TCN}}(X_{t-4s:t})$, $\sigma_j^2 > 450\implies Q\times 50$, $T_L < \gamma$ | • [`lib/services/tcn_speed_engine.dart`](lib/services/tcn_speed_engine.dart)<br>• [`lib/services/vibration_gate.dart`](lib/services/vibration_gate.dart)<br>• [`idr_model_submission/model_architecture.py`](idr_model_submission/model_architecture.py) |
+| **3** | **Advanced Map-Matching & Kinematic Constraints** (Multi-level flyovers, curved ramps, offline maps) | • 15-State Error-State EKF (ES-EKF)<br>• Non-Holonomic Constraints (NHC)<br>• Orthogonal Vector Projection Map Snapper<br>• Barometric Deck Discriminator | $v_{\text{lat}} \approx 0, \quad v_{\text{vert}} \approx 0$<br>$p_{\text{snap}} = p_0 + ((p_{\text{raw}} - p_0)\cdot \hat{u})\hat{u}$ | • [`lib/services/ekf_3d.dart`](lib/services/ekf_3d.dart)<br>• [`lib/services/map_snapper.dart`](lib/services/map_snapper.dart)<br>• [`scripts/download_osm_roads.py`](scripts/download_osm_roads.py) |
+| **4** | **GNSS+INS Fusion Engine** (Tight sensory integration with uncertainty propagation) | • 15-State Error-State Extended Kalman Filter<br>• Heteroscedastic AI dynamic measurement covariance<br>• Joseph-form covariance stabilization | $\delta x \in \mathbb{R}^{15}$, $R_{\text{pseudo}} = \text{diag}(\sigma_v^2, \sigma_{\text{nhc}}^2, \sigma_{\text{nhc}}^2)$, $P^+ = (I-KH)P^-(I-KH)^T + KRK^T$ | • [`lib/services/ekf_3d.dart`](lib/services/ekf_3d.dart)<br>• [`cpp_mobile_app/core/src/ekf_3d.cpp`](cpp_mobile_app/core/src/ekf_3d.cpp)<br>• [`lib/services/idr_pipeline.dart`](lib/services/idr_pipeline.dart) |
+| **5** | **Seamless GNSS Deficit Handler** (Continuous sub-5ms transition during outage ingress & exit) | • Continuous Sigmoidal HDOP gate<br>• Dynamic measurement noise amplification<br>• Prevents map icon jumping / warping | $\lambda(h) = \frac{1}{1 + e^{-1.2(h - 3.5)}}$, $R_{\text{eff}} = (1 + 99\lambda(h))R_{\text{GNSS}}$ | • [`lib/services/ekf_3d.dart`](lib/services/ekf_3d.dart)<br>• [`cpp_mobile_app/core/src/pipeline.cpp`](cpp_mobile_app/core/src/pipeline.cpp) |
+| **6** | **Performance Benchmark** ($<10\%$ Drift Rule, 10 Hz Mobile UI, 200 Hz Edge Engine) | • **0.02% – 0.05%** blackout drift<br>• **93.8% (60/64)** IO-VNBD pass rate<br>• **10 Hz** Flutter UI / **200 Hz** C++ SIMD Core | Verified across IO-VNBD benchmark, DriverSVT, UAH-DriveSet, and Mumbai-Pune expressway tunnels | • [`idr_model_submission/results.json`](idr_model_submission/results.json)<br>• [`SIH_PROPOSAL_AI_MODEL_AND_POSITION_PLOTS.md`](SIH_PROPOSAL_AI_MODEL_AND_POSITION_PLOTS.md)<br>• [`scripts/evaluate_iovnbd.py`](scripts/evaluate_iovnbd.py) |
 
 ---
 
@@ -114,41 +114,92 @@ flowchart TD
 ### 2. Mathematical Rigor & Formulation
 
 #### 2.1 Coordinate Alignment & Gravity Decoupling
+
 To eliminate orientation-dependent mounting bias when a driver clips their phone to a vent, dashboard tray, or windshield mount:
-$$\hat{\mathbf{g}} = \frac{\bar{\mathbf{a}}}{\|\bar{\mathbf{a}}\|} \cdot 9.80665\text{ m/s}^2, \quad \mathbf{a}_{\text{dyn}} = \mathbf{a}_{\text{raw}} - \hat{\mathbf{g}}$$
+
+$$
+\hat{\mathbf{g}} = \frac{\bar{\mathbf{a}}}{\|\bar{\mathbf{a}}\|} \cdot 9.80665\text{ m/s}^2, \quad \mathbf{a}_{\text{dyn}} = \mathbf{a}_{\text{raw}} - \hat{\mathbf{g}}
+$$
+
 The principal horizontal acceleration axis is identified via Principal Component Analysis (PCA) over a sliding $N$-sample window:
-$$\mathbf{C} = \frac{1}{N}\sum_{k=1}^N \mathbf{a}_{\text{hor}, k}\mathbf{a}_{\text{hor}, k}^T, \quad \mathbf{C}\mathbf{v}_1 = \lambda_1\mathbf{v}_1 \implies \psi_{\text{align}} = \text{atan2}(v_{1, y}, v_{1, x})$$
+
+$$
+\mathbf{C} = \frac{1}{N}\sum_{k=1}^N \mathbf{a}_{\text{hor}, k}\mathbf{a}_{\text{hor}, k}^T, \quad \mathbf{C}\mathbf{v}_1 = \lambda_1\mathbf{v}_1 \implies \psi_{\text{align}} = \text{atan2}(v_{1, y}, v_{1, x})
+$$
 
 #### 2.2 Kinetic Shock & Pothole Variance Gating
+
 Road imperfections (potholes, speed breakers, bridge expansion joints) generate high-frequency mechanical shock that corrupts standard integration. The jerk vector $\mathbf{j}_t$ and its sliding variance $\sigma_j^2$ isolate impacts:
-$$\mathbf{j}_t = \frac{\mathbf{a}_t - \mathbf{a}_{t-1}}{\Delta t}, \quad \sigma_j^2 = \frac{1}{W}\sum_{\tau=0}^{W-1} \|\mathbf{j}_{t-\tau} - \bar{\mathbf{j}}\|^2$$
-$$\text{If } \sigma_j^2 > 450\text{ m/s}^6 \implies \mathbf{Q}_k \leftarrow 50 \times \mathbf{Q}_k, \quad \mathbf{R}_{\text{pseudo}} \leftarrow 100 \times \mathbf{R}_{\text{pseudo}}$$
+
+$$
+\mathbf{j}_t = \frac{\mathbf{a}_t - \mathbf{a}_{t-1}}{\Delta t}, \quad \sigma_j^2 = \frac{1}{W}\sum_{\tau=0}^{W-1} \|\mathbf{j}_{t-\tau} - \bar{\mathbf{j}}\|^2
+$$
+
+$$
+\sigma_j^2 > 450\text{ m/s}^6 \implies \mathbf{Q}_k \leftarrow 50 \times \mathbf{Q}_k, \quad \mathbf{R}_{\text{pseudo}} \leftarrow 100 \times \mathbf{R}_{\text{pseudo}}
+$$
 
 #### 2.3 Standstill Lock: Generalized Likelihood Ratio Test (GLRT) ZUPT
+
 At red lights and during traffic idling, engine vibrations create false acceleration that integrates into phantom motion. The Skog GLRT test statistic enforces true zero-velocity clamping:
-$$T_L = \frac{1}{N}\sum_{k=n}^{n+N-1} \left( \frac{1}{\sigma_a^2}\|\mathbf{a}_k - g\hat{\mathbf{u}}_g\|^2 + \frac{1}{\sigma_g^2}\|\boldsymbol{\omega}_k\|^2 \right) < \gamma \implies \mathbf{v}_t \equiv \mathbf{0}, \quad \delta\mathbf{v}_t = \mathbf{0}$$
+
+$$
+T_L = \frac{1}{N}\sum_{k=n}^{n+N-1} \left( \frac{1}{\sigma_a^2}\|\mathbf{a}_k - g\hat{\mathbf{u}}_g\|^2 + \frac{1}{\sigma_g^2}\|\boldsymbol{\omega}_k\|^2 \right) < \gamma \implies \mathbf{v}_t \equiv \mathbf{0}, \quad \delta\mathbf{v}_t = \mathbf{0}
+$$
 
 #### 2.4 8-Channel Dilated Causal SE-TCN with Heteroscedastic Uncertainty
+
 The neural network processes an 8-channel temporal tensor $\mathbf{X} \in \mathbb{R}^{B \times 8 \times 40}$ ($4.0\text{ seconds}$ at $10\text{ Hz}$). Dilations $d \in \{1, 2, 4, 8\}$ expand the receptive field without future data leakage:
-$$y_t = \sum_{k=0}^{K-1} f_k \cdot x_{t - d \cdot k}$$
+
+$$
+y_t = \sum_{k=0}^{K-1} f_k \cdot x_{t - d \cdot k}
+$$
+
 Channels are adaptively recalibrated via Squeeze-and-Excitation (SE):
-$$\mathbf{s} = \sigma\left(\mathbf{W}_2 \cdot \text{ReLU}(\mathbf{W}_1 \cdot \text{GAP}(\mathbf{F}))\right), \quad \tilde{\mathbf{F}} = \mathbf{s} \odot \mathbf{F}$$
+
+$$
+\mathbf{s} = \sigma\left(\mathbf{W}_2 \cdot \text{ReLU}(\mathbf{W}_1 \cdot \text{GAP}(\mathbf{F}))\right), \quad \tilde{\mathbf{F}} = \mathbf{s} \odot \mathbf{F}
+$$
+
 The dual-headed output predicts forward speed $\hat{v}$ and log-variance $s = \log(\sigma_v^2)$, trained using the Gaussian Negative Log-Likelihood (NLL) loss:
-$$\mathcal{L}_{\text{NLL}} = \frac{1}{2}\exp(-s)\|v_{\text{truth}} - \hat{v}\|^2 + \frac{1}{2}s$$
+
+$$
+\mathcal{L}_{\text{NLL}} = \frac{1}{2}\exp(-s)\|v_{\text{truth}} - \hat{v}\|^2 + \frac{1}{2}s
+$$
 
 #### 2.5 15-State Error-State Kalman Filter (ES-EKF)
+
 The error state vector represents 3D position, velocity, attitude error, and sensor biases:
-$$\delta \mathbf{x} = \begin{bmatrix} \delta \mathbf{p} & \delta \mathbf{v} & \delta \boldsymbol{\theta} & \mathbf{b}_a & \mathbf{b}_g \end{bmatrix}^T \in \mathbb{R}^{15}$$
+
+$$
+\delta \mathbf{x} = \begin{bmatrix} \delta \mathbf{p} & \delta \mathbf{v} & \delta \boldsymbol{\theta} & \mathbf{b}_a & \mathbf{b}_g \end{bmatrix}^T \in \mathbb{R}^{15}
+$$
+
 Continuous-time nominal propagation:
-$$\dot{\mathbf{p}} = \mathbf{v}, \quad \dot{\mathbf{v}} = \mathbf{R}(\mathbf{a}_m - \mathbf{b}_a) + \mathbf{g}, \quad \dot{\mathbf{R}} = \mathbf{R}[\boldsymbol{\omega}_m - \mathbf{b}_g]_\times$$
+
+$$
+\dot{\mathbf{p}} = \mathbf{v}, \quad \dot{\mathbf{v}} = \mathbf{R}(\mathbf{a}_m - \mathbf{b}_a) + \mathbf{g}, \quad \dot{\mathbf{R}} = \mathbf{R}[\boldsymbol{\omega}_m - \mathbf{b}_g]_\times
+$$
+
 Non-Holonomic Constraints (NHC) constrain lateral and vertical slip:
-$$\mathbf{H}_{\text{NHC}} = \begin{bmatrix} 0 & -\sin\psi & \cos\psi & \mathbf{0}_{1 \times 12} \\ 0 & 0 & 1 & \mathbf{0}_{1 \times 12} \end{bmatrix}, \quad \mathbf{z}_{\text{NHC}} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
+$$
+\mathbf{H}_{\text{NHC}} = \begin{bmatrix} 0 & -\sin\psi & \cos\psi & \mathbf{0}_{1 \times 12} \\ 0 & 0 & 1 & \mathbf{0}_{1 \times 12} \end{bmatrix}, \quad \mathbf{z}_{\text{NHC}} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+$$
+
 Joseph-Form stabilized covariance update maintains positive semi-definiteness on finite-precision mobile FP32 ALUs:
-$$\mathbf{P}^+ = (\mathbf{I} - \mathbf{K}\mathbf{H})\mathbf{P}^-(\mathbf{I} - \mathbf{K}\mathbf{H})^T + \mathbf{K}\mathbf{R}\mathbf{K}^T$$
+
+$$
+\mathbf{P}^+ = (\mathbf{I} - \mathbf{K}\mathbf{H})\mathbf{P}^-(\mathbf{I} - \mathbf{K}\mathbf{H})^T + \mathbf{K}\mathbf{R}\mathbf{K}^T
+$$
 
 #### 2.6 Continuous Sigmoidal HDOP Gate
+
 When entering a tunnel, GNSS HDOP surges rapidly. Rather than a brittle binary cutoff that causes display flickering, a sigmoidal transfer function smoothly decouples satellite updates:
-$$\lambda(h) = \frac{1}{1 + \exp\left(-1.2(h - 3.5)\right)}, \quad \mathbf{R}_{\text{eff}} = \left(1 + 99\lambda(h)\right)\mathbf{R}_{\text{nominal}}$$
+
+$$
+\lambda(h) = \frac{1}{1 + \exp\left(-1.2(h - 3.5)\right)}, \quad \mathbf{R}_{\text{eff}} = \left(1 + 99\lambda(h)\right)\mathbf{R}_{\text{nominal}}
+$$
 
 ---
 
@@ -204,7 +255,7 @@ Terminal Error   | Ground Truth Ref  | +194.0 m Off-Course  | 0.42 m (0.17m port
 
 ## 💻 Section E: ISRO Stage-2 Screening CLI (One-Command Reproduction)
 
-ISRO evaluators can run our pre-trained INT8 ONNX model over any unseen CSV or ROSbag sequence using the unified screening script [`scripts/evaluate_iovnbd.py`](file:///e:/inventor/scripts/evaluate_iovnbd.py):
+ISRO evaluators can run our pre-trained INT8 ONNX model over any unseen CSV or ROSbag sequence using the unified screening script [`scripts/evaluate_iovnbd.py`](scripts/evaluate_iovnbd.py):
 
 ### 1. Python Screening CLI (IO-VNBD / Custom CSV)
 ```bash
@@ -254,7 +305,7 @@ flutter run --release
 │   └── normalize_stats.json    # Channel mean and std dev vectors
 ├── cpp_mobile_app/             # C++20 SIMD Native Edge Engine (200 Hz FOG Ready)
 │   ├── CMakeLists.txt          # AVX2 / ARM NEON SIMD compilation
-│   └── src/                    # ES-EKF, Mahony alignment & FOG parsers
+│   └── core/src/               # ES-EKF, Mahony alignment & FOG parsers
 ├── docs/                       # Interactive Aerospace GitHub Pages Telemetry Site
 │   ├── index.html              # Dark-mode dashboard with KaTeX equations
 │   ├── styles.css              # Cyberpunk / Aerospace HUD styles
@@ -266,10 +317,8 @@ flutter run --release
 │   ├── results.json            # 64-trip validation logs
 │   └── test.py                 # Standalone validation runner
 ├── lib/                        # Production Flutter Cross-Platform Client
-│   ├── core/alignment/         # Mahony SO(3) & PCA azimuth lock
-│   ├── core/filters/           # Jerk Variance Gate, Skog ZUPT & 15-State ES-EKF
-│   ├── core/map/               # Offline OSM GeoJSON Orthogonal Vector Snapper
-│   └── ui/                     # Dark-mode real-time telemetry HUD
+│   ├── services/               # Mahony SO(3), Jerk Gate, Skog ZUPT, ES-EKF, Map Snapper
+│   └── screens/                # Dark-mode real-time telemetry HUD
 ├── scripts/                    # Automation & Evaluation Utilities
 │   ├── evaluate_iovnbd.py      # Universal CLI evaluator for ISRO scientists
 │   └── download_osm_roads.py   # Offline OSM vector tile extractor
@@ -278,18 +327,9 @@ flutter run --release
 
 ---
 
-## 🏆 Innovation & Intellectual Property Highlights
-
-1. **Zero-CapEx Consumer Deployment:** Completely eliminates costly OBD-II dongles and fleet CAN-bus splicing. Runs on any sub-₹15,000 Android smartphone.
-2. **Dual-Frequency Scalability:** Seamlessly scales from **10 Hz mobile updates** to **200 Hz industrial FOG telemetry** without mathematical reformulation.
-3. **Pothole-Proof Kinematic Gating:** The Jerk Variance Gate rejects violent vertical suspension shock, preventing the EKF covariance from destabilizing on rugged Indian roads.
-4. **Offline Vector Resiliency:** Operates 100% offline using compact OSM GeoJSON tiles (`~15 MB/city`), guaranteeing sovereign privacy and zero remote dependency.
-
----
-
 ## 👥 Team Inventor (Team ID: 133715)
 
-* **Team Lead & Core Architect:** Yash Ekhande ([GitHub](https://github.com/YashEkhande24))
+* **Team Lead & Core Architect:** Yash Ekhande ([GitHub Profile](https://github.com/YashEkhande24))
 * **Organization:** Indian Space Research Organisation (ISRO) | SIH 2026
 * **Problem Statement:** SIH26168 (*AI-ML based Intelligent Dead Reckoning system for seamless navigation*)
 * **Repository:** [https://github.com/YashEkhande24/idr-desktop-simulator](https://github.com/YashEkhande24/idr-desktop-simulator)

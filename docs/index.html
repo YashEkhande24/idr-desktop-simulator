@@ -14,7 +14,7 @@
   <!-- KaTeX for Aerospace Math Equations -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
   <!-- Chart.js for High-Precision Telemetry Plots -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -35,13 +35,13 @@
     <nav class="nav-links">
       <a href="#benchmarks" class="nav-link">IO-VNBD Benchmarks</a>
       <a href="#architecture" class="nav-link">Mathematical Architecture</a>
-      <a href="#compliance" class="nav-link">ISRO Compliance</a>
+      <a href="#implementation" class="nav-link">Source Mapping</a>
       <a href="#playground" class="nav-link">Outage Simulator</a>
       <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn-telemetry">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
         GitHub Repository
       </a>
-      <a href="../idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-telemetry btn-emerald">
+      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-telemetry btn-emerald">
         Download INT8 ONNX (2.1 MB)
       </a>
     </nav>
@@ -62,14 +62,14 @@
     </p>
 
     <div class="hero-actions">
-      <a href="../build/app/outputs/flutter-apk/app-release.apk" class="btn-telemetry btn-emerald" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
+      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/presentation_website/downloads/idr_pure_cpp_engine.apk" class="btn-telemetry btn-emerald" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
         📱 Download Android Production APK
       </a>
-      <a href="../idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-telemetry" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
+      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-telemetry" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
         🧠 Download 2.1 MB INT8 Model
       </a>
-      <a href="#cli-guide" class="btn-telemetry" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.2); color:#fff;">
-        ⚡ Run Screening CLI
+      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn-telemetry" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.2); color:#fff;">
+        ⚡ View Evaluation Script (Python)
       </a>
     </div>
 
@@ -167,13 +167,13 @@
     </div>
   </section>
 
-  <!-- ISRO Benchmark Compliance Matrix -->
-  <section class="section" id="compliance">
+  <!-- ISRO Technical Solution & Implementation Architecture -->
+  <section class="section" id="implementation">
     <div class="section-header">
-      <div class="section-tag">Verification & Requirements</div>
-      <h2 class="section-title">ISRO Expected Solution Compliance Matrix</h2>
+      <div class="section-tag">Implementation Mapping</div>
+      <h2 class="section-title">ISRO Solution & Codebase Architecture</h2>
       <p class="section-subtitle">
-        Every technical requirement from Problem Statement <strong>SIH26168</strong> verified against concrete repository implementations:
+        Every technical requirement from Problem Statement <strong>SIH26168</strong> directly mapped to verified repository source files:
       </p>
     </div>
 
@@ -185,8 +185,7 @@
             <th>ISRO Requirement</th>
             <th>IDR-Navigator Technical Approach</th>
             <th>Mathematical Formulation</th>
-            <th>File Location</th>
-            <th>Audit Status</th>
+            <th>Direct Repository Source Links</th>
           </tr>
         </thead>
         <tbody>
@@ -195,48 +194,62 @@
             <td><strong>In-Vehicle Alignment & Dynamic Calibration</strong><br><small style="color:#64748b;">Dashboard, vent, cup holder, unconstrained mount</small></td>
             <td>Mahony $SO(3)$ Gravity Leveling + PCA forward velocity axis lock with mid-drive continuous re-leveling.</td>
             <td>$$\hat{g} = \frac{\bar{a}}{\|\bar{a}\|}, \quad C v_1 = \lambda_1 v_1$$</td>
-            <td><code>lib/core/alignment/cabin_alignment.dart</code></td>
-            <td><span class="badge-pass">✔ 100% COMPLIANT</span></td>
+            <td>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/cabin_alignment.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/cabin_alignment.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/cpp_mobile_app/core/src/cabin_aligner.cpp" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">cpp_mobile_app/core/src/cabin_aligner.cpp ↗</a>
+            </td>
           </tr>
           <tr>
             <td><strong>2</strong></td>
             <td><strong>AI Speed & Kinetic Vibration Filter</strong><br><small style="color:#64748b;">Potholes, expansion joints, idle vibration, no OBD-II</small></td>
             <td>8-Channel Dilated Causal SE-TCN ($2.1\text{ MB}$ INT8) + Jerk Variance Shock Gate + Skog GLRT ZUPT standstill lock.</td>
             <td>$$[\hat{v}, \sigma_v^2] = f_{\text{TCN}}(X_{t-4s:t}), \quad \sigma_j^2 > 450\implies Q\times 50$$</td>
-            <td><code>lib/core/ai/tcn_speed_engine.dart</code><br><code>lib/core/filters/vibration_gate.dart</code></td>
-            <td><span class="badge-pass">✔ 100% COMPLIANT</span></td>
+            <td>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/tcn_speed_engine.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/tcn_speed_engine.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/vibration_gate.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/vibration_gate.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/idr_model_submission/model_architecture.py" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">idr_model_submission/model_architecture.py ↗</a>
+            </td>
           </tr>
           <tr>
             <td><strong>3</strong></td>
             <td><strong>Advanced Map-Matching & Kinematic Constraints</strong><br><small style="color:#64748b;">Multi-level flyovers, road networks, offline maps</small></td>
             <td>15-State Error-State EKF with Non-Holonomic Constraints (NHC) + Orthogonal OSM Vector Snapping + Barometric Deck Discrimination.</td>
             <td>$$v_{\text{lat}} \approx 0, \quad v_{\text{vert}} \approx 0$$<br>$$p_{\text{snap}} = p_0 + ((p_{\text{raw}} - p_0)\cdot\hat{u})\hat{u}$$</td>
-            <td><code>lib/core/filters/ekf_3d.dart</code><br><code>lib/core/map/map_matcher.dart</code></td>
-            <td><span class="badge-pass">✔ 100% COMPLIANT</span></td>
+            <td>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/ekf_3d.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/ekf_3d.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/map_snapper.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/map_snapper.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/download_osm_roads.py" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">scripts/download_osm_roads.py ↗</a>
+            </td>
           </tr>
           <tr>
             <td><strong>4</strong></td>
             <td><strong>GNSS + INS Fusion Engine</strong><br><small style="color:#64748b;">Tight integration with dynamic covariance weighting</small></td>
             <td>15-State ES-EKF with Joseph-Form covariance update and learned $\sigma_v^2$ weighting for pseudo-measurement updates.</td>
             <td>$$\delta x = [\delta p, \delta v, \delta\theta, b_a, b_g]^T \in \mathbb{R}^{15}$$<br>$$P^+ = (I-KH)P^-(I-KH)^T + KRK^T$$</td>
-            <td><code>lib/core/filters/ekf_3d.dart</code><br><code>cpp_mobile_app/src/fusion/es_ekf.cpp</code></td>
-            <td><span class="badge-pass">✔ 100% COMPLIANT</span></td>
+            <td>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/ekf_3d.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/ekf_3d.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/cpp_mobile_app/core/src/ekf_3d.cpp" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">cpp_mobile_app/core/src/ekf_3d.cpp ↗</a>
+            </td>
           </tr>
           <tr>
             <td><strong>5</strong></td>
             <td><strong>Seamless GNSS Deficit Handler</strong><br><small style="color:#64748b;">Sub-5ms smooth transition during outage entry/exit</small></td>
             <td>Continuous Sigmoidal HDOP Gate smoothly scaling GNSS measurement noise covariance, eliminating teleportation artifacts.</td>
             <td>$$\lambda(h) = \frac{1}{1 + e^{-1.2(h - 3.5)}}, \quad R_{\text{eff}} = (1 + 99\lambda)R_{\text{GNSS}}$$</td>
-            <td><code>lib/core/filters/ekf_3d.dart</code><br><code>lib/core/fusion/hdop_gate.dart</code></td>
-            <td><span class="badge-pass">✔ 100% COMPLIANT</span></td>
+            <td>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/ekf_3d.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/ekf_3d.dart ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/cpp_mobile_app/core/src/pipeline.cpp" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">cpp_mobile_app/core/src/pipeline.cpp ↗</a>
+            </td>
           </tr>
           <tr>
             <td><strong>6</strong></td>
             <td><strong>Performance Benchmark & Edge Execution</strong><br><small style="color:#64748b;">&lt;10% drift, 10 Hz mobile UI, 200 Hz industrial FOG</small></td>
             <td>Achieves <strong>0.02%–0.05% drift</strong> (vs. &lt;10% requirement), <strong>93.8% pass rate</strong> (60/64 trips), and 200 Hz C++20 SIMD execution.</td>
             <td>$$\text{Drift}_{\text{tunnel}} = 0.05\% \ll 10.0\%$$<br>$$\text{Latency}_{\text{FOG}} < 1.8\text{ ms} \ll 5.0\text{ ms}$$</td>
-            <td><code>idr_model_submission/results.json</code><br><code>cpp_mobile_app/</code></td>
-            <td><span class="badge-pass">✔ 100% COMPLIANT</span></td>
+            <td>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/idr_model_submission/results.json" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">idr_model_submission/results.json ↗</a><br>
+              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">scripts/evaluate_iovnbd.py ↗</a>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -384,8 +397,8 @@ if (lambda > 0.99) {
             <div class="val" id="stat-base-drift" style="color:#ef4444;">144.0 m</div>
           </div>
           <div class="telemetry-stat">
-            <div class="lbl">SIH RULE</div>
-            <div class="val" id="stat-pass-status" style="color:#10b981;">PASSED</div>
+            <div class="lbl">DRIFT REDUCTION</div>
+            <div class="val" id="stat-pass-status" style="color:#10b981;">99.8%</div>
           </div>
         </div>
       </div>
@@ -447,8 +460,8 @@ python scripts/evaluate_iovnbd.py \
       </div>
       <div class="footer-links">
         <a href="https://github.com/YashEkhande24/idr-desktop-simulator" class="nav-link">GitHub Source</a>
-        <a href="../README.md" class="nav-link">Technical Dossier</a>
-        <a href="../SIH26168_133715_Inventor.pdf" class="nav-link">Submission Presentation (PDF)</a>
+        <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/README.md" class="nav-link">Technical Dossier</a>
+        <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/SIH26168_133715_Inventor.pdf" class="nav-link">Submission Presentation (PDF)</a>
       </div>
     </div>
   </footer>

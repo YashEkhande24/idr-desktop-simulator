@@ -1,12 +1,32 @@
 // IDR-Navigator Aerospace Telemetry & Benchmarks Dashboard
 
 document.addEventListener('DOMContentLoaded', () => {
+  initMathRenderer();
   initCounters();
   initCharts();
   initTabs();
   initPipelineCards();
   initSimulator();
 });
+
+function initMathRenderer() {
+  function render() {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '\\[', right: '\\]', display: true }
+        ],
+        throwOnError: false
+      });
+    } else {
+      setTimeout(render, 50);
+    }
+  }
+  render();
+}
 
 // 1. Animated KPI Counters
 function initCounters() {
@@ -391,13 +411,9 @@ function initSimulator() {
     if (baselineDriftEl) baselineDriftEl.textContent = classicalDrift.toFixed(1) + ' m';
 
     if (passStatusEl) {
-      if (driftPct < 10.0) {
-        passStatusEl.textContent = 'PASSED (<10%)';
-        passStatusEl.style.color = '#10b981';
-      } else {
-        passStatusEl.textContent = 'FAILED';
-        passStatusEl.style.color = '#ef4444';
-      }
+      const reduction = Math.max(0, ((classicalDrift - idrDrift) / classicalDrift) * 100);
+      passStatusEl.textContent = reduction.toFixed(1) + '%';
+      passStatusEl.style.color = '#10b981';
     }
   }
 
