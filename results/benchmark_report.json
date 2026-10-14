@@ -3,12 +3,12 @@
   "isro_requirement": "< 10.0% drift",
   "true_distance_m": 1639.88,
   "outage_duration_s": 120.0,
-  "idr_drift_m": 0.702,
-  "idr_drift_pct": 0.0428,
+  "idr_drift_m": 1.033,
+  "idr_drift_pct": 0.063,
   "classical_drift_m": 612.0,
   "classical_drift_pct": 37.32,
-  "speed_mae_mps": 0.123,
-  "speed_mae_kmh": 0.44,
+  "speed_mae_mps": 0.095,
+  "speed_mae_kmh": 0.34,
   "model_used": "idr_model_submission/idr_neurospeed_tcn_int8.onnx",
   "onnx_session_active": true
 }

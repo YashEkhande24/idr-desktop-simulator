@@ -400,6 +400,153 @@ body {
   box-shadow: 0 0 8px #10b981;
 }
 
+/* 5-View Multi-Benchmark Selector Bar */
+.view-selector-container {
+  margin-bottom: 1.25rem;
+}
+
+.view-selector-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-selector-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: rgba(11, 15, 25, 0.6);
+  padding: 0.4rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.view-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.view-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.view-btn.active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(0, 92, 237, 0.15));
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+}
+
+.view-btn .pill {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+/* Reconciliation Callout Box */
+.reconciliation-callout {
+  background: linear-gradient(135deg, rgba(16, 24, 40, 0.95), rgba(11, 15, 25, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.reconciliation-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--accent-cyan);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.reconciliation-text {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.reconciliation-text strong {
+  color: #fff;
+}
+
+/* 64-Sequence Failure Mode Inspector Grid */
+.failure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.failure-card {
+  background: rgba(11, 15, 25, 0.8);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.failure-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.failure-card h4 {
+  font-size: 0.88rem;
+  color: #f87171;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.failure-card p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Telemetry Meta Strip */
+.telemetry-meta-bar {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.82rem;
+  color: #94a3b8;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+}
+
 .dot-cyan {
   width: 10px;
   height: 10px;
