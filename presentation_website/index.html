@@ -1,485 +1,601 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDR-Navigator | Intelligent Dead Reckoning & GNSS Fusion System</title>
-  <meta name="description" content="AI-ML based Intelligent Dead Reckoning system for continuous vehicular navigation during satellite outages using smartphone sensors. Smart India Hackathon 2026 | ISRO IISU/SAC | Team Inventor #133715.">
-  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IDR-Navigator — Inertial Dead Reckoning Under GNSS Denial (ISRO SIH26168)</title>
+  <meta name="description" content="Inertial Dead Reckoning on uncalibrated commodity smartphones during prolonged GNSS outages. Team Inventor #133715 — ISRO Smart India Hackathon 2026." />
+  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg" />
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Editorial Typography: Newsreader (Serif), Plus Jakarta Sans (Body), JetBrains Mono (Telemetry) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Chart.js for Benchmark Telemetry -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-  <link rel="stylesheet" href="style.css?v=20261019_2">
+  <link rel="stylesheet" href="style.css?v=20261019_3" />
 </head>
 <body>
 
-  <!-- Site Navigation -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <div class="brand">
-        <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
-        <div class="brand-text">
-          <h1>IDR-NAVIGATOR <span class="brand-badge">ISRO SIH26168</span></h1>
-          <p>Indian Space Research Organisation &bull; Team Inventor #133715</p>
-        </div>
+  <!-- Top Archival Monograph Bar -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-id">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="mono-label">ISRO SIH26168</span>
+        <span class="divider">/</span>
+        <span class="mono-label">TEAM INVENTOR #133715</span>
       </div>
 
       <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
 
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#overview">Overview</a></li>
-        <li><a href="#problem">The Problem</a></li>
-        <li><a href="#architecture">How It Works</a></li>
-        <li><a href="#benchmarks">Benchmarks</a></li>
-        <li><a href="#field-demo">Field Demo</a></li>
-        <li><a href="#simulator">Live Simulator</a></li>
-        <li><a href="#downloads">Downloads</a></li>
-      </ul>
-
-      <div class="header-actions">
-        <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.825rem;">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          GitHub
-        </a>
-      </div>
+      <nav class="topbar-nav" id="navLinks" aria-label="Document Sections">
+        <a href="#abstract"><span class="nav-num">01</span> Abstract</a>
+        <a href="#cascade"><span class="nav-num">02</span> Pipeline</a>
+        <a href="#benchmarks"><span class="nav-num">03</span> Benchmarks</a>
+        <a href="#demonstration"><span class="nav-num">04</span> Field Video</a>
+        <a href="#simulator"><span class="nav-num">05</span> Simulator</a>
+        <a href="#artifacts"><span class="nav-num">06</span> Artifacts</a>
+      </nav>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero-section" id="overview">
-    <div class="container hero-grid">
-      <div>
-        <div class="hero-tag">
-          Smart India Hackathon 2026 &bull; Problem Statement SIH26168
-        </div>
-        <h1 class="hero-title">
-          Navigation that doesn't stop when <span>satellite signals drop</span>.
-        </h1>
-        <p class="hero-desc">
-          When GPS signals vanish inside tunnels, underpasses, and urban corridors, standard navigation apps freeze or jump across buildings. 
-          <strong>IDR-Navigator</strong> turns an ordinary smartphone into a reliable inertial navigation system using on-device causal neural networks, Kalman filtering, and map matching—with zero vehicle modifications.
-        </p>
+  <main class="container">
 
-        <div class="hero-actions">
-          <a href="#field-demo" class="btn btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Watch Field Demo
-          </a>
-          <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn btn-secondary">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            Explore Source Code
-          </a>
-        </div>
-      </div>
-
-      <div class="hero-preview-card">
-        <img src="assets/images/hero_hud_showcase.jpg" alt="IDR-Navigator Telemetry HUD in Tunnel" class="hero-preview-img">
-        <div class="hero-preview-bar">
-          <span style="color: var(--text-secondary);">Tunnel Outage Test Run</span>
-          <span style="color: var(--accent-emerald); font-family: var(--font-mono); font-weight: 600;">Lane-Level Clamping Active</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Ground-Truth Metrics Strip -->
-  <section class="metrics-strip">
-    <div class="container">
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">Benchmark Pass Rate</span>
+    <!-- =========================================================
+         SECTION 01: HERO / EDITORIAL MONOGRAPH HEADER
+    ========================================================== -->
+    <section id="abstract" class="hero-section">
+      <div class="editorial-grid">
+        
+        <!-- Left Column: Technical Dossier Metadata -->
+        <aside class="hero-meta">
+          <div class="meta-block">
+            <div class="meta-title">Problem Statement</div>
+            <div class="meta-value">GNSS-Denied Vehicular Navigation (Tunnels, Underpasses, Canyons)</div>
           </div>
-          <div class="metric-value emerald">100.0%</div>
-          <div class="metric-sub">5 of 5 test scenarios &lt;10% drift</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">Mean Positional Drift</span>
+          <div class="meta-block">
+            <div class="meta-title">Sponsoring Agency</div>
+            <div class="meta-value">Indian Space Research Organisation (ISRO IISU / SAC) — SIH26168</div>
           </div>
-          <div class="metric-value blue">3.47%</div>
-          <div class="metric-sub">Across all 5 real-world scenarios</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">Mean Speed Error</span>
+          <div class="meta-block">
+            <div class="meta-title">Hardware Target</div>
+            <div class="meta-value">Commodity Android MEMS IMU (100 Hz Accel &amp; Gyro). Zero Vehicle Retrofit.</div>
           </div>
-          <div class="metric-value">0.60 m/s</div>
-          <div class="metric-sub">Neural velocity estimation MAE</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">INT8 Model Size</span>
+          <div class="meta-block">
+            <div class="meta-title">Runtime Footprint</div>
+            <div class="meta-value mono">2.1 MB INT8 ONNX &middot; 2.2 ms/step</div>
           </div>
-          <div class="metric-value">2.1 MB</div>
-          <div class="metric-sub">Runs 100% locally on phone NPU</div>
-        </div>
-      </div>
-    </div>
-  </section>
+          <div class="meta-actions">
+            <a href="#artifacts" class="btn-primary">Download Artifacts &amp; APK</a>
+            <a href="#demonstration" class="btn-secondary">Watch Field Video</a>
+          </div>
+        </aside>
 
-  <!-- Section 1: The Problem -->
-  <section class="section" id="problem">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-eyebrow">The Challenge</div>
-        <h2 class="section-title">Why Navigation Breaks in Blackout Zones</h2>
-        <p class="section-desc">
-          When satellite line-of-sight is blocked, conventional navigation systems either freeze entirely or drift catastrophically off-road.
-        </p>
-      </div>
-
-      <div class="problem-grid">
-        <div class="problem-card">
-          <span class="card-badge rose">Consumer Apps</span>
-          <h3>Signal Drop &amp; Screen Freeze</h3>
-          <p>
-            Inside tunnels, underpasses, and urban canyons, GNSS satellite fixes drop to zero. Consumer apps freeze, report "Searching for GPS", or jump erratically to nearby flyovers and service roads, causing missed exits and dangerous driver confusion.
+        <!-- Right Column: Title, Abstract & Key Metrics -->
+        <div class="hero-main">
+          <div class="kicker">TECHNICAL MONOGRAPH &amp; FIELD VALIDATION REPORT</div>
+          <h1 class="hero-title">
+            IDR-Navigator: Bounded Inertial Dead Reckoning on Commodity Smartphones Without Vehicle Telemetry
+          </h1>
+          <p class="hero-abstract">
+            When consumer vehicles enter subterranean tunnels, dense urban canyons, or highway underpasses, Global Navigation Satellite System (GNSS) carrier locks degrade or vanish entirely. Classical strapdown inertial navigation on uncalibrated smartphone MEMS sensors diverges quadratically within seconds due to bias instability. <strong>IDR-Navigator</strong> replaces quadratic double integration with a five-stage hybrid estimation cascade—combining a 6-DoF attitude observer, spectral vibration gating, a causal Squeeze-and-Excitation Temporal Convolutional Network (SE-TCN), Zero-Velocity Updates (ZUPT), and offline OpenStreetMap vector constraints.
           </p>
-          <div class="card-footer-metric">
-            STATUS: 0 SATELLITES VISIBLE &bull; FROZEN UI
-          </div>
-        </div>
 
-        <div class="problem-card">
-          <span class="card-badge amber">Classical Inertial (INS)</span>
-          <h3>Quadratic Drift Explosion</h3>
-          <p>
-            Standard dead reckoning relies on double-integrating noisy accelerometer data. Sensor biases compound quadratically (&Delta;p &prop; &frac12; b t&sup2;), while gyro bias tilts gravity into the acceleration axis, causing drift to exceed 140 meters in just 30 seconds.
-          </p>
-          <div class="card-footer-metric">
-            30-SEC DRIFT: &gt;140 METERS OFF-ROAD
-          </div>
-        </div>
-
-        <div class="problem-card solution-card">
-          <span class="card-badge emerald">IDR-Navigator</span>
-          <h3>The 5-Stage Hybrid Cascade</h3>
-          <p>
-            Instead of raw acceleration integration, IDR-Navigator infers instantaneous forward velocity using a causal SE-TCN, fuses it with an Extended Kalman Filter enforcing vehicle physics constraints, and locks the trajectory to verified road geometries.
-          </p>
-          <div class="card-footer-metric" style="color: var(--accent-emerald);">
-            MEAN DRIFT: 3.47% &bull; &#8377;0 HARDWARE RETROFIT
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 2: How It Works -->
-  <section class="section" id="architecture" style="background: var(--bg-secondary);">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-eyebrow">Architecture</div>
-        <h2 class="section-title">The 5-Stage Hybrid Pipeline</h2>
-        <p class="section-desc">
-          How our software pipeline replaces open-loop integration with a robust, physics-constrained state estimator.
-        </p>
-      </div>
-
-      <div class="pipeline-flow">
-        <div class="pipeline-step">
-          <div class="step-num">STAGE 01</div>
-          <h4>Attitude Observer</h4>
-          <p>Dynamic Mahony SO(3) filter continuously decouples gravity and phone tilt from vehicle acceleration vectors.</p>
-        </div>
-
-        <div class="pipeline-step">
-          <div class="step-num">STAGE 02</div>
-          <h4>Vibration Gate</h4>
-          <p>Savitzky-Golay jerk filter isolates chassis vibration harmonics and speed-breaker shocks from genuine motion.</p>
-        </div>
-
-        <div class="pipeline-step">
-          <div class="step-num">STAGE 03</div>
-          <h4>Neural Speed (TCN)</h4>
-          <p>8-channel Causal Dilated SE-TCN predicts instantaneous forward speed at 20 Hz without satellite fixes.</p>
-        </div>
-
-        <div class="pipeline-step">
-          <div class="step-num">STAGE 04</div>
-          <h4>Zero-Velocity (ZUPT)</h4>
-          <p>Detects full vehicle stops at traffic lights instantly, freezing coordinate drift without relying on GPS Doppler.</p>
-        </div>
-
-        <div class="pipeline-step">
-          <div class="step-num">STAGE 05</div>
-          <h4>Vector Map Snapping</h4>
-          <p>Projects state estimates onto offline OpenStreetMap road polylines, clamping cross-track error to the roadway.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 3: Verified Benchmarks -->
-  <section class="section" id="benchmarks">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-eyebrow">Ground Truth Results</div>
-        <h2 class="section-title">Verified ISRO Benchmark Scenarios</h2>
-        <p class="section-desc">
-          All values are taken verbatim from <code>idr_model_submission/results.json</code>, evaluated using live ONNX Runtime inference on 5 real-world test scenarios.
-        </p>
-      </div>
-
-      <div class="benchmarks-container">
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Scenario</th>
-                <th>Distance</th>
-                <th>Drift</th>
-                <th>Speed MAE</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="scenario-title">1. Highway Tunnel</td>
-                <td>1600.0 m</td>
-                <td>0.43% (6.81m)</td>
-                <td>0.40 m/s</td>
-                <td class="pass-badge">PASS (&lt;10%)</td>
-              </tr>
-              <tr>
-                <td class="scenario-title">2. Urban Stop &amp; Go</td>
-                <td>770.5 m</td>
-                <td>2.38% (18.31m)</td>
-                <td>0.45 m/s</td>
-                <td class="pass-badge">PASS (&lt;10%)</td>
-              </tr>
-              <tr>
-                <td class="scenario-title">3. Interstate Cruise</td>
-                <td>1538.9 m</td>
-                <td>0.80% (12.38m)</td>
-                <td>0.42 m/s</td>
-                <td class="pass-badge">PASS (&lt;10%)</td>
-              </tr>
-              <tr>
-                <td class="scenario-title">4. Winding Mountain Road</td>
-                <td>305.9 m</td>
-                <td>4.68% (14.31m)</td>
-                <td>0.37 m/s</td>
-                <td class="pass-badge">PASS (&lt;10%)</td>
-              </tr>
-              <tr>
-                <td class="scenario-title">5. Two-Wheeler Urban</td>
-                <td>840.3 m</td>
-                <td>9.08% (76.32m)</td>
-                <td>1.36 m/s</td>
-                <td class="pass-badge">PASS (&lt;10%)</td>
-              </tr>
-              <tr style="background: rgba(255, 255, 255, 0.03); font-weight: 600;">
-                <td class="scenario-title">Aggregate Summary</td>
-                <td>5055.6 m</td>
-                <td style="color: var(--accent-emerald);">3.47% Mean</td>
-                <td>0.60 m/s</td>
-                <td class="pass-badge">100% PASS (5/5)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-card-head">
-            <span class="chart-title">Drift Comparison: IDR vs Classical Double Integration</span>
-          </div>
-          <div class="chart-container-box">
-            <canvas id="benchmarkChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 4: Field Demonstration Video -->
-  <section class="section" id="field-demo" style="background: var(--bg-secondary);">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-eyebrow">Field Testing</div>
-        <h2 class="section-title">Field Demonstration &amp; Telemetry Video</h2>
-        <p class="section-desc">
-          Synchronized road ground-truth camera feed paired side-by-side with the real-time cockpit HUD during simulated blackouts.
-        </p>
-      </div>
-
-      <div class="video-showcase-box">
-        <div class="video-player-container">
-          <video id="demoVideo" controls poster="assets/images/hero_hud_showcase.jpg">
-            <source src="assets/videos/demo_recording.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        <div class="video-meta-bar">
-          <div class="trial-summary">
-            <h4>Trial 01: Highway Underpass Outage</h4>
-            <p>Pune–Nashik Highway (NH60). Location toggled OFF at 00:07 to simulate instant tunnel blackout. Demonstrates neural speed estimation and lane clamping.</p>
-            <div class="trial-badges">
-              <button class="trial-pill" data-jump-time="0">Phase 1: Open Sky (00:00)</button>
-              <button class="trial-pill" data-jump-time="7">Phase 2: Cut GPS (00:07)</button>
-              <button class="trial-pill" data-jump-time="35">Phase 4: Traversal (00:35)</button>
+          <!-- Key Empirical Findings Ledger -->
+          <div class="key-metrics-strip" role="region" aria-label="Summary Benchmark Metrics">
+            <div class="metric-cell">
+              <span class="metric-label">Mean Positional Drift</span>
+              <div class="metric-number">3.47<span class="metric-unit">%</span></div>
+              <span class="metric-note">Across 5,055 m total outage testing</span>
             </div>
-          </div>
-
-          <div class="trial-summary">
-            <h4>Trial 02: Extended Bypass Run</h4>
-            <p>Sangamner Bypass. Multi-minute extended blackout demonstrating edge NPU efficiency, vibration rejection on a two-wheeler, and topological road snapping.</p>
-            <div class="trial-badges">
-              <button class="trial-pill" data-jump-time="211">Phase 8: Bypass Start (03:31)</button>
-              <button class="trial-pill" data-jump-time="230">Phase 9: High-Speed (03:50)</button>
-              <button class="trial-pill" data-jump-time="315">Phase 11: 8km Check (05:15)</button>
+            <div class="metric-cell">
+              <span class="metric-label">ISRO &lt;10% Compliance</span>
+              <div class="metric-number accent-pass">100<span class="metric-unit">%</span></div>
+              <span class="metric-note">5 of 5 benchmark regimes passed</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Best Outage Accuracy</span>
+              <div class="metric-number">0.43<span class="metric-unit">%</span></div>
+              <span class="metric-note">1,600 m Highway Tunnel (0.40 m/s MAE)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">External Hardware</span>
+              <div class="metric-number">&#8377;0</div>
+              <span class="metric-note">No OBD-II, CAN bus, or wheel encoders</span>
             </div>
           </div>
         </div>
+
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Section 5: Interactive Simulator -->
-  <section class="section" id="simulator">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-eyebrow">Interactive Demo</div>
-        <h2 class="section-title">Live In-Browser Physics Simulator</h2>
-        <p class="section-desc">
-          Watch in real-time how open-loop double integration flies off the road while IDR-Navigator stays locked to the highway corridor during a tunnel outage.
-        </p>
+    <!-- =========================================================
+         SECTION 02: THE 5-STAGE ESTIMATION CASCADE
+    ========================================================== -->
+    <section id="cascade" class="section-block">
+      <div class="editorial-grid">
+        
+        <div class="section-sidebar">
+          <div class="section-index">§ 02 — ARCHITECTURE</div>
+          <h2 class="section-heading">Five-Stage Estimation Cascade</h2>
+          <p class="sidebar-prose">
+            Rather than integrating noisy body-frame acceleration (&iint; a(t) dt&sup2;), IDR-Navigator reformulates dead reckoning as a sequential velocity-estimation and topological projection problem running natively on the smartphone CPU/NPU.
+          </p>
+          <div class="sidebar-callout">
+            <div class="callout-label">Why Naive IMU Fails</div>
+            <p>
+              A 0.02 m/s&sup2; uncompensated accelerometer bias accumulates <strong>36 meters of error in 60 seconds</strong> and over <strong>144 meters in two minutes</strong>. Bounding error requires learning velocity directly from multi-axis dynamics.
+            </p>
+          </div>
+        </div>
+
+        <div class="section-content">
+          <div class="cascade-list">
+
+            <!-- Stage 1 -->
+            <article class="cascade-item">
+              <div class="cascade-header">
+                <span class="stage-num">STAGE 01</span>
+                <h3 class="stage-title">6-DoF Attitude Observer &amp; Frame Alignment</h3>
+                <span class="stage-spec">100 Hz &middot; SO(3) Manifold</span>
+              </div>
+              <p class="stage-desc">
+                Smartphones are placed arbitrarily in cupholders, dashboard mounts, or handlebar clamps. An adaptive Mahony complementary filter fuses tri-axial gyroscope angular rates with low-pass gravitational acceleration vectors to maintain a continuous orientation quaternion. Dynamic PCA over horizontal acceleration during pre-outage GNSS lock resolves the yaw misalignment angle between the phone's silicon axes and the vehicle's forward heading vector.
+              </p>
+              <div class="stage-io">
+                <span>Input: Raw a_b, &omega;_b &isin; &reals;&sup3; (100 Hz)</span>
+                <span>Output: Gravity-compensated vehicle-frame kinematics</span>
+              </div>
+            </article>
+
+            <!-- Stage 2 -->
+            <article class="cascade-item">
+              <div class="cascade-header">
+                <span class="stage-num">STAGE 02</span>
+                <h3 class="stage-title">Spectral Vibration &amp; Jerk Gate</h3>
+                <span class="stage-spec">Savitzky-Golay &middot; 128-Sample Window</span>
+              </div>
+              <p class="stage-desc">
+                Internal combustion engines and two-wheeler chassis generate high-amplitude harmonic vibrations (18–65 Hz) that mimic forward acceleration. Our spectral gate computes short-time energy ratios between vehicle locomotion bands (0.3–8.0 Hz) and structural resonance bands, suppressing phantom speed surges and road bump shocks before neural inference.
+              </p>
+              <div class="stage-io">
+                <span>Input: Windowed acceleration a_v[t-128 : t]</span>
+                <span>Output: Jerk-gated motion confidence mask</span>
+              </div>
+            </article>
+
+            <!-- Stage 3 -->
+            <article class="cascade-item">
+              <div class="cascade-header">
+                <span class="stage-num">STAGE 03</span>
+                <h3 class="stage-title">Causal SE-TCN Forward Velocity Estimator</h3>
+                <span class="stage-spec">INT8 ONNX &middot; 2.1 MB &middot; 20 Hz Inference</span>
+              </div>
+              <p class="stage-desc">
+                At the core of the pipeline, an 8-channel causal Temporal Convolutional Network with Squeeze-and-Excitation (SE) channel attention ingests a 4.0-second receptive field of gravity-removed IMU streams. Using exponentially dilated causal convolutions (d &isin; {1, 2, 4, 8}), the network regresses instantaneous forward speed directly from road-surface micro-excitations—converting quadratic error growth into bounded linear error.
+              </p>
+              <div class="stage-io">
+                <span>Input: Tensor [1 &times; 8 &times; 40] INT8/FP32</span>
+                <span>Output: Estimated velocity v&#770;(t) (m/s) &amp; uncertainty &sigma;&sup2;</span>
+              </div>
+            </article>
+
+            <!-- Stage 4 -->
+            <article class="cascade-item">
+              <div class="cascade-header">
+                <span class="stage-num">STAGE 04</span>
+                <h3 class="stage-title">Zero-Velocity Updates (ZUPT) &amp; Non-Holonomic Constraints</h3>
+                <span class="stage-spec">Error-State Kalman Filter</span>
+              </div>
+              <p class="stage-desc">
+                Wheeled vehicles obey non-holonomic physical constraints: lateral velocity (v_y &asymp; 0) and vertical velocity (v_z &asymp; 0) in the vehicle frame are tightly bounded. When the stopping detector confirms a standstill at urban traffic signals, ZUPT clamps velocity to zero instantly and calibrates gyroscope heading bias without relying on GPS Doppler.
+              </p>
+              <div class="stage-io">
+                <span>Input: v&#770;(t), &gamma;_vib, &omega;_z</span>
+                <span>Output: Drift-clamped 2D velocity vector &amp; corrected heading</span>
+              </div>
+            </article>
+
+            <!-- Stage 5 -->
+            <article class="cascade-item">
+              <div class="cascade-header">
+                <span class="stage-num">STAGE 05</span>
+                <h3 class="stage-title">Offline OSM Road Vector Snapping</h3>
+                <span class="stage-spec">Topological Map-Matching &middot; 1D Manifold</span>
+              </div>
+              <p class="stage-desc">
+                Unconstrained dead reckoning on prolonged bypasses can slowly accumulate azimuth drift. Stage 5 projects the dead-reckoned increments onto cached OpenStreetMap (OSM) highway polylines. This collapses the navigation search space from 2D/3D to a 1D roadway corridor, holding cross-track error to zero while neural speed governs along-track progression.
+              </p>
+              <div class="stage-io">
+                <span>Input: Dead-reckoned position + cached OSM spatial index</span>
+                <span>Output: Map-clamped geodetic coordinates</span>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
       </div>
+    </section>
 
-      <div class="sim-wrapper">
-        <div class="sim-controls-bar">
-          <div class="sim-btn-group">
-            <button id="btnSimOutage" class="btn btn-primary" onclick="toggleSimOutage()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Toggle GPS Outage</span>
-            </button>
-            <button id="btnSimShock" class="btn btn-secondary" onclick="injectSimShock()">
-              Road Bump (Shock)
-            </button>
-            <button id="btnSimZupt" class="btn btn-secondary" onclick="toggleSimZupt()">
-              Red Light (ZUPT)
-            </button>
-            <button class="btn btn-secondary" onclick="resetSimulator()">
-              Reset
-            </button>
-          </div>
+    <!-- =========================================================
+         SECTION 03: EMPIRICAL BENCHMARKS (results.json)
+    ========================================================== -->
+    <section id="benchmarks" class="section-block">
+      <div class="editorial-grid">
 
-          <div class="sim-telemetry-row">
-            <div>SPEED: <span id="simSpeedVal" style="color: #fff;">54.0 km/h</span></div>
-            <div>OUTAGE TIME: <span id="simOutageTimeVal" style="color: var(--accent-rose);">00:00</span></div>
-            <div>CLASSICAL DRIFT: <span id="simClassicDriftVal" style="color: var(--accent-rose);">0.0 m (0%)</span></div>
-            <div>IDR DRIFT: <span id="simIdrDriftVal" style="color: var(--accent-emerald);">0.2 m (0.00%)</span></div>
+        <div class="section-sidebar">
+          <div class="section-index">§ 03 — EMPIRICAL VALIDATION</div>
+          <h2 class="section-heading">GNSS Outage Benchmark Ledger</h2>
+          <p class="sidebar-prose">
+            Evaluated across five heterogeneous driving regimes taken verbatim from <span class="mono">results.json</span>. In each trial, satellite fixes were completely severed, forcing 100% reliance on the smartphone pipeline.
+          </p>
+          <div class="sidebar-callout" style="border-left-color: var(--accent-emerald);">
+            <div class="callout-label" style="color: var(--accent-emerald);">ISRO Acceptance Criterion</div>
+            <p>
+              Positional drift at the conclusion of the GNSS-denied segment must remain strictly below <strong>10.0% of total distance traveled</strong>.
+            </p>
           </div>
         </div>
 
-        <div class="sim-canvas-box">
-          <canvas id="simCanvas" width="900" height="480"></canvas>
+        <div class="section-content">
+          <div class="table-wrapper">
+            <div class="table-caption-top">
+              <span><strong>Table 1:</strong> Quantitative evaluation across 5 test scenarios (<span class="mono">idr_model_submission/results.json</span>).</span>
+              <span class="mono-label">THRESHOLD: &lt;10.00% DRIFT</span>
+            </div>
+
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Scenario Regime</th>
+                  <th class="num-col">Outage Dist.</th>
+                  <th class="num-col">Speed MAE</th>
+                  <th class="num-col">Positional Drift</th>
+                  <th class="bar-col">Drift vs. 10% Limit</th>
+                  <th class="status-col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="scenario-name">1. Highway Tunnel</div>
+                    <div class="scenario-sub">Subterranean bore, steady velocity, zero sky view</div>
+                  </td>
+                  <td class="num-col mono">1,600.0 m</td>
+                  <td class="num-col mono">0.40 m/s</td>
+                  <td class="num-col mono highlight-val">0.43% (6.8m)</td>
+                  <td class="bar-col">
+                    <div class="drift-meter" title="0.43% of 10% max threshold">
+                      <div class="drift-fill" style="width: 4.3%;"></div>
+                    </div>
+                  </td>
+                  <td class="status-col"><span class="tag-pass">PASS</span></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div class="scenario-name">2. Urban Stop &amp; Go</div>
+                    <div class="scenario-sub">Dense canyon, frequent braking, ZUPT active</div>
+                  </td>
+                  <td class="num-col mono">770.5 m</td>
+                  <td class="num-col mono">0.45 m/s</td>
+                  <td class="num-col mono highlight-val">2.38% (18.3m)</td>
+                  <td class="bar-col">
+                    <div class="drift-meter" title="2.38% of 10% max threshold">
+                      <div class="drift-fill" style="width: 23.8%;"></div>
+                    </div>
+                  </td>
+                  <td class="status-col"><span class="tag-pass">PASS</span></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div class="scenario-name">3. Interstate Cruise</div>
+                    <div class="scenario-sub">High-speed multi-lane arterial under simulated denial</div>
+                  </td>
+                  <td class="num-col mono">1,538.9 m</td>
+                  <td class="num-col mono">0.42 m/s</td>
+                  <td class="num-col mono highlight-val">0.80% (12.4m)</td>
+                  <td class="bar-col">
+                    <div class="drift-meter" title="0.80% of 10% max threshold">
+                      <div class="drift-fill" style="width: 8.0%;"></div>
+                    </div>
+                  </td>
+                  <td class="status-col"><span class="tag-pass">PASS</span></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div class="scenario-name">4. Winding Mountain Road</div>
+                    <div class="scenario-sub">High yaw-rate curves, grade changes, OSM snapping</div>
+                  </td>
+                  <td class="num-col mono">305.9 m</td>
+                  <td class="num-col mono">0.37 m/s</td>
+                  <td class="num-col mono highlight-val">4.68% (14.3m)</td>
+                  <td class="bar-col">
+                    <div class="drift-meter" title="4.68% of 10% max threshold">
+                      <div class="drift-fill" style="width: 46.8%;"></div>
+                    </div>
+                  </td>
+                  <td class="status-col"><span class="tag-pass">PASS</span></td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div class="scenario-name">5. Two-Wheeler Urban</div>
+                    <div class="scenario-sub">Dynamic roll/bank angles, severe chassis vibration</div>
+                  </td>
+                  <td class="num-col mono">840.3 m</td>
+                  <td class="num-col mono">1.36 m/s</td>
+                  <td class="num-col mono highlight-val">9.08% (76.3m)</td>
+                  <td class="bar-col">
+                    <div class="drift-meter" title="9.08% of 10% max threshold">
+                      <div class="drift-fill warn" style="width: 90.8%;"></div>
+                    </div>
+                  </td>
+                  <td class="status-col"><span class="tag-pass">PASS</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="summary-row">
+                  <td><strong>Aggregate / Mean Performance</strong></td>
+                  <td class="num-col mono"><strong>5,055.6 m</strong></td>
+                  <td class="num-col mono"><strong>0.60 m/s</strong></td>
+                  <td class="num-col mono" style="color: var(--accent-emerald);"><strong>3.47%</strong></td>
+                  <td class="bar-col">
+                    <div class="drift-meter" title="Mean 3.47% of 10% threshold">
+                      <div class="drift-fill" style="width: 34.7%;"></div>
+                    </div>
+                  </td>
+                  <td class="status-col"><span class="tag-pass">5/5 PASS</span></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Technical Commentary -->
+          <div class="editorial-note">
+            <div class="note-col">
+              <h4>Arterial &amp; Tunnel Stability (0.43% – 0.80%)</h4>
+              <p>
+                In steady-state highway corridors, road micro-vibration signatures correlate tightly with forward wheel speed. Combined with low yaw variance and 1D topological snapping, the causal SE-TCN achieves sub-1% drift over 1.6 kilometers.
+              </p>
+            </div>
+            <div class="note-col">
+              <h4>Two-Wheeler Roll Dynamics (9.08%)</h4>
+              <p>
+                Motorcycles lean into turns up to 25°–30°, causing lateral acceleration to align with the frame's apparent gravity vector. Under severe handlebar vibration and traffic filtering over 840 m, drift naturally rises to 9.08% but stays reliably within ISRO's 10% ceiling.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div class="sim-legend">
-          <div class="legend-item">
-            <div class="legend-dot emerald"></div>
-            <span>Green Vehicle: IDR-Navigator (Neural Velocity + Map Clamping)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-dot rose"></div>
-            <span>Red Vehicle: Classical Double Integration (Accelerates off-road)</span>
-          </div>
-        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Section 6: Downloads & Deliverables -->
-  <section class="section" id="downloads" style="background: var(--bg-secondary);">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-eyebrow">Deliverables</div>
-        <h2 class="section-title">Production Binaries &amp; Code</h2>
-        <p class="section-desc">
-          Download the production Android APK, quantized neural network weights, and offline Python evaluation script.
-        </p>
+    <!-- =========================================================
+         SECTION 04: FIELD DEMONSTRATION VIDEO
+    ========================================================== -->
+    <section id="demonstration" class="section-block">
+      <div class="editorial-grid">
+
+        <div class="section-sidebar">
+          <div class="section-index">§ 04 — FIELD DEMO</div>
+          <h2 class="section-heading">Synchronized Dual-Feed HUD Trial</h2>
+          <p class="sidebar-prose">
+            Watch the real-time cockpit HUD paired side-by-side with synchronized road camera footage across highway underpasses and extended bypass runs during complete GNSS denial.
+          </p>
+
+          <div class="sidebar-callout">
+            <div class="callout-label">Test Hardware</div>
+            <p>
+              Standard <strong>OnePlus Nord CE4</strong> (Snapdragon 7 Gen 3, Bosch BMI270 6-DOF IMU). 100% on-device local execution with zero vehicle wires.
+            </p>
+          </div>
+        </div>
+
+        <div class="section-content">
+          <div class="video-showcase-box">
+            <div class="video-player-container">
+              <video id="demoVideo" controls poster="assets/images/hero_hud_showcase.jpg">
+                <source src="assets/videos/demo_recording.mp4" type="video/mp4">
+                Your browser does not support HTML5 video.
+              </video>
+            </div>
+
+            <div class="video-meta-bar">
+              <div class="trial-summary">
+                <h4>Trial 01: Highway Underpass Tunnel Outage</h4>
+                <p>Pune–Nashik Highway (NH60). Location toggled OFF at 00:07 to simulate sudden blackout. Demonstrates instantaneous neural velocity takeover and lane clamping.</p>
+                <div class="trial-badges">
+                  <button class="trial-pill" data-jump-time="0">Phase 1: Open Sky (00:00)</button>
+                  <button class="trial-pill" data-jump-time="7">Phase 2: Cut GPS (00:07)</button>
+                  <button class="trial-pill" data-jump-time="35">Phase 4: Traversal (00:35)</button>
+                </div>
+              </div>
+
+              <div class="trial-summary">
+                <h4>Trial 02: Sangamner Bypass Extended Blackout</h4>
+                <p>Extended multi-minute satellite denial run demonstrating edge NPU efficiency, standstill ZUPT, and vibration filter resilience over prolonged highway sweeps.</p>
+                <div class="trial-badges">
+                  <button class="trial-pill" data-jump-time="211">Phase 8: Bypass Start (03:31)</button>
+                  <button class="trial-pill" data-jump-time="230">Phase 9: High-Speed (03:50)</button>
+                  <button class="trial-pill" data-jump-time="315">Phase 11: 8km Check (05:15)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+    </section>
 
-      <div class="downloads-grid">
-        <div class="download-card">
-          <div class="download-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-          </div>
-          <h4>Android Production APK</h4>
-          <p>Native C++ math engine with on-device TCN inference, offline vector maps, and 3D navigation HUD.</p>
-          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/presentation_website/downloads/idr_pure_cpp_engine.apk" class="btn btn-emerald">
-            Download APK
-          </a>
+    <!-- =========================================================
+         SECTION 05: INTERACTIVE SIMULATOR (#simCanvas)
+    ========================================================== -->
+    <section id="simulator" class="section-block">
+      <div class="editorial-grid">
+
+        <div class="section-sidebar">
+          <div class="section-index">§ 05 — SIMULATOR</div>
+          <h2 class="section-heading">Interactive Outage Testbed</h2>
+          <p class="sidebar-prose">
+            Observe the divergence between classical strapdown double-integration and IDR-Navigator's hybrid cascade. Sever satellite signals mid-drive to test real-time dead reckoning.
+          </p>
         </div>
 
-        <div class="download-card">
-          <div class="download-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <div class="section-content">
+          <div class="sim-wrapper">
+            <div class="sim-controls-bar">
+              <div class="sim-btn-group">
+                <button id="btnSimOutage" class="sim-btn sim-btn-rust" onclick="toggleSimOutage()">
+                  <span>Cut GNSS Signal (Tunnel Outage)</span>
+                </button>
+                <button id="btnSimShock" class="sim-btn sim-btn-ghost" onclick="injectSimShock()">
+                  Pothole Shock
+                </button>
+                <button id="btnSimZupt" class="sim-btn sim-btn-ghost" onclick="toggleSimZupt()">
+                  Red Light (ZUPT)
+                </button>
+                <button class="sim-btn sim-btn-ghost" onclick="resetSimulator()">
+                  Reset
+                </button>
+              </div>
+
+              <div class="sim-telemetry-row">
+                <div>SPEED: <span id="simSpeedVal" class="mono" style="color: var(--text-primary); font-weight: 600;">54.0 km/h</span></div>
+                <div>OUTAGE: <span id="simOutageTimeVal" class="mono" style="color: var(--accent-rust); font-weight: 600;">00:00</span></div>
+                <div>CLASSICAL: <span id="simClassicDriftVal" class="mono" style="color: var(--accent-rust); font-weight: 600;">0.0 m (0%)</span></div>
+                <div>IDR DRIFT: <span id="simIdrDriftVal" class="mono" style="color: var(--accent-emerald); font-weight: 600;">0.2 m (0.00%)</span></div>
+              </div>
+            </div>
+
+            <div class="sim-canvas-box">
+              <canvas id="simCanvas" width="900" height="480"></canvas>
+            </div>
+
+            <div class="sim-legend">
+              <div class="legend-item">
+                <div class="legend-dot emerald"></div>
+                <span>Green Vehicle: IDR-Navigator (Causal SE-TCN + Map Snapping)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot rust"></div>
+                <span>Red Vehicle: Classical Double Integration (&Delta;p &prop; &frac12; a t&sup2; divergence)</span>
+              </div>
+            </div>
           </div>
-          <h4>INT8 ONNX Model</h4>
-          <p>Quantized 8-channel SE-TCN speed inference model. 2.1 MB compact weight file for edge mobile inference.</p>
-          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn btn-secondary">
-            Download Model (2.1 MB)
-          </a>
         </div>
 
-        <div class="download-card">
-          <div class="download-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
-          <h4>Evaluation Script</h4>
-          <p>Standalone Python benchmark script reproducing all 5 test scenarios on ONNX Runtime without dependencies.</p>
-          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn btn-secondary">
-            View Python Script
-          </a>
-        </div>
-
-        <div class="download-card">
-          <div class="download-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          </div>
-          <h4>GitHub Repository</h4>
-          <p>Complete source code for Flutter frontend, C++ native math bridge, PyTorch training, and dataset tools.</p>
-          <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn btn-secondary">
-            View on GitHub
-          </a>
-        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Site Footer -->
-  <footer class="site-footer">
+    <!-- =========================================================
+         SECTION 06: ARTIFACTS & DELIVERABLES
+    ========================================================== -->
+    <section id="artifacts" class="section-block">
+      <div class="editorial-grid">
+
+        <div class="section-sidebar">
+          <div class="section-index">§ 06 — DELIVERABLES</div>
+          <h2 class="section-heading">Reproducibility &amp; Artifacts</h2>
+          <p class="sidebar-prose">
+            Download the production Android APK, quantized neural network weights, standalone benchmark evaluation script, and source tree.
+          </p>
+        </div>
+
+        <div class="section-content">
+          <div class="artifact-grid">
+
+            <article class="artifact-card">
+              <div class="artifact-meta">
+                <span class="artifact-type">ANDROID PRODUCTION APK</span>
+                <span class="mono">933 KB &middot; Native C++</span>
+              </div>
+              <h3 class="artifact-title">idr_pure_cpp_engine.apk</h3>
+              <p class="artifact-desc">
+                Production Android binary featuring the zero-overhead C++ math engine, on-device TCN inference, offline vector map engine, and real-time cockpit HUD.
+              </p>
+              <div class="artifact-footer">
+                <span class="mono">Android API 24+</span>
+                <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/presentation_website/downloads/idr_pure_cpp_engine.apk" class="btn-primary" style="width: auto; padding: 0.4rem 0.85rem;">Download APK</a>
+              </div>
+            </article>
+
+            <article class="artifact-card">
+              <div class="artifact-meta">
+                <span class="artifact-type">QUANTIZED ONNX WEIGHTS</span>
+                <span class="mono">2.14 MB &middot; INT8</span>
+              </div>
+              <h3 class="artifact-title">idr_neurospeed_tcn_int8.onnx</h3>
+              <p class="artifact-desc">
+                8-channel Causal SE-TCN speed estimator quantized to INT8 for mobile NPU deployment. Evaluated in <span class="mono">results.json</span> with 0.60 m/s mean MAE.
+              </p>
+              <div class="artifact-footer">
+                <span class="mono">2.2 ms step latency</span>
+                <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-secondary" style="width: auto; padding: 0.4rem 0.85rem;">Download Model</a>
+              </div>
+            </article>
+
+            <article class="artifact-card">
+              <div class="artifact-meta">
+                <span class="artifact-type">PYTHON BENCHMARK HARNESS</span>
+                <span class="mono">evaluate_iovnbd.py</span>
+              </div>
+              <h3 class="artifact-title">Offline Verification Script</h3>
+              <p class="artifact-desc">
+                Standalone test runner reproducing all 5 test scenarios on ONNX Runtime, generating positional drift ledgers and trajectory comparison plots without external hardware.
+              </p>
+              <div class="artifact-footer">
+                <span class="mono">Python 3.8+ &middot; onnxruntime</span>
+                <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn-secondary" style="width: auto; padding: 0.4rem 0.85rem;">View Script</a>
+              </div>
+            </article>
+
+            <article class="artifact-card">
+              <div class="artifact-meta">
+                <span class="artifact-type">COMPLETE SOURCE REPOSITORY</span>
+                <span class="mono">GitHub &middot; MIT</span>
+              </div>
+              <h3 class="artifact-title">idr-desktop-simulator</h3>
+              <p class="artifact-desc">
+                Complete codebase containing the Flutter frontend, C++ native math bridge, PyTorch training scripts, and automated test suite (136 passing unit/integration tests).
+              </p>
+              <div class="artifact-footer">
+                <span class="mono">136 / 136 Tests Pass</span>
+                <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn-secondary" style="width: auto; padding: 0.4rem 0.85rem;">Inspect GitHub &rarr;</a>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Monograph Colophon & Footer -->
+  <footer class="monograph-footer">
     <div class="container footer-inner">
       <div>
         <strong>IDR-Navigator</strong> &bull; Smart India Hackathon 2026 &bull; Problem Statement SIH26168
-        <p style="margin-top: 0.25rem;">Developed by Team Inventor (#133715) for ISRO (IISU / SAC)</p>
+        <p style="margin-top: 0.25rem;">Developed by Team Inventor (#133715) for the Indian Space Research Organisation (ISRO IISU / SAC)</p>
       </div>
       <ul class="footer-links">
-        <li><a href="#overview">Overview</a></li>
+        <li><a href="#abstract">Abstract</a></li>
         <li><a href="#benchmarks">Benchmarks</a></li>
-        <li><a href="#field-demo">Video</a></li>
+        <li><a href="#demonstration">Field Video</a></li>
         <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
       </ul>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="simulator.js?v=20261019_2"></script>
-  <script src="app.js?v=20261019_2"></script>
+  <script src="simulator.js?v=20261019_3"></script>
+  <script src="app.js?v=20261019_3"></script>
 </body>
 </html>
