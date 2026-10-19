@@ -3,515 +3,483 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDR-Navigator | ISRO SIH26168 Intelligent Dead Reckoning & Telemetry Portal</title>
-  <meta name="description" content="AI-ML based Intelligent Dead Reckoning system for seamless vehicular navigation during extended GNSS outages. ISRO Smart India Hackathon 2026 | Team Inventor.">
-  
-  <!-- Fonts -->
+  <title>IDR-Navigator | Intelligent Dead Reckoning & GNSS Fusion System</title>
+  <meta name="description" content="AI-ML based Intelligent Dead Reckoning system for continuous vehicular navigation during satellite outages using smartphone sensors. Smart India Hackathon 2026 | ISRO IISU/SAC | Team Inventor #133715.">
+  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- KaTeX for Aerospace Math Equations -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Chart.js for High-Precision Telemetry Plots -->
+  <!-- Chart.js for Benchmark Telemetry -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Top Aerospace Navigation Header -->
-  <header class="header">
-    <div class="brand">
-      <div class="brand-logo">IDR</div>
-      <div class="brand-text">
-        <h1>IDR-NAVIGATOR <span style="font-size:0.75rem; color:#00f0ff; background:rgba(0,240,255,0.1); padding:2px 8px; border-radius:4px; border:1px solid #00f0ff;">ISRO SIH26168</span></h1>
-        <p>Indian Space Research Organisation | Team Inventor #133715</p>
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>IDR-NAVIGATOR <span class="brand-badge">ISRO SIH26168</span></h1>
+          <p>Indian Space Research Organisation &bull; Team Inventor #133715</p>
+        </div>
+      </div>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#problem">The Problem</a></li>
+        <li><a href="#architecture">How It Works</a></li>
+        <li><a href="#benchmarks">Benchmarks</a></li>
+        <li><a href="#field-demo">Field Demo</a></li>
+        <li><a href="#simulator">Live Simulator</a></li>
+        <li><a href="#downloads">Downloads</a></li>
+      </ul>
+
+      <div class="header-actions">
+        <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.825rem;">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
       </div>
     </div>
-    <nav class="nav-links">
-      <a href="#reconciliation" class="nav-link">ISRO Verification</a>
-      <a href="#benchmarks" class="nav-link">Multi-View Benchmarks</a>
-      <a href="#architecture" class="nav-link">Mathematical Architecture</a>
-      <a href="#implementation" class="nav-link">Source Mapping</a>
-      <a href="#playground" class="nav-link">Live Simulator</a>
-      <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn-telemetry">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub Source
-      </a>
-      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-telemetry btn-emerald">
-        Download INT8 ONNX (2.1 MB)
-      </a>
-    </nav>
   </header>
 
-  <!-- Hero Telemetry Section -->
-  <section class="hero">
-    <div class="hero-tag">
-      <span>🚀 Smart India Hackathon 2026</span>
-      <span>•</span>
-      <span>Problem Statement: SIH26168</span>
-      <span>•</span>
-      <span>ISRO IISU / SAC</span>
-      <span>•</span>
-      <span>Team ID: 133715</span>
-    </div>
-    <h2>AI-ML Intelligent Dead Reckoning & GNSS Fusion Engine</h2>
-    <p class="hero-desc">
-      Dead reckoning on commodity smartphones without vehicle modifications (₹0 CapEx). Fuses an 8-channel Dilated Causal SE-TCN with a 15-state Error-State EKF, continuous Sigmoidal HDOP gating, native NavIC (IRNSS L5/L1) support, and offline vector map snapping. Achieves <strong>3.47% mean drift</strong> and <strong>100% pass rate (5/5 scenarios)</strong> under ISRO's &lt;10% threshold (source: <code>results.json</code>).
-    </p>
+  <!-- Hero Section -->
+  <section class="hero-section" id="overview">
+    <div class="container hero-grid">
+      <div>
+        <div class="hero-tag">
+          Smart India Hackathon 2026 &bull; Problem Statement SIH26168
+        </div>
+        <h1 class="hero-title">
+          Navigation that doesn't stop when <span>satellite signals drop</span>.
+        </h1>
+        <p class="hero-desc">
+          When GPS signals vanish inside tunnels, underpasses, and urban corridors, standard navigation apps freeze or jump across buildings. 
+          <strong>IDR-Navigator</strong> turns an ordinary smartphone into a reliable inertial navigation system using on-device causal neural networks, Kalman filtering, and map matching—with zero vehicle modifications.
+        </p>
 
-    <div class="hero-actions">
-      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/presentation_website/downloads/idr_pure_cpp_engine.apk" class="btn-telemetry btn-emerald" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
-        📱 Download Android Production APK
-      </a>
-      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-telemetry" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
-        🧠 Download 2.1 MB INT8 Model
-      </a>
-      <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn-telemetry" style="padding: 0.75rem 1.5rem; font-size: 0.95rem; background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.2); color:#fff;">
-        ⚡ View Evaluation Script (Python)
-      </a>
-    </div>
+        <div class="hero-actions">
+          <a href="#field-demo" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Watch Field Demo
+          </a>
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Explore Source Code
+          </a>
+        </div>
+      </div>
 
-    <!-- Live Animated KPI Counters -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Benchmark Pass Rate</div>
-        <div class="kpi-value" id="kpi-pass-rate">0.0%</div>
-        <div class="kpi-sub">5 of 5 scenarios &lt;10% drift</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Best Scenario Drift</div>
-        <div class="kpi-value" id="kpi-min-drift">0.00%</div>
-        <div class="kpi-sub">Scenario 1 (Highway Tunnel)</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Quantized Model Size</div>
-        <div class="kpi-value" id="kpi-model-size">0.0 MB</div>
-        <div class="kpi-sub">INT8 Dilated SE-TCN (2.1M params)</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">NPU Inference Latency</div>
-        <div class="kpi-value" id="kpi-npu-latency">0.0 ms</div>
-        <div class="kpi-sub">Qualcomm Hexagon / NNAPI</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Full Mobile Loop Time</div>
-        <div class="kpi-value" id="kpi-loop-latency">0.0 ms</div>
-        <div class="kpi-sub">10 Hz UI / 200 Hz C++ SIMD</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Battery Drain Rate</div>
-        <div class="kpi-value" id="kpi-battery-rate">0.0%/hr</div>
-        <div class="kpi-sub">Continuous Android service</div>
+      <div class="hero-preview-card">
+        <img src="assets/images/hero_hud_showcase.jpg" alt="IDR-Navigator Telemetry HUD in Tunnel" class="hero-preview-img">
+        <div class="hero-preview-bar">
+          <span style="color: var(--text-secondary);">Tunnel Outage Test Run</span>
+          <span style="color: var(--accent-emerald); font-family: var(--font-mono); font-weight: 600;">Lane-Level Clamping Active</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ISRO Verification & Technical Scrutiny Reconciliation Banner -->
-  <section class="section" id="reconciliation" style="padding-top:1rem;">
-    <div class="reconciliation-callout">
-      <div class="reconciliation-header">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        ISRO SIH26168 Evaluator Verification &amp; Benchmark Summary
-      </div>
-      <div class="reconciliation-text">
-        <p><strong>Slide 4 Errata:</strong> The presentation slide displayed illustrative trajectory visualizations. The actual benchmark results are sourced from <code>idr_model_submission/results.json</code>, generated by <code>test.py</code> with ONNX Runtime on 5 IO-VNBD scenarios.</p>
-        <p style="margin-top:0.6rem;"><strong>Ground-Truth Benchmark:</strong> Mean drift <strong>3.47%</strong>, pass rate <strong>100% (5/5)</strong>, mean MAE <strong>0.60 m/s</strong>. Best: Highway Tunnel <strong>0.43%</strong>. Hardest: Two-Wheeler Urban <strong>9.08%</strong>.</p>
-        <p style="margin-top:0.6rem;"><strong>NavIC (IRNSS):</strong> Android <code>GnssStatus.CONSTELLATION_IRNSS</code> (constant <code>7</code>), L5/L1 frequencies (IRNSS-1A through IRNSS-1I, NVS-01). NMEA 4.11: <code>$GIGSV</code>, <code>$GIGSA</code>, <code>$GIGGA</code>, <code>$GIRMC</code>.</p>
+  <!-- Ground-Truth Metrics Strip -->
+  <section class="metrics-strip">
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Benchmark Pass Rate</span>
+          </div>
+          <div class="metric-value emerald">100.0%</div>
+          <div class="metric-sub">5 of 5 test scenarios &lt;10% drift</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Mean Positional Drift</span>
+          </div>
+          <div class="metric-value blue">3.47%</div>
+          <div class="metric-sub">Across all 5 real-world scenarios</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Mean Speed Error</span>
+          </div>
+          <div class="metric-value">0.60 m/s</div>
+          <div class="metric-sub">Neural velocity estimation MAE</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">INT8 Model Size</span>
+          </div>
+          <div class="metric-value">2.1 MB</div>
+          <div class="metric-sub">Runs 100% locally on phone NPU</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Multi-View Benchmarks Explorer -->
-  <section class="section" id="benchmarks" style="padding-top:0;">
-    <div class="section-header">
-      <div class="section-tag">Interactive Empirical Validation</div>
-      <h2 class="section-title">Multi-View Trajectory & Benchmark Telemetry Visualizer</h2>
-      <p class="section-subtitle">
-        Explore verified benchmark results from <code>idr_model_submission/results.json</code> across all 5 test scenarios evaluated under ONNX Runtime:
-      </p>
-    </div>
-
-    <!-- 3-View Multi-Benchmark Selector Bar -->
-    <div class="view-selector-container">
-      <div class="view-selector-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
-        Select Telemetry Evaluation View (Click to Switch):
-      </div>
-      <div class="view-selector-bar">
-        <button class="view-btn active" data-view="view-scenario-overview">
-          <span>View 1: Positional Drift % (All 5 Scenarios)</span>
-          <span class="pill">Mean 3.47%</span>
-        </button>
-        <button class="view-btn" data-view="view-speed-mae">
-          <span>View 2: Speed MAE (m/s)</span>
-          <span class="pill">Mean 0.60 m/s</span>
-        </button>
-        <button class="view-btn" data-view="view-distance-comparison">
-          <span>View 3: True vs Predicted Distance</span>
-          <span class="pill">100% Pass Rate</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="interactive-panel">
-      <!-- Tabs for Trajectory vs Speed vs Drift -->
-      <div class="tab-controls">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="tab-trajectory">Benchmark Distribution (results.json)</button>
-          <button class="tab-btn" data-tab="tab-speed">Speed Tracking & Heteroscedastic Uncertainty (σ_v)</button>
-          <button class="tab-btn" data-tab="tab-drift">Cumulative Drift vs. Outage Time</button>
-        </div>
-        <div class="chart-legend-custom">
-          <div class="legend-item"><span class="dot-green"></span> Ground Truth Reference</div>
-          <div class="legend-item"><span class="dot-cyan"></span> IDR-Navigator (TCN + ES-EKF)</div>
-          <div class="legend-item"><span class="dot-red"></span> Classical INS Double-Integration</div>
-        </div>
-      </div>
-
-      <!-- Tab 1: Active Benchmark Trajectory / Distribution -->
-      <div class="tab-content" id="tab-trajectory">
-        <div class="chart-wrapper">
-          <canvas id="trajectoryCanvas"></canvas>
-        </div>
-        
-        <!-- Reactive Telemetry Meta Bar -->
-        <div class="telemetry-meta-bar" id="trajectoryMetaStrip">
-          <span>Model: <strong>idr_neurospeed_tcn.onnx</strong></span>
-          <span>Engine: <strong>ONNX Runtime (Production)</strong></span>
-          <span>Pass Rate: <strong style="color:#10b981;">100.0% (5/5)</strong></span>
-          <span>Mean Drift: <strong style="color:#00f0ff;">3.47%</strong></span>
-          <span>ISRO Limit (&lt;10%): <strong class="badge-pass">ALL PASS</strong></span>
-        </div>
-      </div>
-
-      <!-- Tab 2: Speed Tracking -->
-      <div class="tab-content" id="tab-speed" style="display:none;">
-        <div class="chart-wrapper">
-          <canvas id="speedCanvas"></canvas>
-        </div>
-        <p style="margin-top:1rem; font-size:0.85rem; color:#94a3b8;">
-          Notice the adaptive inflation of the predictive uncertainty head <span style="font-family:var(--font-mono); color:#00f0ff;">$\pm 2\sigma_v$</span> at <span style="font-family:var(--font-mono); color:#fff;">t = 24s – 28s</span> where road pothole shock occurs. The sliding Jerk Variance Gate <span style="font-family:var(--font-mono); color:#00f0ff;">($\sigma_j^2 > 450\text{ m/s}^6$)</span> triggers adaptive process noise scaling, preventing mechanical impact from corrupting the Kalman velocity state.
+  <!-- Section 1: The Problem -->
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">The Challenge</div>
+        <h2 class="section-title">Why Navigation Breaks in Blackout Zones</h2>
+        <p class="section-desc">
+          When satellite line-of-sight is blocked, conventional navigation systems either freeze entirely or drift catastrophically off-road.
         </p>
       </div>
 
-      <!-- Tab 3: Cumulative Drift -->
-      <div class="tab-content" id="tab-drift" style="display:none;">
-        <div class="chart-wrapper">
-          <canvas id="driftCanvas"></canvas>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <span class="card-badge rose">Consumer Apps</span>
+          <h3>Signal Drop &amp; Screen Freeze</h3>
+          <p>
+            Inside tunnels, underpasses, and urban canyons, GNSS satellite fixes drop to zero. Consumer apps freeze, report "Searching for GPS", or jump erratically to nearby flyovers and service roads, causing missed exits and dangerous driver confusion.
+          </p>
+          <div class="card-footer-metric">
+            STATUS: 0 SATELLITES VISIBLE &bull; FROZEN UI
+          </div>
         </div>
-        <p style="margin-top:1rem; font-size:0.85rem; color:#94a3b8;">
-          Classical double-integration explodes quadratically <span style="font-family:var(--font-mono); color:#ef4444;">($\Delta p \propto \frac{1}{2} b_a t^2$)</span> surpassing ISRO's 10% drift ceiling within seconds, whereas IDR-Navigator bounds drift to 3.47% mean (0.43% to 9.08%) across tested scenarios, meeting ISRO's &lt;10% threshold.
+
+        <div class="problem-card">
+          <span class="card-badge amber">Classical Inertial (INS)</span>
+          <h3>Quadratic Drift Explosion</h3>
+          <p>
+            Standard dead reckoning relies on double-integrating noisy accelerometer data. Sensor biases compound quadratically (&Delta;p &prop; &frac12; b t&sup2;), while gyro bias tilts gravity into the acceleration axis, causing drift to exceed 140 meters in just 30 seconds.
+          </p>
+          <div class="card-footer-metric">
+            30-SEC DRIFT: &gt;140 METERS OFF-ROAD
+          </div>
+        </div>
+
+        <div class="problem-card solution-card">
+          <span class="card-badge emerald">IDR-Navigator</span>
+          <h3>The 5-Stage Hybrid Cascade</h3>
+          <p>
+            Instead of raw acceleration integration, IDR-Navigator infers instantaneous forward velocity using a causal SE-TCN, fuses it with an Extended Kalman Filter enforcing vehicle physics constraints, and locks the trajectory to verified road geometries.
+          </p>
+          <div class="card-footer-metric" style="color: var(--accent-emerald);">
+            MEAN DRIFT: 3.47% &bull; &#8377;0 HARDWARE RETROFIT
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: How It Works -->
+  <section class="section" id="architecture" style="background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Architecture</div>
+        <h2 class="section-title">The 5-Stage Hybrid Pipeline</h2>
+        <p class="section-desc">
+          How our software pipeline replaces open-loop integration with a robust, physics-constrained state estimator.
         </p>
       </div>
-    </div>
-  </section>
 
-  <!-- ISRO Technical Solution & Implementation Architecture -->
-  <section class="section" id="implementation">
-    <div class="section-header">
-      <div class="section-tag">Implementation Mapping</div>
-      <h2 class="section-title">ISRO Solution & Codebase Architecture</h2>
-      <p class="section-subtitle">
-        Every technical requirement from Problem Statement <strong>SIH26168</strong> directly mapped to verified repository source files:
-      </p>
-    </div>
+      <div class="pipeline-flow">
+        <div class="pipeline-step">
+          <div class="step-num">STAGE 01</div>
+          <h4>Attitude Observer</h4>
+          <p>Dynamic Mahony SO(3) filter continuously decouples gravity and phone tilt from vehicle acceleration vectors.</p>
+        </div>
 
-    <div class="compliance-table-container">
-      <table class="compliance-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>ISRO Requirement</th>
-            <th>IDR-Navigator Technical Approach</th>
-            <th>Mathematical Formulation</th>
-            <th>Direct Repository Source Links</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>1</strong></td>
-            <td><strong>In-Vehicle Alignment & Dynamic Calibration</strong><br><small style="color:#64748b;">Dashboard, vent, cup holder, unconstrained mount</small></td>
-            <td>Mahony $SO(3)$ Gravity Leveling + PCA forward velocity axis lock with mid-drive continuous re-leveling.</td>
-            <td>$$\hat{g} = \frac{\bar{a}}{\|\bar{a}\|}, \quad C v_1 = \lambda_1 v_1$$</td>
-            <td>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/cabin_alignment.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/cabin_alignment.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/cpp_mobile_app/core/src/cabin_aligner.cpp" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">cpp_mobile_app/core/src/cabin_aligner.cpp ↗</a>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>2</strong></td>
-            <td><strong>AI Speed & Kinetic Vibration Filter</strong><br><small style="color:#64748b;">Potholes, expansion joints, idle vibration, no OBD-II</small></td>
-            <td>8-Channel Dilated Causal SE-TCN ($2.1\text{ MB}$ INT8) + Jerk Variance Shock Gate + Skog GLRT ZUPT standstill lock.</td>
-            <td>$$[\hat{v}, \sigma_v^2] = f_{\text{TCN}}(X_{t-4s:t}), \quad \sigma_j^2 > 450\implies Q\times 50$$</td>
-            <td>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/tcn_speed_engine.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/tcn_speed_engine.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/vibration_gate.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/vibration_gate.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/idr_model_submission/model_architecture.py" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">idr_model_submission/model_architecture.py ↗</a>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>3</strong></td>
-            <td><strong>Advanced Map-Matching & Kinematic Constraints</strong><br><small style="color:#64748b;">Multi-level flyovers, road networks, 2-wheeler banking</small></td>
-            <td>15-State ES-EKF with Lean-Invariant NHC + Two-stage Viterbi HMM + Orthogonal OSM Vector Snapping + Barometric Deck Discrimination.</td>
-            <td>$$\phi_{\text{lean}} = \arctan\left(\frac{v\omega_z}{g}\right), \quad v_{\text{lat}} \approx 0$$<br>$$p_{\text{snap}} = p_0 + ((p_{\text{raw}} - p_0)\cdot\hat{u})\hat{u}$$</td>
-            <td>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/ekf_3d.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/ekf_3d.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/map_snapper.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/map_snapper.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/download_osm_roads.py" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">scripts/download_osm_roads.py ↗</a>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>4</strong></td>
-            <td><strong>GNSS + INS Fusion Engine</strong><br><small style="color:#64748b;">NavIC multi-constellation, Chi-Square NIS gating</small></td>
-            <td>15-State ES-EKF with Joseph-Form covariance update, learned $\sigma_v^2$ weighting, native NavIC (IRNSS L5/S/L1) and Chi-Square NIS gating.</td>
-            <td>$$\gamma_k = \nu_k^T S_k^{-1} \nu_k < \chi^2_{3, 0.99}$$<br>$$P^+ = (I-KH)P^-(I-KH)^T + KRK^T$$</td>
-            <td>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/ekf_3d.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/ekf_3d.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/cpp_mobile_app/core/src/ekf_3d.cpp" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">cpp_mobile_app/core/src/ekf_3d.cpp ↗</a>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>5</strong></td>
-            <td><strong>Seamless GNSS Deficit Handler</strong><br><small style="color:#64748b;">Sub-5ms smooth transition during outage entry/exit</small></td>
-            <td>Continuous Sigmoidal HDOP Gate smoothly scaling GNSS measurement noise covariance, eliminating teleportation artifacts + 200ms watchdog.</td>
-            <td>$$\lambda(h) = \frac{1}{1 + e^{-1.2(h - 3.5)}}, \quad R_{\text{eff}} = (1 + 99\lambda)R_{\text{GNSS}}$$</td>
-            <td>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/lib/services/ekf_3d.dart" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">lib/services/ekf_3d.dart ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/cpp_mobile_app/core/src/pipeline.cpp" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">cpp_mobile_app/core/src/pipeline.cpp ↗</a>
-            </td>
-          </tr>
-          <tr>
-            <td><strong>6</strong></td>
-            <td><strong>Performance Benchmark & Edge Execution</strong><br><small style="color:#64748b;">&lt;10% drift, 10 Hz mobile UI, 200 Hz industrial FOG</small></td>
-            <td>Achieves <strong>3.47% mean drift</strong> (vs. &lt;10% requirement), <strong>100% pass rate</strong> (5/5 scenarios), and 200 Hz C++20 SIMD execution. Source: <code>results.json</code></td>
-            <td>$$\text{Mean Drift} = 3.47\% \lt 10.0\%$$<br>$$\text{Latency}_{\text{step}} \approx 2.2\text{ ms}$$</td>
-            <td>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/idr_model_submission/results.json" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; margin-bottom:4px; display:inline-block;">idr_model_submission/results.json ↗</a><br>
-              <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn-telemetry" style="font-size:0.75rem; padding:4px 10px; display:inline-block;">scripts/evaluate_iovnbd.py ↗</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        <div class="pipeline-step">
+          <div class="step-num">STAGE 02</div>
+          <h4>Vibration Gate</h4>
+          <p>Savitzky-Golay jerk filter isolates chassis vibration harmonics and speed-breaker shocks from genuine motion.</p>
+        </div>
 
-  <!-- Interactive System Architecture Pipeline Cards -->
-  <section class="section" id="architecture">
-    <div class="section-header">
-      <div class="section-tag">System Deep-Dive</div>
-      <h2 class="section-title">6-Stage Algorithmic Architecture</h2>
-      <p class="section-subtitle">Click any stage below to inspect mathematical formulations and production C++ / Dart code:</p>
-    </div>
+        <div class="pipeline-step">
+          <div class="step-num">STAGE 03</div>
+          <h4>Neural Speed (TCN)</h4>
+          <p>8-channel Causal Dilated SE-TCN predicts instantaneous forward speed at 20 Hz without satellite fixes.</p>
+        </div>
 
-    <div class="pipeline-grid">
-      <!-- Card 1 -->
-      <div class="pipeline-card" id="card-1">
-        <div class="pipeline-step">Stage 01 • Kinematic Alignment</div>
-        <h3>Mahony SO(3) & PCA Azimuth Lock <span>⚙</span></h3>
-        <p>Estimates pitch and roll from gravity vector; extracts vehicle forward azimuth via Principal Component Analysis of horizontal acceleration.</p>
-        <div class="math-preview">$$\hat{\mathbf{g}} = \frac{\bar{\mathbf{a}}}{\|\bar{\mathbf{a}}\|}, \quad \mathbf{C} = \frac{1}{N}\sum \mathbf{a}_{\text{hor}}\mathbf{a}_{\text{hor}}^T, \quad \mathbf{C}\mathbf{v}_1 = \lambda_1 \mathbf{v}_1$$</div>
-        <div class="code-snippet">// C++20 SIMD Mahony Leveling Implementation
-Eigen::Vector3d a_bar = imu_buffer.rowwise().mean();
-Eigen::Vector3d g_hat = a_bar.normalized() * 9.80665;
-Eigen::Matrix2d C = horiz_accel.transpose() * horiz_accel / N;
-Eigen::SelfAdjointEigenSolver<Eigen::Matrix2d> es(C);
-double vehicle_heading = std::atan2(es.eigenvectors()(1,1), es.eigenvectors()(0,1));</div>
-      </div>
+        <div class="pipeline-step">
+          <div class="step-num">STAGE 04</div>
+          <h4>Zero-Velocity (ZUPT)</h4>
+          <p>Detects full vehicle stops at traffic lights instantly, freezing coordinate drift without relying on GPS Doppler.</p>
+        </div>
 
-      <!-- Card 2 -->
-      <div class="pipeline-card" id="card-2">
-        <div class="pipeline-step">Stage 02 • Vibration & Shock Gating</div>
-        <h3>Jerk Shock Gate & Skog GLRT ZUPT <span>🛡</span></h3>
-        <p>Computes discrete jerk variance over a 250ms sliding window to reject pothole shocks; clamps velocity to zero during traffic idling.</p>
-        <div class="math-preview">$$\sigma_j^2 = \text{Var}\left(\frac{\Delta a}{\Delta t}\right) > 450\text{ m/s}^6 \implies \mathbf{Q} \leftarrow 50\mathbf{Q}$$</div>
-        <div class="code-snippet">// Vibration Shock Rule & Standstill ZUPT
-if (jerk_variance > 450.0) {
-    ekf.inflate_process_noise(50.0); // Shock protection
-}
-if (skog_glrt_statistic(imu_window) < ZUPT_GAMMA) {
-    ekf.apply_zero_velocity_update(); // Red-light lock
-}</div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="pipeline-card" id="card-3">
-        <div class="pipeline-step">Stage 03 • Deep Neural Kinematics</div>
-        <h3>8-Channel Dilated Causal SE-TCN <span>🧠</span></h3>
-        <p>4.0-second temporal receptive field predicting forward speed $\hat{v}$ and heteroscedastic log-variance $s = \log(\sigma_v^2)$ via Gaussian NLL loss with batch bias regularization.</p>
-        <div class="math-preview">$$\mathcal{L}_{\text{total}} = 1.0\mathcal{L}_{\text{Huber}} + 0.2\mathcal{L}_{\text{NLL}} + 0.5\mathcal{L}_{\text{ZV}} + 0.2\mathcal{L}_{\text{bias}}$$</div>
-        <div class="code-snippet">// 2.1 MB INT8 ONNX Runtime Inference
-Ort::Value input_tensor = Ort::Value::CreateTensor<int8_t>(...);
-auto outputs = session.Run(run_options, input_names, &input_tensor, 1, output_names, 2);
-float v_hat = outputs[0].GetTensorMutableData<float>()[0];
-float sigma_v = std::sqrt(std::exp(outputs[1].GetTensorMutableData<float>()[0]));</div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="pipeline-card" id="card-4">
-        <div class="pipeline-step">Stage 04 • Multi-Sensor Fusion</div>
-        <h3>15-State 3D Error-State EKF (ES-EKF) <span>🧭</span></h3>
-        <p>Propagates position, velocity, and attitude error with gyro/accel bias tracking. Enforces lean-invariant Non-Holonomic Constraints.</p>
-        <div class="math-preview">$$\delta\mathbf{x} = [\delta\mathbf{p}, \delta\mathbf{v}, \delta\boldsymbol{\theta}, \mathbf{b}_a, \mathbf{b}_g]^T \in \mathbb{R}^{15}, \quad \mathbf{P}^+ = (\mathbf{I}-\mathbf{K}\mathbf{H})\mathbf{P}^-(\mathbf{I}-\mathbf{K}\mathbf{H})^T + \mathbf{K}\mathbf{R}\mathbf{K}^T$$</div>
-        <div class="code-snippet">// Joseph-Form Covariance Stabilization
-Eigen::Matrix<double,15,15> I_KH = I15 - K * H;
-P = I_KH * P * I_KH.transpose() + K * R * K.transpose();
-nominal_state.p += delta_x.segment<3>(0);
-nominal_state.v += delta_x.segment<3>(3);</div>
-      </div>
-
-      <!-- Card 5 -->
-      <div class="pipeline-card" id="card-5">
-        <div class="pipeline-step">Stage 05 • Geometric Map Matching</div>
-        <h3>Two-Stage Viterbi HMM & Barometer <span>🗺</span></h3>
-        <p>Resolves topological road network segments via Viterbi dynamic programming followed by fast orthogonal vector projection and barometric deck discrimination.</p>
-        <div class="math-preview">$$p(r_j \mid r_i) \propto \exp\left(-\frac{|\Delta d_{\text{gc}} - \Delta d_{\text{net}}|}{\beta}\right), \quad \Delta h = 44330\left(1 - \left(\frac{P}{P_0}\right)^{0.1903}\right)$$</div>
-        <div class="code-snippet">// Offline Vector Map Matching (15 MB/City GeoJSON)
-RoadSegment seg = spatial_rtree.find_nearest_bearing(p_raw, heading);
-double proj = (p_raw - seg.p0).dot(seg.u_unit);
-Vector2d snapped = seg.p0 + std::clamp(proj, 0.0, seg.length) * seg.u_unit;</div>
-      </div>
-
-      <!-- Card 6 -->
-      <div class="pipeline-card" id="card-6">
-        <div class="pipeline-step">Stage 06 • Outage Transition & NavIC</div>
-        <h3>Sigmoid HDOP & Chi-Square NIS Gating <span>⚡</span></h3>
-        <p>Continuously inflates GNSS measurement covariance during tunnel entry and screens urban multipath reflections via Chi-Square innovation testing.</p>
-        <div class="math-preview">$$\lambda(h) = \frac{1}{1 + e^{-1.2(h - 3.5)}}, \quad \gamma_k = \boldsymbol{\nu}_k^T \mathbf{S}_k^{-1}\boldsymbol{\nu}_k < 11.345$$</div>
-        <div class="code-snippet">// Millisecond Seamless Outage Transition & NIS Multipath Screening
-double lambda = 1.0 / (1.0 + std::exp(-1.2 * (hdop - 3.5)));
-Matrix3d R_effective = (1.0 + 99.0 * lambda) * R_gnss_nominal;
-if (mahalanobis_nis > 11.345) {
-    reject_gnss_measurement(); // Multipath rejection
-}</div>
+        <div class="pipeline-step">
+          <div class="step-num">STAGE 05</div>
+          <h4>Vector Map Snapping</h4>
+          <p>Projects state estimates onto offline OpenStreetMap road polylines, clamping cross-track error to the roadway.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Live Outage Simulator Playground -->
-  <section class="section" id="playground">
-    <div class="section-header">
-      <div class="section-tag">Interactive Evaluation</div>
-      <h2 class="section-title">Live GNSS Outage Simulation Playground</h2>
-      <p class="section-subtitle">Test how IDR-Navigator performs across different vehicular configurations and road conditions:</p>
-    </div>
+  <!-- Section 3: Verified Benchmarks -->
+  <section class="section" id="benchmarks">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Ground Truth Results</div>
+        <h2 class="section-title">Verified ISRO Benchmark Scenarios</h2>
+        <p class="section-desc">
+          All values are taken verbatim from <code>idr_model_submission/results.json</code>, evaluated using live ONNX Runtime inference on 5 real-world test scenarios.
+        </p>
+      </div>
 
-    <div class="interactive-panel playground-grid">
-      <div class="controls-card">
-        <h3 style="font-size:1.1rem; margin-bottom:1rem; color:#fff;">Outage Parameters</h3>
-        
-        <div class="control-group">
-          <label class="control-label">Vehicle & Sensor Platform</label>
-          <select id="sim-vehicle" class="select-input">
-            <option value="car">Passenger Car (Smartphone MEMS @ 100 Hz)</option>
-            <option value="bike">Two-Wheeler Motorcycle (Lean-Decoupled NHC)</option>
-            <option value="truck">Commercial Truck (Suspension Resonance)</option>
-            <option value="fog">External Tactical FOG IMU (@ 200 Hz C++20)</option>
-          </select>
+      <div class="benchmarks-container">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th>Distance</th>
+                <th>Drift</th>
+                <th>Speed MAE</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="scenario-title">1. Highway Tunnel</td>
+                <td>1600.0 m</td>
+                <td>0.43% (6.81m)</td>
+                <td>0.40 m/s</td>
+                <td class="pass-badge">PASS (&lt;10%)</td>
+              </tr>
+              <tr>
+                <td class="scenario-title">2. Urban Stop &amp; Go</td>
+                <td>770.5 m</td>
+                <td>2.38% (18.31m)</td>
+                <td>0.45 m/s</td>
+                <td class="pass-badge">PASS (&lt;10%)</td>
+              </tr>
+              <tr>
+                <td class="scenario-title">3. Interstate Cruise</td>
+                <td>1538.9 m</td>
+                <td>0.80% (12.38m)</td>
+                <td>0.42 m/s</td>
+                <td class="pass-badge">PASS (&lt;10%)</td>
+              </tr>
+              <tr>
+                <td class="scenario-title">4. Winding Mountain Road</td>
+                <td>305.9 m</td>
+                <td>4.68% (14.31m)</td>
+                <td>0.37 m/s</td>
+                <td class="pass-badge">PASS (&lt;10%)</td>
+              </tr>
+              <tr>
+                <td class="scenario-title">5. Two-Wheeler Urban</td>
+                <td>840.3 m</td>
+                <td>9.08% (76.32m)</td>
+                <td>1.36 m/s</td>
+                <td class="pass-badge">PASS (&lt;10%)</td>
+              </tr>
+              <tr style="background: rgba(255, 255, 255, 0.03); font-weight: 600;">
+                <td class="scenario-title">Aggregate Summary</td>
+                <td>5055.6 m</td>
+                <td style="color: var(--accent-emerald);">3.47% Mean</td>
+                <td>0.60 m/s</td>
+                <td class="pass-badge">100% PASS (5/5)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div class="control-group">
-          <label class="control-label">Continuous GNSS Blackout Duration: <span id="sim-duration-val" style="color:#00f0ff; font-weight:700;">60 s</span></label>
-          <input type="range" id="sim-duration" class="range-input" min="10" max="180" value="60" step="5">
-        </div>
-
-        <div class="control-group">
-          <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.85rem; color:#fff;">
-            <input type="checkbox" id="sim-shock" checked style="accent-color:#00f0ff;">
-            Enable Pothole & Road Shock Injection ($\sigma_j^2 > 450$)
-          </label>
-        </div>
-
-        <div class="telemetry-output">
-          <div class="telemetry-stat">
-            <div class="lbl">IDR DRIFT</div>
-            <div class="val" id="stat-drift-dist">29.17 m</div>
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <span class="chart-title">Drift Comparison: IDR vs Classical Double Integration</span>
           </div>
-          <div class="telemetry-stat">
-            <div class="lbl">DRIFT %</div>
-            <div class="val" id="stat-drift-pct">3.50%</div>
-          </div>
-          <div class="telemetry-stat">
-            <div class="lbl">CLASSICAL INS</div>
-            <div class="val" id="stat-base-drift" style="color:#ef4444;">153.0 m</div>
-          </div>
-          <div class="telemetry-stat">
-            <div class="lbl">DRIFT REDUCTION</div>
-            <div class="val" id="stat-pass-status" style="color:#10b981;">80.9%</div>
+          <div class="chart-container-box">
+            <canvas id="benchmarkChart"></canvas>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div style="display:flex; flex-direction:column; justify-content:center; background:#050811; border-radius:12px; padding:1.5rem; border:1px solid rgba(255,255,255,0.05);">
-        <h4 style="font-family:var(--font-mono); font-size:0.85rem; color:#00f0ff; margin-bottom:1rem;">REAL-TIME TELEMETRY DIAGNOSTIC STATUS</h4>
-        <div style="font-family:var(--font-mono); font-size:0.8rem; color:#94a3b8; line-height:1.8;">
-          <div>[STATUS] Multi-Constellation: <span style="color:#10b981;">NavIC (IRNSS L5/L1) + GPS L1 Locked</span></div>
-          <div>[STATUS] HDOP = 99.0 &rarr; <span style="color:#ef4444;">GNSS_BLACKOUT_ACTIVE</span></div>
-          <div>[STATUS] Sigmoid HDOP Gate: &lambda;(h) = 1.000 &rarr; Satellite Covariance Decoupled</div>
-          <div>[STATUS] Kinematic Mode: <span style="color:#00f0ff;">SE-TCN Speed Head Active (Forward Axis Clamped)</span></div>
-          <div>[STATUS] NHC Status: <span style="color:#10b981;">Lean-Invariant Constraints Enforced (v_lat &approx; 0)</span></div>
-          <div>[STATUS] Map Snapper: <span style="color:#10b981;">Locked to GeoJSON WayID #409215 (NH-48 Expressway)</span></div>
-          <div>[STATUS] Barometric Elevation: &Delta;h = +0.2m (Deck Level Confirmed)</div>
-          <div>[BENCHMARK] Positional Divergence: <span style="color:#10b981; font-weight:700;">Bounded at 3.47% Mean Drift (&lt;10% Threshold)</span></div>
+  <!-- Section 4: Field Demonstration Video -->
+  <section class="section" id="field-demo" style="background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Field Testing</div>
+        <h2 class="section-title">Field Demonstration &amp; Telemetry Video</h2>
+        <p class="section-desc">
+          Synchronized road ground-truth camera feed paired side-by-side with the real-time cockpit HUD during simulated blackouts.
+        </p>
+      </div>
+
+      <div class="video-showcase-box">
+        <div class="video-player-container">
+          <video id="demoVideo" controls poster="assets/images/hero_hud_showcase.jpg">
+            <source src="assets/videos/demo_recording.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div class="video-meta-bar">
+          <div class="trial-summary">
+            <h4>Trial 01: Highway Underpass Outage</h4>
+            <p>Pune–Nashik Highway (NH60). Location toggled OFF at 00:07 to simulate instant tunnel blackout. Demonstrates neural speed estimation and lane clamping.</p>
+            <div class="trial-badges">
+              <button class="trial-pill" data-jump-time="0">Phase 1: Open Sky (00:00)</button>
+              <button class="trial-pill" data-jump-time="7">Phase 2: Cut GPS (00:07)</button>
+              <button class="trial-pill" data-jump-time="35">Phase 4: Traversal (00:35)</button>
+            </div>
+          </div>
+
+          <div class="trial-summary">
+            <h4>Trial 02: Extended Bypass Run</h4>
+            <p>Sangamner Bypass. Multi-minute extended blackout demonstrating edge NPU efficiency, vibration rejection on a two-wheeler, and topological road snapping.</p>
+            <div class="trial-badges">
+              <button class="trial-pill" data-jump-time="211">Phase 8: Bypass Start (03:31)</button>
+              <button class="trial-pill" data-jump-time="230">Phase 9: High-Speed (03:50)</button>
+              <button class="trial-pill" data-jump-time="315">Phase 11: 8km Check (05:15)</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ISRO Stage-2 Screening CLI Guide -->
-  <section class="section" id="cli-guide">
-    <div class="section-header">
-      <div class="section-tag">Stage-2 Reproduction</div>
-      <h2 class="section-title">ISRO Evaluator CLI Screening Guide</h2>
-      <p class="section-subtitle">Run the unified evaluation script on any unseen CSV sequence with one command:</p>
-    </div>
-
-    <div class="interactive-panel" style="background:#050811; border-color:rgba(0,240,255,0.3);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.5rem;">
-        <span style="font-family:var(--font-mono); font-size:0.8rem; color:#00f0ff;">bash / powershell</span>
-        <span style="font-size:0.75rem; color:#64748b;">Ready for immediate evaluation</span>
+  <!-- Section 5: Interactive Simulator -->
+  <section class="section" id="simulator">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Interactive Demo</div>
+        <h2 class="section-title">Live In-Browser Physics Simulator</h2>
+        <p class="section-desc">
+          Watch in real-time how open-loop double integration flies off the road while IDR-Navigator stays locked to the highway corridor during a tunnel outage.
+        </p>
       </div>
-      <pre style="color:#38bdf8; font-family:var(--font-mono); font-size:0.85rem; overflow-x:auto; line-height:1.6;">
-# 1. Clone repository
-git clone https://github.com/YashEkhande24/idr-desktop-simulator.git
-cd idr-desktop-simulator
-pip install -r idr_model_submission/requirements.txt
 
-# 2. Run Python benchmark on any IO-VNBD or unseen ISRO test sequence
-python scripts/evaluate_iovnbd.py \
-  --input idr_model_submission/sample_data/scenario_1_highway_tunnel_outage.csv \
-  --model idr_model_submission/idr_neurospeed_tcn_int8.onnx \
-  --osm-tiles maps/ \
-  --rate 100 \
-  --export-plot results/trajectory_comparison.png \
-  --export-metrics results/benchmark_report.json \
-  --generate-benchmarks
+      <div class="sim-wrapper">
+        <div class="sim-controls-bar">
+          <div class="sim-btn-group">
+            <button id="btnSimOutage" class="btn btn-primary" onclick="toggleSimOutage()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Toggle GPS Outage</span>
+            </button>
+            <button id="btnSimShock" class="btn btn-secondary" onclick="injectSimShock()">
+              Road Bump (Shock)
+            </button>
+            <button id="btnSimZupt" class="btn btn-secondary" onclick="toggleSimZupt()">
+              Red Light (ZUPT)
+            </button>
+            <button class="btn btn-secondary" onclick="resetSimulator()">
+              Reset
+            </button>
+          </div>
 
-# 3. For 200 Hz Industrial FOG IMU stream over UART/CAN:
-./build/idr_edge_engine --imu-rate 200 --sensor-type FOG --input /dev/ttyUSB0 --baud 921600
-      </pre>
+          <div class="sim-telemetry-row">
+            <div>SPEED: <span id="simSpeedVal" style="color: #fff;">54.0 km/h</span></div>
+            <div>OUTAGE TIME: <span id="simOutageTimeVal" style="color: var(--accent-rose);">00:00</span></div>
+            <div>CLASSICAL DRIFT: <span id="simClassicDriftVal" style="color: var(--accent-rose);">0.0 m (0%)</span></div>
+            <div>IDR DRIFT: <span id="simIdrDriftVal" style="color: var(--accent-emerald);">0.2 m (0.00%)</span></div>
+          </div>
+        </div>
+
+        <div class="sim-canvas-box">
+          <canvas id="simCanvas" width="900" height="480"></canvas>
+        </div>
+
+        <div class="sim-legend">
+          <div class="legend-item">
+            <div class="legend-dot emerald"></div>
+            <span>Green Vehicle: IDR-Navigator (Neural Velocity + Map Clamping)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot rose"></div>
+            <span>Red Vehicle: Classical Double Integration (Accelerates off-road)</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-copy">
-        <p><strong>IDR-Navigator</strong> • Smart India Hackathon 2026 Submission (PS ID: SIH26168)</p>
-        <p style="margin-top:0.3rem;">Team Inventor (Team ID: 133715) | Indian Space Research Organisation (ISRO)</p>
+  <!-- Section 6: Downloads & Deliverables -->
+  <section class="section" id="downloads" style="background: var(--bg-secondary);">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eyebrow">Deliverables</div>
+        <h2 class="section-title">Production Binaries &amp; Code</h2>
+        <p class="section-desc">
+          Download the production Android APK, quantized neural network weights, and offline Python evaluation script.
+        </p>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/YashEkhande24/idr-desktop-simulator" class="nav-link">GitHub Source</a>
-        <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/README.md" class="nav-link">Technical Dossier</a>
-        <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/SIH26168_133715_Inventor.pdf" class="nav-link">Submission Presentation (PDF)</a>
+
+      <div class="downloads-grid">
+        <div class="download-card">
+          <div class="download-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h4>Android Production APK</h4>
+          <p>Native C++ math engine with on-device TCN inference, offline vector maps, and 3D navigation HUD.</p>
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/presentation_website/downloads/idr_pure_cpp_engine.apk" class="btn btn-emerald">
+            Download APK
+          </a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <h4>INT8 ONNX Model</h4>
+          <p>Quantized 8-channel SE-TCN speed inference model. 2.1 MB compact weight file for edge mobile inference.</p>
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn btn-secondary">
+            Download Model (2.1 MB)
+          </a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h4>Evaluation Script</h4>
+          <p>Standalone Python benchmark script reproducing all 5 test scenarios on ONNX Runtime without dependencies.</p>
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/blob/main/scripts/evaluate_iovnbd.py" target="_blank" class="btn btn-secondary">
+            View Python Script
+          </a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <h4>GitHub Repository</h4>
+          <p>Complete source code for Flutter frontend, C++ native math bridge, PyTorch training, and dataset tools.</p>
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank" class="btn btn-secondary">
+            View on GitHub
+          </a>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>IDR-Navigator</strong> &bull; Smart India Hackathon 2026 &bull; Problem Statement SIH26168
+        <p style="margin-top: 0.25rem;">Developed by Team Inventor (#133715) for ISRO (IISU / SAC)</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#benchmarks">Benchmarks</a></li>
+        <li><a href="#field-demo">Video</a></li>
+        <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
+      </ul>
     </div>
   </footer>
 
+  <!-- Scripts -->
+  <script src="simulator.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

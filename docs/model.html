@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDR-Navigator | Neural Velocity Models & Checkpoints (SIH 2026)</title>
+  <meta name="description" content="Trained neural network models and weights for IDR-Navigator: Download ONNX edge models, INT8 quantized weights, and architecture specifications.">
+  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <h1>IDR-NAVIGATOR <span class="brand-badge">ISRO SIH26168</span></h1>
+          <p>Indian Space Research Organisation &bull; Team Inventor #133715</p>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="index.html#overview">Overview</a></li>
+        <li><a href="index.html#problem">The Problem</a></li>
+        <li><a href="index.html#architecture">How It Works</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="video.html">Field Demo</a></li>
+        <li><a href="model.html" class="active">AI Model</a></li>
+        <li><a href="index.html#downloads">Downloads</a></li>
+      </ul>
+
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.825rem;">
+          &larr; Back to Main
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Section Header -->
+  <section class="hero-section" style="padding: 3rem 0 2rem;">
+    <div class="container">
+      <div class="hero-tag">Edge Model Checkpoints</div>
+      <h1 class="hero-title" style="font-size: 2.25rem;">Neural Velocity <span>Model &amp; Weights</span></h1>
+      <p class="hero-desc">
+        Trained model weights, ONNX edge deployment files, and input scalers for the Causal SE-TCN speed estimation engine. Runs 100% locally on commodity phone NPUs.
+      </p>
+    </div>
+  </section>
+
+  <!-- Models Content -->
+  <main class="section" style="padding-top: 1rem;">
+    <div class="container">
+
+      <div class="problem-grid" style="grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+
+        <!-- Model 1: INT8 Primary Submission -->
+        <div class="problem-card solution-card">
+          <span class="card-badge emerald">PRIMARY BENCHMARK MODEL</span>
+          <h3>idr_neurospeed_tcn_int8.onnx</h3>
+          <p>
+            Quantized 8-channel Causal SE-TCN deployed for offline evaluation and benchmarked in <code>results.json</code>. Delivers 2.2ms step latency on mobile NPU with 0.60 m/s mean MAE across all 5 test scenarios.
+          </p>
+
+          <table class="data-table" style="margin-bottom: 1.25rem; font-size: 0.8rem;">
+            <tr>
+              <td>Format</td>
+              <td>ONNX INT8 Quantized</td>
+            </tr>
+            <tr>
+              <td>File Size</td>
+              <td style="color: var(--accent-emerald); font-weight: 700;">2.14 MB</td>
+            </tr>
+            <tr>
+              <td>Input Tensor</td>
+              <td>[1, 8, 40] (10 Hz sliding window)</td>
+            </tr>
+            <tr>
+              <td>Output Tensor</td>
+              <td>[1, 2] (Velocity &mu;, Uncertainty &sigma;&sup2;)</td>
+            </tr>
+            <tr>
+              <td>Evaluation MAE</td>
+              <td>0.60 m/s Mean across 5 scenarios</td>
+            </tr>
+          </table>
+
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn btn-emerald">
+            Download INT8 Model (2.1 MB)
+          </a>
+        </div>
+
+        <!-- Model 2: Float32 Model -->
+        <div class="problem-card">
+          <span class="card-badge blue">FLOAT32 REFERENCE</span>
+          <h3>vehicle_speed_tcn.onnx</h3>
+          <p>
+            Unquantized full-precision Float32 model trained on the DriverSVT telemetry dataset (633 drivers) with CAN-bus wheel speed ground truth. Used for baseline validation and floating-point comparison.
+          </p>
+
+          <table class="data-table" style="margin-bottom: 1.25rem; font-size: 0.8rem;">
+            <tr>
+              <td>Format</td>
+              <td>ONNX v1.14 (Float32)</td>
+            </tr>
+            <tr>
+              <td>File Size</td>
+              <td>8.43 MB</td>
+            </tr>
+            <tr>
+              <td>Dynamic Range</td>
+              <td>0.0 km/h (Standstill) &ndash; 158.0 km/h</td>
+            </tr>
+            <tr>
+              <td>Ground Truth</td>
+              <td>OBD-II CAN Bus Wheel Speed</td>
+            </tr>
+            <tr>
+              <td>Validation Error</td>
+              <td>0.48 m/s MAE / 0.69 m/s RMSE</td>
+            </tr>
+          </table>
+
+          <a href="downloads/models/vehicle_speed_tcn.onnx" download class="btn btn-secondary">
+            Download Float32 Model (8.4 MB)
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Network Architecture Overview -->
+      <div style="margin-top: 3rem; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 2rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">
+          SE-TCN Network Architecture Specifications
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
+          The network processes 4-second sliding windows of 8 inertial channels (tri-axial accelerometer, tri-axial gyroscope, forward acceleration magnitude, and jerk rate).
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; font-size: 0.85rem;">
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Input Shape</span>
+            <strong style="color: var(--text-primary); font-family: var(--font-mono);">[1, 8, 40]</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">4.0s window @ 10 Hz</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Causal Dilations</span>
+            <strong style="color: var(--text-primary); font-family: var(--font-mono);">d &isin; {1, 2, 4, 8}</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Zero future-frame leakage</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Attention Block</span>
+            <strong style="color: var(--text-primary);">Squeeze-and-Excitation</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Channel-wise reweighting</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Inference Rate</span>
+            <strong style="color: var(--accent-emerald); font-family: var(--font-mono);">20 Hz (50ms loop)</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">&lt;8% mobile CPU load</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>IDR-Navigator</strong> &bull; Smart India Hackathon 2026 &bull; Team Inventor (#133715)
+        <p style="margin-top: 0.25rem;">Developed for ISRO (IISU / SAC)</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="index.html#overview">Overview</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="video.html">Video</a></li>
+        <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</body>
+</html>

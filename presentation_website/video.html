@@ -1,234 +1,182 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDR-Navigator | Demo Video (SIH 2026)</title>
+  <title>IDR-Navigator | Field Test Video (SIH 2026)</title>
   <meta name="description" content="Field test demonstration video for IDR-Navigator: Vehicular navigation during GNSS tunnel outages using smartphone inertial sensors.">
   <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
-  
-  <!-- Fonts -->
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-light">
+<body>
 
   <!-- Site Navigation -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand-link">
+      <div class="brand">
         <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
-        <div class="brand-info">
-          <div class="brand-title">
-            <span>IDR-NAVIGATOR</span>
-            <span class="sih-badge">SIH 2026</span>
-          </div>
-          <span class="brand-tagline">Intelligent Dead Reckoning System</span>
+        <div class="brand-text">
+          <h1>IDR-NAVIGATOR <span class="brand-badge">ISRO SIH26168</span></h1>
+          <p>Indian Space Research Organisation &bull; Team Inventor #133715</p>
         </div>
-      </a>
+      </div>
 
-      <nav>
-        <ul class="nav-menu">
-          <li><a href="index.html" class="nav-item-link">Overview</a></li>
-          <li><a href="index.html#problem" class="nav-item-link">Problem &amp; Solution</a></li>
-          <li><a href="index.html#architecture" class="nav-item-link">How It Works</a></li>
-          <li><a href="index.html#pitch-deck" class="nav-item-link">Pitch Deck</a></li>
-          <li><a href="index.html#simulator" class="nav-item-link">Simulator</a></li>
-          <li><a href="video.html" class="nav-item-link active">Demo Video</a></li>
-          <li><a href="model.html" class="nav-item-link">AI Model &amp; Weights</a></li>
-          <li><a href="index.html#downloads" class="nav-item-link">APK Downloads</a></li>
-        </ul>
-      </nav>
+      <ul class="nav-links">
+        <li><a href="index.html#overview">Overview</a></li>
+        <li><a href="index.html#problem">The Problem</a></li>
+        <li><a href="index.html#architecture">How It Works</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="video.html" class="active">Field Demo</a></li>
+        <li><a href="index.html#simulator">Simulator</a></li>
+        <li><a href="index.html#downloads">Downloads</a></li>
+      </ul>
 
       <div class="header-actions">
-        <a href="model.html" class="btn-secondary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          Model Link
-        </a>
-        <a href="index.html" class="btn-primary">
-          Back to Presentation
+        <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.825rem;">
+          &larr; Back to Main
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Header -->
-  <section class="subpage-hero">
+  <!-- Section Header -->
+  <section class="hero-section" style="padding: 3rem 0 2rem;">
     <div class="container">
-      <nav class="breadcrumb-nav">
-        <a href="index.html">Presentation Home</a>
-        <span>/</span>
-        <span style="color: var(--text-main);">Field Demo Video</span>
-      </nav>
-
-      <h1 class="subpage-title">Field Demonstration <span class="gradient-text">Video</span></h1>
-      <p class="subpage-desc">
-        Real-world test recording of IDR-Navigator tracking vehicle position through complete satellite denial.
-        Demonstrates the contrast between classical inertial divergence and our neural dead reckoning engine.
+      <div class="hero-tag">Real-World Field Demonstration</div>
+      <h1 class="hero-title" style="font-size: 2.25rem;">Synchronized <span>Dual-Feed HUD</span> Trial</h1>
+      <p class="hero-desc">
+        Continuous vehicular dead reckoning evaluated over highway underpasses and extended bypass runs during complete GNSS denial.
       </p>
     </div>
   </section>
 
-  <!-- Main Video Presentation Section -->
-  <main class="section-wrapper" style="padding-top: 2.5rem;">
+  <!-- Video Showcase -->
+  <main class="section" style="padding-top: 1rem;">
     <div class="container">
-
-      <!-- Video Card: Clean Placeholder / Local Upload Switcher -->
-      <div id="videoContainerBox">
-
-        <!-- Active Player Box: Real Field Demonstration Video Loaded by Default -->
-        <div id="activePlayerBox" style="display: block; background: #ffffff; border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-          <video id="mainVideoPlayer" src="assets/videos/demo_recording.mp4" controls class="video-player-real" style="width: 100%; max-height: 720px; display: block; background: #000;" preload="metadata">
+      <div class="video-showcase-box">
+        <div class="video-player-container">
+          <video id="demoVideo" controls poster="assets/images/hero_hud_showcase.jpg" style="width: 100%; height: 100%; background: #000;">
+            <source src="assets/videos/demo_recording.mp4" type="video/mp4">
             Your browser does not support HTML5 video.
           </video>
-          <div style="padding: 1rem 1.5rem; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-            <div style="font-size: 0.85rem; color: var(--text-muted);">
-              Active Field Video: <span class="mono" style="color: var(--text-main); font-weight: 600;" id="activeVideoNameDisplay">IDR_Navigator_Field_Demo_Combined.mp4 (Pune-Nashik Highway &amp; Sangamner Bypass)</span>
+        </div>
+
+        <div class="video-meta-bar">
+          <div class="trial-summary">
+            <h4>Trial 01: Highway Underpass Tunnel Outage</h4>
+            <p>Pune–Nashik Highway (NH60). Location deliberately toggled OFF at 00:07 to test instant satellite denial. Neural speed estimator and road clamping hold vehicle in-lane throughout the outage.</p>
+            <div class="trial-badges">
+              <span class="trial-pill">00:00 - Open Sky</span>
+              <span class="trial-pill">00:07 - GPS Cut</span>
+              <span class="trial-pill">00:35 - Traversal</span>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
-              <span class="badge" style="background: rgba(22,163,74,0.08); color: #16a34a; border: 1px solid rgba(22,163,74,0.2); padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;">
-                ● Synchronized Dual-HUD Trial
-              </span>
+          </div>
+
+          <div class="trial-summary">
+            <h4>Trial 02: Sangamner Bypass Extended Blackout</h4>
+            <p>High-speed bypass curves tested over an extended multi-minute blackout. Demonstrates edge NPU efficiency, standstill ZUPT, and vibration rejection on a single-track vehicle.</p>
+            <div class="trial-badges">
+              <span class="trial-pill">03:31 - Bypass Start</span>
+              <span class="trial-pill">03:50 - Curve Banking</span>
+              <span class="trial-pill">05:15 - 8km Stability</span>
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- Test Breakdown & Milestones -->
+      <!-- Test Breakdown Cards -->
       <div style="margin-top: 3.5rem;">
-        <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin-bottom: 1.25rem;">
-          What This Field Demonstration Demonstrates
+        <h3 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">
+          Trial Breakdown &amp; Engineering Phases
         </h3>
 
         <div class="problem-grid">
           <div class="problem-card">
-            <div class="problem-tag green-text">Phase 1 &bull; 00:00 &ndash; 00:07</div>
-            <h4 class="problem-title">Open-Sky Baseline Calibration</h4>
-            <p class="problem-desc">
+            <span class="card-badge emerald">Phase 1 &bull; 00:00 &ndash; 00:07</span>
+            <h3>Open-Sky Baseline Calibration</h3>
+            <p>
               Vehicle begins under clear open skies with healthy satellite lock. The green GNSS ACTIVE indicator verifies healthy satellite signal with &plusmn;0.7m accuracy, establishing baseline Doppler alignment.
             </p>
           </div>
 
           <div class="problem-card">
-            <div class="problem-tag red-text">Phase 2 &bull; 00:07 &ndash; 00:10</div>
-            <h4 class="problem-title">Manual GNSS Denial Trigger</h4>
-            <p class="problem-desc">
-              Quick settings shade is pulled down on camera to sever GNSS location, simulating entering a complete blackout tunnel (0 satellites). Red outage telemetry banner slides in immediately.
+            <span class="card-badge rose">Phase 2 &bull; 00:07 &ndash; 00:14</span>
+            <h3>Manual GNSS Denial Trigger</h3>
+            <p>
+              The quick settings shade is pulled down on camera to sever GNSS location, simulating entering a complete blackout tunnel (0 satellites). Red outage telemetry banner slides in immediately.
             </p>
           </div>
 
           <div class="problem-card">
-            <div class="problem-tag blue-text">Phase 3 &bull; 00:10 &ndash; 03:31</div>
-            <h4 class="problem-title">Underpass Tunnel Outage (Trial 1)</h4>
-            <p class="problem-desc">
-              Pune-Nashik Highway (NH60) tunnel outage run. 8-Ch Dilated SE-TCN speed estimator and 3D vector road snapping maintain lane lock without satellite signal, rejecting road bumps and stops.
+            <span class="card-badge blue">Phase 3 &bull; 00:14 &ndash; 03:31</span>
+            <h3>Underpass Traversal &amp; Clamping</h3>
+            <p>
+              8-channel Causal SE-TCN speed estimator and 3D vector road snapping maintain lane lock without satellite signal, rejecting road bumps, uneven asphalt, and temporary deceleration stops.
             </p>
           </div>
 
           <div class="problem-card">
-            <div class="problem-tag amber-text">Phase 4 &bull; 03:31 &ndash; 05:59</div>
-            <h4 class="problem-title">Extended Blackout Trial (Trial 2)</h4>
-            <p class="problem-desc">
-              Sangamner Bypass extended satellite denial run demonstrating standstill ZUPT and vibration filter resilience over prolonged outages without coordinate drift or jumping.
+            <span class="card-badge amber">Phase 4 &bull; 03:31 &ndash; 05:59</span>
+            <h3>Extended Bypass Blackout Run</h3>
+            <p>
+              Sangamner Bypass extended satellite denial run demonstrating standstill ZUPT and vibration filter resilience over prolonged outages without coordinate drift or teleportation.
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Hardware Test Setup Specs -->
-      <div style="margin-top: 2.5rem; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 2rem;">
-        <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">
+      <!-- Test Configuration Specs -->
+      <div style="margin-top: 2.5rem; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 1.75rem;">
+        <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">
           Field Test Hardware &amp; Sensor Configuration
         </h4>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; font-size: 0.85rem;">
           <div>
-            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Smartphone</span>
-            <strong style="color: var(--text-main);">OnePlus Nord CE4</strong>
-            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Snapdragon 7 Gen 3</span>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Test Smartphone</span>
+            <strong style="color: var(--text-primary);">OnePlus Nord CE4</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Snapdragon 7 Gen 3</span>
           </div>
           <div>
-            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Inertial IMU</span>
-            <strong style="color: var(--text-main);">Bosch BMI270 (6-DOF)</strong>
-            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">50 Hz Tri-axial Accel + Gyro</span>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Inertial IMU</span>
+            <strong style="color: var(--text-primary);">Bosch BMI270 (6-DOF)</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">50 Hz Tri-axial Accel + Gyro</span>
           </div>
           <div>
-            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Positioning Engine</span>
-            <strong style="color: var(--text-main);">SE-TCN + 9D EKF</strong>
-            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">11.2ms Edge NPU Inference</span>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">Positioning Engine</span>
+            <strong style="color: var(--text-primary);">SE-TCN + 9D EKF</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">11.2ms Edge NPU Latency</span>
           </div>
           <div>
-            <span style="color: var(--text-dim); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">External Hardware</span>
-            <strong style="color: var(--text-main);">Zero External Wires</strong>
-            <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.2rem;">100% Smartphone Embedded</span>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem;">External Hardware</span>
+            <strong style="color: var(--text-primary);">&#8377;0 Extra Hardware</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">100% Smartphone Embedded</span>
           </div>
         </div>
       </div>
-
     </div>
   </main>
 
   <!-- Site Footer -->
   <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <div class="brand-title" style="margin-bottom: 0.5rem;">
-            <span>IDR-NAVIGATOR</span>
-            <span class="sih-badge">SIH 2026</span>
-          </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-width: 320px;">
-            Intelligent Dead Reckoning &amp; GNSS Fusion System. Smart India Hackathon 2026 Submission.
-          </p>
-        </div>
-
-        <div class="footer-col">
-          <h5>Navigation</h5>
-          <ul class="footer-links">
-            <li><a href="index.html">Presentation Home</a></li>
-            <li><a href="index.html#problem">Problem &amp; Solution</a></li>
-            <li><a href="index.html#pitch-deck">Pitch Deck</a></li>
-            <li><a href="index.html#simulator">Live Simulator</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h5>Artifacts</h5>
-          <ul class="footer-links">
-            <li><a href="video.html">Field Demo Video</a></li>
-            <li><a href="model.html">AI Model Link</a></li>
-            <li><a href="downloads/models/vehicle_speed_tcn.onnx" download>ONNX Weights (8.4 MB)</a></li>
-            <li><a href="index.html#downloads">Android APK (111 MB)</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h5>External Links</h5>
-          <ul class="footer-links">
-            <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub Repository</a></li>
-            <li><a href="https://zenodo.org/records/4646877" target="_blank">DriverSVT Dataset</a></li>
-          </ul>
-        </div>
+    <div class="container footer-inner">
+      <div>
+        <strong>IDR-Navigator</strong> &bull; Smart India Hackathon 2026 &bull; Team Inventor (#133715)
+        <p style="margin-top: 0.25rem;">Developed for ISRO (IISU / SAC)</p>
       </div>
-
-      <div class="footer-bottom">
-        <div>&copy; 2026 IDR-Navigator Team &bull; Smart India Hackathon (SIH 2026)</div>
-        <div class="mono">Edge Inference: 11.2ms &bull; Zero External Hardware</div>
-      </div>
+      <ul class="footer-links">
+        <li><a href="index.html#overview">Overview</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="index.html#downloads">Downloads</a></li>
+        <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
+      </ul>
     </div>
   </footer>
 
-  <script>
-    const video = document.getElementById('mainVideoPlayer');
-    // Ensure video is ready for playback
-    if (video) {
-      video.addEventListener('play', () => {
-        console.log('[IDR Video] Field demonstration video playback started');
-      });
-    }
-  </script>
 </body>
 </html>

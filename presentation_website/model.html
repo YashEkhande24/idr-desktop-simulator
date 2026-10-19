@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDR-Navigator | AI Model & Weights (SIH 2026)</title>
-  <meta name="description" content="AI model links and weights for IDR-Navigator: Download trained ONNX mobile models, PyTorch checkpoints, and view architecture specifications.">
+  <title>IDR-Navigator | Neural Velocity Models & Checkpoints (SIH 2026)</title>
+  <meta name="description" content="Trained neural network models and weights for IDR-Navigator: Download ONNX edge models, INT8 quantized weights, and architecture specifications.">
   <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg">
-  
-  <!-- Fonts -->
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,364 +19,154 @@
   <!-- Site Navigation -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand-link">
+      <div class="brand">
         <img src="assets/images/idr_app_logo.jpg" alt="IDR Logo" class="brand-logo-img">
-        <div class="brand-info">
-          <div class="brand-title">
-            <span>IDR-NAVIGATOR</span>
-            <span class="sih-badge">SIH 2026</span>
-          </div>
-          <span class="brand-tagline">Intelligent Dead Reckoning System</span>
+        <div class="brand-text">
+          <h1>IDR-NAVIGATOR <span class="brand-badge">ISRO SIH26168</span></h1>
+          <p>Indian Space Research Organisation &bull; Team Inventor #133715</p>
         </div>
-      </a>
+      </div>
 
-      <nav>
-        <ul class="nav-menu">
-          <li><a href="index.html" class="nav-item-link">Overview</a></li>
-          <li><a href="index.html#problem" class="nav-item-link">Problem &amp; Solution</a></li>
-          <li><a href="index.html#architecture" class="nav-item-link">How It Works</a></li>
-          <li><a href="index.html#pitch-deck" class="nav-item-link">Pitch Deck</a></li>
-          <li><a href="index.html#simulator" class="nav-item-link">Simulator</a></li>
-          <li><a href="video.html" class="nav-item-link">Demo Video</a></li>
-          <li><a href="model.html" class="nav-item-link active">AI Model &amp; Weights</a></li>
-          <li><a href="index.html#downloads" class="nav-item-link">APK Downloads</a></li>
-        </ul>
-      </nav>
+      <ul class="nav-links">
+        <li><a href="index.html#overview">Overview</a></li>
+        <li><a href="index.html#problem">The Problem</a></li>
+        <li><a href="index.html#architecture">How It Works</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="video.html">Field Demo</a></li>
+        <li><a href="model.html" class="active">AI Model</a></li>
+        <li><a href="index.html#downloads">Downloads</a></li>
+      </ul>
 
       <div class="header-actions">
-        <a href="downloads/models/vehicle_speed_tcn.onnx" download="vehicle_speed_tcn.onnx" class="btn-primary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download ONNX (8.4MB)
+        <a href="index.html" class="btn btn-secondary" style="padding: 0.5rem 0.9rem; font-size: 0.825rem;">
+          &larr; Back to Main
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Header -->
-  <section class="subpage-hero">
+  <!-- Section Header -->
+  <section class="hero-section" style="padding: 3rem 0 2rem;">
     <div class="container">
-      <nav class="breadcrumb-nav">
-        <a href="index.html">Presentation Home</a>
-        <span>/</span>
-        <span style="color: #fff;">AI Model &amp; Weights Link</span>
-      </nav>
-
-      <h1 class="subpage-title">Neural Velocity Model <span class="gradient-text">&amp; Checkpoints</span></h1>
-      <p class="subpage-desc">
-        Trained model weights, ONNX edge deployment files, PyTorch checkpoints, and input scalers for the 
-        Causal SE-TCN velocity estimation engine. Estimates forward vehicle speed at 10 Hz directly from phone IMU vibrations.
+      <div class="hero-tag">Edge Model Checkpoints</div>
+      <h1 class="hero-title" style="font-size: 2.25rem;">Neural Velocity <span>Model &amp; Weights</span></h1>
+      <p class="hero-desc">
+        Trained model weights, ONNX edge deployment files, and input scalers for the Causal SE-TCN speed estimation engine. Runs 100% locally on commodity phone NPUs.
       </p>
     </div>
   </section>
 
-  <!-- Main Content -->
-  <main class="section-wrapper" style="padding-top: 2.5rem;">
+  <!-- Models Content -->
+  <main class="section" style="padding-top: 1rem;">
     <div class="container">
 
-      <!-- Direct Model Downloads -->
-      <div>
-        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">
-          Model Files &amp; Direct Downloads
-        </h2>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-          Hosted locally for presentation evaluation and reproducible testing.
-        </p>
+      <div class="problem-grid" style="grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
 
-        <div class="model-list-grid">
+        <!-- Model 1: INT8 Primary Submission -->
+        <div class="problem-card solution-card">
+          <span class="card-badge emerald">PRIMARY BENCHMARK MODEL</span>
+          <h3>idr_neurospeed_tcn_int8.onnx</h3>
+          <p>
+            Quantized 8-channel Causal SE-TCN deployed for offline evaluation and benchmarked in <code>results.json</code>. Delivers 2.2ms step latency on mobile NPU with 0.60 m/s mean MAE across all 5 test scenarios.
+          </p>
 
-          <!-- Model 1: Production ONNX -->
-          <div class="model-item-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(180deg, #131b2e 0%, #101524 100%);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span class="nav-pill-badge" style="margin-bottom: 0.5rem; display: inline-block;">PRIMARY EDGE MODEL</span>
-                <h3 class="model-item-title">vehicle_speed_tcn.onnx</h3>
-              </div>
-              <span class="mono" style="font-size: 0.85rem; color: var(--green-accent); font-weight: 700;">8.43 MB</span>
-            </div>
+          <table class="data-table" style="margin-bottom: 1.25rem; font-size: 0.8rem;">
+            <tr>
+              <td>Format</td>
+              <td>ONNX INT8 Quantized</td>
+            </tr>
+            <tr>
+              <td>File Size</td>
+              <td style="color: var(--accent-emerald); font-weight: 700;">2.14 MB</td>
+            </tr>
+            <tr>
+              <td>Input Tensor</td>
+              <td>[1, 8, 40] (10 Hz sliding window)</td>
+            </tr>
+            <tr>
+              <td>Output Tensor</td>
+              <td>[1, 2] (Velocity &mu;, Uncertainty &sigma;&sup2;)</td>
+            </tr>
+            <tr>
+              <td>Evaluation MAE</td>
+              <td>0.60 m/s Mean across 5 scenarios</td>
+            </tr>
+          </table>
 
-            <p class="model-item-desc">
-              Production ONNX model deployed inside the IDR Navigator mobile application. Takes normalized 8-channel IMU 
-              time-series windows of shape <code class="mono" style="color: #93c5fd;">[1, 8, 40]</code> and infers forward speed ($\hat{v}_x$) 
-              and predictive uncertainty ($\sigma^2$) for the Kalman filter.
-            </p>
-
-            <table class="spec-table">
-              <tr>
-                <td>Format</td>
-                <td>ONNX v1.14 (Float32)</td>
-              </tr>
-              <tr>
-                <td>Input Tensor</td>
-                <td>[1, 8, 40] (10 Hz sliding window)</td>
-              </tr>
-              <tr>
-                <td>Output Tensor</td>
-                <td>[1, 2] (Velocity &mu;, Log-Variance &sigma;&sup2;)</td>
-              </tr>
-              <tr>
-                <td>Latency</td>
-                <td>11.2ms (Snapdragon 7 Gen 3) / 4.5ms (x86 CPU)</td>
-              </tr>
-            </table>
-
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <a href="downloads/models/vehicle_speed_tcn.onnx" download="vehicle_speed_tcn.onnx" class="btn-primary">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download ONNX Model
-              </a>
-              <button class="btn-secondary" onclick="copyModelLink('downloads/models/vehicle_speed_tcn.onnx', this)">
-                Copy URL
-              </button>
-            </div>
-          </div>
-
-          <!-- Model 2: Highway Fine-Tuned -->
-          <div class="model-item-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span class="nav-pill-badge" style="margin-bottom: 0.5rem; display: inline-block;">STAGE 2 FINE-TUNED</span>
-                <h3 class="model-item-title">stage2_model.onnx</h3>
-              </div>
-              <span class="mono" style="font-size: 0.85rem; color: #fff;">8.43 MB</span>
-            </div>
-
-            <p class="model-item-desc">
-              Fine-tuned on the Zenodo DriverSVT telemetry dataset (17.5M samples, 633 drivers) and UAH-DriveSet CAN-bus wheel speed ground truth.
-              Calibrated for expressway cruising speeds up to 158 km/h.
-            </p>
-
-            <table class="spec-table">
-              <tr>
-                <td>Format</td>
-                <td>ONNX v1.14 (Float32)</td>
-              </tr>
-              <tr>
-                <td>Dynamic Range</td>
-                <td>0.0 km/h (Standstill) &ndash; 158.0 km/h (Highway)</td>
-              </tr>
-              <tr>
-                <td>Ground Truth</td>
-                <td>OBD-II CAN Bus Wheel Speed Sensor</td>
-              </tr>
-              <tr>
-                <td>Validation Error</td>
-                <td>0.48 m/s MAE / 0.69 m/s RMSE</td>
-              </tr>
-            </table>
-
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <a href="downloads/models/stage2_model.onnx" download="stage2_model.onnx" class="btn-primary">
-                Download Stage 2 Model
-              </a>
-              <button class="btn-secondary" onclick="copyModelLink('downloads/models/stage2_model.onnx', this)">
-                Copy URL
-              </button>
-            </div>
-          </div>
-
-          <!-- Model 3: PyTorch Checkpoint -->
-          <div class="model-item-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span class="nav-pill-badge" style="margin-bottom: 0.5rem; display: inline-block;">PYTORCH CHECKPOINT</span>
-                <h3 class="model-item-title">best_speed_tcn.pth</h3>
-              </div>
-              <span class="mono" style="font-size: 0.85rem; color: #fff;">8.44 MB</span>
-            </div>
-
-            <p class="model-item-desc">
-              Full PyTorch model checkpoint state dictionary (<code class="mono">state_dict</code>) with AdamW optimizer states.
-              Used for research replication, fine-tuning, and retraining in Python.
-            </p>
-
-            <table class="spec-table">
-              <tr>
-                <td>Format</td>
-                <td>PyTorch Checkpoint (.pth / torch.save)</td>
-              </tr>
-              <tr>
-                <td>Loss Function</td>
-                <td>Gaussian Negative Log-Likelihood (NLL)</td>
-              </tr>
-              <tr>
-                <td>Training Epochs</td>
-                <td>50 Epochs (OneCycleLR Scheduler)</td>
-              </tr>
-              <tr>
-                <td>Parameters</td>
-                <td>2,108,418 weights</td>
-              </tr>
-            </table>
-
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <a href="downloads/models/best_speed_tcn.pth" download="best_speed_tcn.pth" class="btn-primary">
-                Download PyTorch Weights
-              </a>
-              <button class="btn-secondary" onclick="copyModelLink('downloads/models/best_speed_tcn.pth', this)">
-                Copy URL
-              </button>
-            </div>
-          </div>
-
-          <!-- Model 4: Normalization Scaler -->
-          <div class="model-item-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <span class="nav-pill-badge" style="margin-bottom: 0.5rem; display: inline-block;">SCALER PARAMETERS</span>
-                <h3 class="model-item-title">normalize_stats.json</h3>
-              </div>
-              <span class="mono" style="font-size: 0.85rem; color: var(--green-accent);">481 B</span>
-            </div>
-
-            <p class="model-item-desc">
-              Per-channel means and standard deviations computed across the training corpus for standardizing raw IMU measurements 
-              before feeding into the neural network: $x_{\text{norm}} = (x - \mu) / \sigma$.
-            </p>
-
-            <table class="spec-table">
-              <tr>
-                <td>Format</td>
-                <td>JSON (.json)</td>
-              </tr>
-              <tr>
-                <td>Channels</td>
-                <td>Ax, Ay, Az, Gx, Gy, Gz, Jerk, Tilt Angle</td>
-              </tr>
-              <tr>
-                <td>Speed Scale</td>
-                <td>25.0 (Velocity Normalization Divisor)</td>
-              </tr>
-              <tr>
-                <td>Application</td>
-                <td>Shared across Python, Dart, and C++ SIMD engine</td>
-              </tr>
-            </table>
-
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <a href="downloads/models/normalize_stats.json" download="normalize_stats.json" class="btn-primary">
-                Download Scaler JSON
-              </a>
-              <button class="btn-secondary" onclick="toggleJsonView()">
-                View JSON
-              </button>
-            </div>
-          </div>
-
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn btn-emerald">
+            Download INT8 Model (2.1 MB)
+          </a>
         </div>
 
-        <!-- Collapsible JSON Drawer -->
-        <div id="jsonDrawer" style="display: none; margin-top: 1.5rem;">
-          <div class="code-box">{
-  "mean": [
-    -0.02365945,  // Accel X (m/s²)
-    -0.06469030,  // Accel Y (m/s²)
-     0.01274203,  // Accel Z (m/s²)
-    -0.00004271,  // Gyro X (rad/s)
-    -0.00518811,  // Gyro Y (rad/s)
-    -0.00053543,  // Gyro Z (rad/s)
-     1.83050894,  // Jerk Magnitude (m/s³)
-     0.18634985   // Pitch / Tilt (rad)
-  ],
-  "std": [
-    1.68240916,
-    1.64495146,
-    0.73317313,
-    0.13121275,
-    0.23679392,
-    0.11545656,
-    1.65169441,
-    0.22786571
-  ],
-  "speed_scale": 25.0
-}</div>
+        <!-- Model 2: Float32 Model -->
+        <div class="problem-card">
+          <span class="card-badge blue">FLOAT32 REFERENCE</span>
+          <h3>vehicle_speed_tcn.onnx</h3>
+          <p>
+            Unquantized full-precision Float32 model trained on the DriverSVT telemetry dataset (633 drivers) with CAN-bus wheel speed ground truth. Used for baseline validation and floating-point comparison.
+          </p>
+
+          <table class="data-table" style="margin-bottom: 1.25rem; font-size: 0.8rem;">
+            <tr>
+              <td>Format</td>
+              <td>ONNX v1.14 (Float32)</td>
+            </tr>
+            <tr>
+              <td>File Size</td>
+              <td>8.43 MB</td>
+            </tr>
+            <tr>
+              <td>Dynamic Range</td>
+              <td>0.0 km/h (Standstill) &ndash; 158.0 km/h</td>
+            </tr>
+            <tr>
+              <td>Ground Truth</td>
+              <td>OBD-II CAN Bus Wheel Speed</td>
+            </tr>
+            <tr>
+              <td>Validation Error</td>
+              <td>0.48 m/s MAE / 0.69 m/s RMSE</td>
+            </tr>
+          </table>
+
+          <a href="downloads/models/vehicle_speed_tcn.onnx" download class="btn btn-secondary">
+            Download Float32 Model (8.4 MB)
+          </a>
         </div>
+
       </div>
 
-      <!-- Architecture Specifications -->
-      <div style="margin-top: 4rem;">
-        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">
-          Network Architecture &amp; Pipeline
-        </h2>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-          How the 8-channel temporal network translates inertial vibration patterns into speed.
+      <!-- Network Architecture Overview -->
+      <div style="margin-top: 3rem; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 2rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">
+          SE-TCN Network Architecture Specifications
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
+          The network processes 4-second sliding windows of 8 inertial channels (tri-axial accelerometer, tri-axial gyroscope, forward acceleration magnitude, and jerk rate).
         </p>
 
-        <div class="problem-grid">
-          <div class="problem-card">
-            <div class="problem-tag blue-text">Input Window</div>
-            <h4 class="problem-title">4.0s Sliding Window (40 Steps @ 10Hz)</h4>
-            <p class="problem-desc">
-              Takes 8 physical channels: tri-axial accelerometer, tri-axial gyroscope, vertical jerk magnitude, and chassis pitch angle.
-              Downsampled to 10 Hz to balance power consumption and capture wheel-rolling harmonics.
-            </p>
-          </div>
-
-          <div class="problem-card">
-            <div class="problem-tag blue-text">Convolutions</div>
-            <h4 class="problem-title">Dilated Causal Residual Blocks</h4>
-            <p class="problem-desc">
-              5 dilated convolution layers with expansion factors $d \in \{1, 2, 4, 8, 16\}$.
-              Causal padding prevents future information leakage, while Squeeze-and-Excitation attention gates focus on the most informative sensor channels.
-            </p>
-          </div>
-
-          <div class="problem-card">
-            <div class="problem-tag green-text">Dual Head Output</div>
-            <h4 class="problem-title">Speed ($\hat{v}_x$) &amp; Uncertainty ($\sigma^2$)</h4>
-            <p class="problem-desc">
-              Trained with Gaussian Negative Log-Likelihood (NLL). When encountering unmodeled dynamics (e.g. sudden wheel slip or severe potholes),
-              the network automatically outputs high variance $\sigma^2$, prompting the Kalman filter to lower measurement trust.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quickstart Code -->
-      <div style="margin-top: 4rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; font-size: 0.85rem;">
           <div>
-            <h2 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700;">
-              Python Inference Quickstart
-            </h2>
-            <p style="font-size: 0.88rem; color: var(--text-muted);">
-              Run inference on the downloaded ONNX model with standard onnxruntime.
-            </p>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Input Shape</span>
+            <strong style="color: var(--text-primary); font-family: var(--font-mono);">[1, 8, 40]</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">4.0s window @ 10 Hz</span>
           </div>
-          <button class="btn-secondary" onclick="copySnippet(this)">
-            Copy Code
-          </button>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Causal Dilations</span>
+            <strong style="color: var(--text-primary); font-family: var(--font-mono);">d &isin; {1, 2, 4, 8}</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Zero future-frame leakage</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Attention Block</span>
+            <strong style="color: var(--text-primary);">Squeeze-and-Excitation</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">Channel-wise reweighting</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase;">Inference Rate</span>
+            <strong style="color: var(--accent-emerald); font-family: var(--font-mono);">20 Hz (50ms loop)</strong>
+            <span style="color: var(--text-secondary); display: block; font-size: 0.8rem; margin-top: 0.2rem;">&lt;8% mobile CPU load</span>
+          </div>
         </div>
-
-        <div class="code-box" id="codeSnippetArea">import onnxruntime as ort
-import numpy as np
-import json
-
-# 1. Load ONNX model and normalization statistics
-session = ort.InferenceSession("downloads/models/vehicle_speed_tcn.onnx")
-with open("downloads/models/normalize_stats.json") as f:
-    stats = json.load(f)
-
-means = np.array(stats["mean"]).reshape(1, 8, 1)
-stds = np.array(stats["std"]).reshape(1, 8, 1)
-
-# 2. Window of raw 8-channel IMU data across 40 steps @ 10 Hz
-# Shape: [Batch=1, Channels=8, TimeSteps=40]
-raw_imu = np.random.randn(1, 8, 40).astype(np.float32)
-
-# 3. Normalize input
-normalized_input = (raw_imu - means) / stds
-
-# 4. Run real-time edge inference (~11ms on mobile CPU)
-inputs = {session.get_inputs()[0].name: normalized_input.astype(np.float32)}
-output = session.run(None, inputs)[0][0]
-
-predicted_speed_mps = float(output[0])
-predicted_speed_kmh = predicted_speed_mps * 3.6
-variance = float(np.exp(output[1]))
-
-print(f"Predicted Speed: {predicted_speed_kmh:.2f} km/h ({predicted_speed_mps:.2f} m/s)")
-print(f"Uncertainty (R_k): {variance:.4f}")
-</div>
       </div>
 
     </div>
@@ -384,81 +174,19 @@ print(f"Uncertainty (R_k): {variance:.4f}")
 
   <!-- Site Footer -->
   <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <div class="brand-title" style="margin-bottom: 0.5rem;">
-            <span>IDR-NAVIGATOR</span>
-            <span class="sih-badge">SIH 2026</span>
-          </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-width: 320px;">
-            Intelligent Dead Reckoning &amp; GNSS Fusion System. Smart India Hackathon 2026 Submission.
-          </p>
-        </div>
-
-        <div class="footer-col">
-          <h5>Navigation</h5>
-          <ul class="footer-links">
-            <li><a href="index.html">Presentation Home</a></li>
-            <li><a href="index.html#problem">Problem &amp; Solution</a></li>
-            <li><a href="index.html#pitch-deck">Pitch Deck</a></li>
-            <li><a href="index.html#simulator">Live Simulator</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h5>Artifacts</h5>
-          <ul class="footer-links">
-            <li><a href="video.html">Field Demo Video</a></li>
-            <li><a href="model.html">AI Model Link</a></li>
-            <li><a href="downloads/models/vehicle_speed_tcn.onnx" download>ONNX Weights (8.4 MB)</a></li>
-            <li><a href="index.html#downloads">Android APK (111 MB)</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h5>External Links</h5>
-          <ul class="footer-links">
-            <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub Repository</a></li>
-            <li><a href="https://zenodo.org/records/4646877" target="_blank">DriverSVT Dataset</a></li>
-          </ul>
-        </div>
+    <div class="container footer-inner">
+      <div>
+        <strong>IDR-Navigator</strong> &bull; Smart India Hackathon 2026 &bull; Team Inventor (#133715)
+        <p style="margin-top: 0.25rem;">Developed for ISRO (IISU / SAC)</p>
       </div>
-
-      <div class="footer-bottom">
-        <div>&copy; 2026 IDR-Navigator Team &bull; Smart India Hackathon (SIH 2026)</div>
-        <div class="mono">Edge Inference: 11.2ms &bull; Zero External Hardware</div>
-      </div>
+      <ul class="footer-links">
+        <li><a href="index.html#overview">Overview</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="video.html">Video</a></li>
+        <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
+      </ul>
     </div>
   </footer>
 
-  <script>
-    function copyModelLink(relPath, btn) {
-      const fullUrl = window.location.origin + '/' + relPath;
-      navigator.clipboard.writeText(fullUrl).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.style.color = '#10b981';
-        setTimeout(() => {
-          btn.textContent = orig;
-          btn.style.color = '';
-        }, 2000);
-      });
-    }
-
-    function toggleJsonView() {
-      const el = document.getElementById('jsonDrawer');
-      el.style.display = el.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function copySnippet(btn) {
-      const code = document.getElementById('codeSnippetArea').textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = orig; }, 2000);
-      });
-    }
-  </script>
 </body>
 </html>
