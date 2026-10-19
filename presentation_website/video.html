@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IDR-Navigator — Field Test Demonstration Video (ISRO SIH26168)</title>
+  <title>IDR-Navigator — Field Demonstration Video (ISRO SIH26168)</title>
   <meta name="description" content="Synchronized road ground truth paired side-by-side with real-time cockpit HUD during GNSS blackout trials. Team Inventor #133715." />
   <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg" />
 
@@ -12,44 +12,46 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=20261019_3" />
+  <link rel="stylesheet" href="style.css?v=20261019_4" />
 </head>
 <body>
 
-  <!-- Top Archival Bar -->
+  <!-- Top Archival Navigation Bar -->
   <header class="topbar">
     <div class="container topbar-inner">
       <div class="topbar-id">
         <span class="status-dot" aria-hidden="true"></span>
         <span class="mono-label">ISRO SIH26168</span>
         <span class="divider">/</span>
-        <span class="mono-label">FIELD TEST RECORDING</span>
+        <span class="mono-label">FIELD TEST DEMONSTRATION</span>
       </div>
 
       <nav class="topbar-nav" aria-label="Navigation">
-        <a href="index.html#abstract">Abstract</a>
-        <a href="index.html#cascade">Pipeline</a>
-        <a href="index.html#benchmarks">Benchmarks</a>
-        <a href="video.html" class="active">Field Video</a>
-        <a href="model.html">AI Model</a>
-        <a href="index.html#artifacts">Artifacts</a>
+        <a href="index.html#abstract"><span class="nav-num">01</span> Abstract</a>
+        <a href="index.html#cascade"><span class="nav-num">02</span> Pipeline</a>
+        <a href="index.html#benchmarks"><span class="nav-num">03</span> Benchmarks</a>
+        <a href="index.html#simulator"><span class="nav-num">04</span> Simulator</a>
+        <a href="video" class="active"><span class="nav-num">05</span> Video (/video)</a>
+        <a href="model"><span class="nav-num">06</span> Model (/model)</a>
+        <a href="index.html#artifacts"><span class="nav-num">07</span> Artifacts</a>
       </nav>
 
       <div>
-        <a href="index.html" class="btn-secondary" style="width: auto; padding: 0.35rem 0.75rem;">&larr; Monograph</a>
+        <a href="index.html" class="btn-secondary" style="width: auto; padding: 0.35rem 0.85rem; font-size: 0.75rem;">&larr; Return to Monograph</a>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-    <div class="kicker">EMPIRICAL PROVING GROUND &middot; NH60 &amp; SANGAMNER BYPASS</div>
-    <h1 class="hero-title" style="font-size: 2.5rem; margin-bottom: 1rem;">
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 4.5rem;">
+    <div class="kicker">EMPIRICAL PROVING GROUND &middot; NH60 HIGHWAY &amp; SANGAMNER BYPASS</div>
+    <h1 class="hero-title" style="font-size: clamp(2.2rem, 3.5vw, 3rem); margin-bottom: 1rem;">
       Synchronized Dual-Feed HUD Field Demonstration
     </h1>
     <p class="hero-abstract" style="margin-bottom: 2.5rem;">
-      Live experimental recording demonstrating continuous vehicle tracking across highway underpass blackouts and multi-kilometer bypass runs with GNSS satellite positioning deliberately severed on camera.
+      Live experimental trial recording evaluating continuous vehicular positioning across subterranean underpass blackouts and multi-kilometer highway bypass curves with GNSS satellite fixes severed deliberately on camera.
     </p>
 
+    <!-- Video Showcase Container -->
     <div class="video-showcase-box">
       <div class="video-player-container">
         <video id="demoVideo" controls poster="assets/images/hero_hud_showcase.jpg">
@@ -58,57 +60,88 @@
         </video>
       </div>
 
-      <div class="video-meta-bar">
-        <div class="trial-summary">
-          <h4>Trial 01: Highway Underpass Tunnel Outage</h4>
-          <p>Pune–Nashik Highway (NH60). Location toggled OFF at 00:07 to simulate sudden blackout. Demonstrates instantaneous neural velocity takeover and lane clamping.</p>
-          <div class="trial-badges">
-            <span class="trial-pill">00:00 - Open Sky</span>
-            <span class="trial-pill">00:07 - GPS Cut</span>
-            <span class="trial-pill">00:35 - Traversal</span>
+      <!-- Video Phase Chapters Bar -->
+      <div class="video-meta-bar" style="grid-template-columns: 1fr;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin: 0;">
+              Interactive Video Chapter Index
+            </h4>
+            <span class="mono-label" style="color: var(--accent-emerald);">Total Runtime: 05:59</span>
           </div>
-        </div>
-
-        <div class="trial-summary">
-          <h4>Trial 02: Sangamner Bypass Extended Blackout</h4>
-          <p>Extended multi-minute satellite denial run demonstrating edge NPU efficiency, standstill ZUPT, and vibration filter resilience over prolonged highway sweeps.</p>
-          <div class="trial-badges">
-            <span class="trial-pill">03:31 - Bypass Start</span>
-            <span class="trial-pill">03:50 - Curve Banking</span>
-            <span class="trial-pill">05:15 - 8km Check</span>
+          
+          <div class="trial-badges" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <button class="trial-pill" data-jump-time="0">00:00 &middot; Phase 1: Open-Sky Baseline</button>
+            <button class="trial-pill" data-jump-time="7">00:07 &middot; Phase 2: Intentional GNSS Severing</button>
+            <button class="trial-pill" data-jump-time="14">00:14 &middot; Phase 3: Outage Banner &amp; Neural Takeover</button>
+            <button class="trial-pill" data-jump-time="35">00:35 &middot; Phase 4: Highway Traversal &amp; Lane Clamping</button>
+            <button class="trial-pill" data-jump-time="75">01:15 &middot; Phase 5: Road Bumps &amp; Jerk Gating</button>
+            <button class="trial-pill" data-jump-time="120">02:00 &middot; Phase 6: Standstill ZUPT Detection</button>
+            <button class="trial-pill" data-jump-time="165">02:45 &middot; Phase 7: Tunnel Exit &amp; Re-Convergence</button>
+            <button class="trial-pill" data-jump-time="211">03:31 &middot; Phase 8: Trial 02 Extended Bypass Start</button>
+            <button class="trial-pill" data-jump-time="230">03:50 &middot; Phase 9: High-Speed Curvature &amp; Banking</button>
+            <button class="trial-pill" data-jump-time="275">04:35 &middot; Phase 10: Zero External Wires Inspection</button>
+            <button class="trial-pill" data-jump-time="315">05:15 &middot; Phase 11: 8,000m Long-Distance Stability</button>
+            <button class="trial-pill" data-jump-time="345">05:45 &middot; Phase 12: Terminus &amp; Summary</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Hardware Configuration Specs -->
-    <div style="margin-top: 2.5rem; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xs); padding: 1.5rem; box-shadow: var(--shadow-subtle);">
-      <h3 style="font-family: var(--font-serif); font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">
-        Field Test Sensor &amp; Compute Configuration
+    <!-- Trial Breakdowns -->
+    <div style="margin-top: 3rem;">
+      <h2 class="section-heading" style="font-size: 1.6rem; margin-bottom: 1.25rem;">
+        Experimental Protocol &amp; Trial Regimes
+      </h2>
+
+      <div class="editorial-note" style="margin-top: 0;">
+        <div class="note-col">
+          <div class="kicker" style="margin-bottom: 0.5rem;">TRIAL 01 &middot; SEGMENT 00:00 &ndash; 03:31</div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Highway Underpass Tunnel Outage (NH60)</h4>
+          <p>
+            Conducted along the Pune–Nashik Highway (NH60). Location services are deliberately toggled OFF at 00:07 via the Android notification shade to replicate instantaneous GNSS carrier loss upon entering subterranean highway bores. The 8-channel causal SE-TCN speed estimator and 3D vector road snapper maintain continuous lane lock without satellite fixes, successfully isolating road pothole shocks through Savitzky-Golay jerk gating.
+          </p>
+        </div>
+
+        <div class="note-col">
+          <div class="kicker" style="margin-bottom: 0.5rem;">TRIAL 02 &middot; SEGMENT 03:31 &ndash; 05:59</div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Sangamner Bypass Extended Blackout</h4>
+          <p>
+            An extended multi-kilometer blackout trial conducted over sweeping highway curves. Evaluates thermal stability, on-device NPU latency (&lt;2.2 ms/step), and single-track vehicle dynamics. Demonstrates that our Mahony SO(3) attitude observer decouples roll banking during cornering, while Stage 5 OSM map snapping bounds cross-track lateral error across more than 8,000 meters traversed.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sensor & Hardware Specs -->
+    <div style="margin-top: 2.5rem; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xs); padding: 1.75rem; box-shadow: var(--shadow-subtle);">
+      <h3 style="font-family: var(--font-serif); font-size: 1.25rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-primary);">
+        Field Demonstration Sensor &amp; Compute Configuration
       </h3>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; font-size: 0.85rem;">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; font-size: 0.85rem;">
         <div>
-          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Test Platform</span>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Host Device</span>
           <strong style="color: var(--text-primary);">OnePlus Nord CE4</strong>
-          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Snapdragon 7 Gen 3</span>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Qualcomm Snapdragon 7 Gen 3</span>
         </div>
         <div>
           <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Inertial IMU</span>
           <strong style="color: var(--text-primary);">Bosch BMI270 (6-DOF)</strong>
-          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">100 Hz Accel + Gyro</span>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">100 Hz Accel + Gyroscope</span>
         </div>
         <div>
-          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Positioning Engine</span>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Inference Engine</span>
           <strong style="color: var(--text-primary);">Causal SE-TCN + EKF</strong>
-          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">2.2 ms Step Latency</span>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">2.2 ms Step Execution Latency</span>
         </div>
         <div>
-          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">External Hardware</span>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Retrofit Cost</span>
           <strong style="color: var(--accent-emerald);">&#8377;0 Extra Hardware</strong>
-          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Zero vehicle modifications</span>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Zero vehicle telematics or wiring</span>
         </div>
       </div>
     </div>
+
   </main>
 
   <!-- Monograph Footer -->
@@ -121,10 +154,12 @@
       <ul class="footer-links">
         <li><a href="index.html#abstract">Monograph</a></li>
         <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="model">AI Model (/model)</a></li>
         <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
       </ul>
     </div>
   </footer>
 
+  <script src="app.js?v=20261019_4"></script>
 </body>
 </html>

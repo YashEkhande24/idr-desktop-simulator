@@ -34,9 +34,10 @@
         <a href="#abstract"><span class="nav-num">01</span> Abstract</a>
         <a href="#cascade"><span class="nav-num">02</span> Pipeline</a>
         <a href="#benchmarks"><span class="nav-num">03</span> Benchmarks</a>
-        <a href="#demonstration"><span class="nav-num">04</span> Field Video</a>
-        <a href="#simulator"><span class="nav-num">05</span> Simulator</a>
-        <a href="#artifacts"><span class="nav-num">06</span> Artifacts</a>
+        <a href="#simulator"><span class="nav-num">04</span> Simulator</a>
+        <a href="video"><span class="nav-num">05</span> Video (/video)</a>
+        <a href="model"><span class="nav-num">06</span> Model (/model)</a>
+        <a href="#artifacts"><span class="nav-num">07</span> Artifacts</a>
       </nav>
     </div>
   </header>
@@ -68,8 +69,8 @@
             <div class="meta-value mono">2.1 MB INT8 ONNX &middot; 2.2 ms/step</div>
           </div>
           <div class="meta-actions">
-            <a href="#artifacts" class="btn-primary">Download Artifacts &amp; APK</a>
-            <a href="#demonstration" class="btn-secondary">Watch Field Video</a>
+            <a href="video" class="btn-primary">Watch Field Video (/video) &rarr;</a>
+            <a href="model" class="btn-secondary">AI Model &amp; Weights (/model) &rarr;</a>
           </div>
         </aside>
 
@@ -536,7 +537,10 @@
               </p>
               <div class="artifact-footer">
                 <span class="mono">2.2 ms step latency</span>
-                <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-secondary" style="width: auto; padding: 0.4rem 0.85rem;">Download Model</a>
+                <div style="display: flex; gap: 0.4rem;">
+                  <a href="model" class="btn-primary" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.72rem;">Model Specs (/model)</a>
+                  <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-secondary" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.72rem;">Download .onnx</a>
+                </div>
               </div>
             </article>
 

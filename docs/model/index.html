@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="../">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IDR-Navigator — Neural Velocity Estimator Model Specifications (ISRO SIH26168)</title>
+  <meta name="description" content="Quantized INT8 ONNX models and PyTorch checkpoints for Causal SE-TCN speed inference. Team Inventor #133715." />
+  <link rel="icon" type="image/jpeg" href="assets/images/favicon.jpg" />
+
+  <!-- Editorial Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css?v=20261019_4" />
+</head>
+<body>
+
+  <!-- Top Archival Navigation Bar -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-id">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="mono-label">ISRO SIH26168</span>
+        <span class="divider">/</span>
+        <span class="mono-label">NEURAL WEIGHTS &amp; MODEL DOSSIER</span>
+      </div>
+
+      <nav class="topbar-nav" aria-label="Navigation">
+        <a href="index.html#abstract"><span class="nav-num">01</span> Abstract</a>
+        <a href="index.html#cascade"><span class="nav-num">02</span> Pipeline</a>
+        <a href="index.html#benchmarks"><span class="nav-num">03</span> Benchmarks</a>
+        <a href="index.html#simulator"><span class="nav-num">04</span> Simulator</a>
+        <a href="video"><span class="nav-num">05</span> Video (/video)</a>
+        <a href="model" class="active"><span class="nav-num">06</span> Model (/model)</a>
+        <a href="index.html#artifacts"><span class="nav-num">07</span> Artifacts</a>
+      </nav>
+
+      <div>
+        <a href="index.html" class="btn-secondary" style="width: auto; padding: 0.35rem 0.85rem; font-size: 0.75rem;">&larr; Return to Monograph</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 3.5rem; padding-bottom: 4.5rem;">
+    <div class="kicker">NEURAL KINEMATICS &middot; EDGE ONNX NPU DEPLOYMENT</div>
+    <h1 class="hero-title" style="font-size: clamp(2.2rem, 3.5vw, 3rem); margin-bottom: 1rem;">
+      Causal SE-TCN Velocity Model &amp; Checkpoints
+    </h1>
+    <p class="hero-abstract" style="margin-bottom: 2.5rem;">
+      Production neural network checkpoints, ONNX computational graphs, and inference specifications for instantaneous scalar vehicle speed regression directly from multi-axis smartphone IMU motion.
+    </p>
+
+    <!-- Model Checkpoint Cards -->
+    <div class="artifact-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 3rem;">
+      
+      <!-- Primary INT8 Model -->
+      <article class="artifact-card" style="border-top-color: var(--accent-emerald);">
+        <div class="artifact-meta">
+          <span class="artifact-type">OFFICIAL ISRO SUBMISSION</span>
+          <span class="mono" style="color: var(--accent-emerald); font-weight: 600;">2.14 MB &middot; INT8 ONNX</span>
+        </div>
+        <h3 class="artifact-title">idr_neurospeed_tcn_int8.onnx</h3>
+        <p class="artifact-desc">
+          Quantized 8-channel Causal SE-TCN speed estimator deployed inside the IDR-Navigator production application and benchmarked in <span class="mono">results.json</span>. Uses dynamic INT8 symmetric per-tensor quantization to achieve 2.2 ms step latency on mobile NPU with 0.60 m/s mean MAE across all 5 test scenarios.
+        </p>
+        <div class="table-wrapper" style="margin: 0 0 1.25rem; box-shadow: none;">
+          <table class="benchmark-table" style="font-size: 0.8rem;">
+            <tr><td>Model Format</td><td class="num-col mono">ONNX v1.14 (INT8 Quantized)</td></tr>
+            <tr><td>Memory Footprint</td><td class="num-col mono highlight-val">2,143,842 Bytes (2.14 MB)</td></tr>
+            <tr><td>Input Tensor Shape</td><td class="num-col mono">[1, 8, 40] (10 Hz Sliding Window)</td></tr>
+            <tr><td>Output Tensor Shape</td><td class="num-col mono">[1, 2] (Velocity &mu;, Uncertainty &sigma;&sup2;)</td></tr>
+            <tr><td>Validation MAE</td><td class="num-col mono highlight-val" style="color: var(--accent-emerald);">0.60 m/s (5-Scenario Mean)</td></tr>
+          </table>
+        </div>
+        <div class="artifact-footer">
+          <span class="mono">2.2 ms / step on NPU</span>
+          <a href="https://github.com/YashEkhande24/idr-desktop-simulator/raw/main/idr_model_submission/idr_neurospeed_tcn_int8.onnx" download class="btn-primary" style="width: auto; padding: 0.45rem 1rem;">Download INT8 Model (2.1 MB)</a>
+        </div>
+      </article>
+
+      <!-- Float32 Baseline Model -->
+      <article class="artifact-card">
+        <div class="artifact-meta">
+          <span class="artifact-type">FULL-PRECISION REFERENCE</span>
+          <span class="mono">8.43 MB &middot; FP32 ONNX</span>
+        </div>
+        <h3 class="artifact-title">vehicle_speed_tcn.onnx</h3>
+        <p class="artifact-desc">
+          Unquantized baseline model trained on the Zenodo DriverSVT dataset (633 drivers, 17.5M inertial frames) and UAH-DriveSet CAN-bus wheel speed ground truth. Used for floating-point reference testing and offline scientific comparison.
+        </p>
+        <div class="table-wrapper" style="margin: 0 0 1.25rem; box-shadow: none;">
+          <table class="benchmark-table" style="font-size: 0.8rem;">
+            <tr><td>Model Format</td><td class="num-col mono">ONNX v1.14 (Float32)</td></tr>
+            <tr><td>Memory Footprint</td><td class="num-col mono">8,430,579 Bytes (8.43 MB)</td></tr>
+            <tr><td>Dynamic Range</td><td class="num-col mono">0.0 km/h to 158.0 km/h</td></tr>
+            <tr><td>Ground Truth Sensor</td><td class="num-col mono">OBD-II CAN Bus Wheel Encoders</td></tr>
+            <tr><td>Validation MAE</td><td class="num-col mono highlight-val">0.48 m/s (Single-Track Highway)</td></tr>
+          </table>
+        </div>
+        <div class="artifact-footer">
+          <span class="mono">4.5 ms on x86 CPU</span>
+          <a href="downloads/models/vehicle_speed_tcn.onnx" download class="btn-secondary" style="width: auto; padding: 0.45rem 1rem;">Download FP32 Model (8.4 MB)</a>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Python Minimal Inference Code Block -->
+    <div style="background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xs); padding: 1.75rem; box-shadow: var(--shadow-subtle); margin-bottom: 3rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+        <h3 style="font-family: var(--font-serif); font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin: 0;">
+          5-Line Minimal Python Inference Snippet
+        </h3>
+        <span class="mono-label">Python 3.8+ &middot; pip install onnxruntime numpy</span>
+      </div>
+
+      <pre style="background-color: var(--bg-code); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: var(--radius-xs); font-size: 0.825rem; line-height: 1.6; overflow-x: auto; color: var(--text-primary);"><code><span style="color: var(--accent-rust);">import</span> onnxruntime <span style="color: var(--accent-rust);">as</span> ort
+<span style="color: var(--accent-rust);">import</span> numpy <span style="color: var(--accent-rust);">as</span> np
+
+<span style="color: var(--text-muted);"># 1. Initialize quantized ONNX Runtime inference session</span>
+session = ort.InferenceSession(<span style="color: var(--accent-emerald);">"idr_model_submission/idr_neurospeed_tcn_int8.onnx"</span>)
+
+<span style="color: var(--text-muted);"># 2. Prepare 4.0-second normalized 8-channel IMU window [Batch, Channels, Timesteps]</span>
+imu_window = np.random.randn(1, 8, 40).astype(np.float32)
+
+<span style="color: var(--text-muted);"># 3. Predict instantaneous vehicle forward velocity (m/s) and uncertainty variance</span>
+outputs = session.run(<span style="color: var(--accent-rust);">None</span>, {session.get_inputs()[0].name: imu_window})
+velocity_mps, variance = outputs[0][0][0], outputs[0][0][1]
+print(<span style="color: var(--accent-emerald); font-style: italic;">f"Estimated Vehicle Speed: {velocity_mps * 3.6:.2f} km/h (sigma: {np.sqrt(variance):.3f})"</span>)</code></pre>
+    </div>
+
+    <!-- Network Hyperparameters Ledger -->
+    <div style="background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xs); padding: 1.75rem; box-shadow: var(--shadow-subtle);">
+      <h3 style="font-family: var(--font-serif); font-size: 1.25rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--text-primary);">
+        Neural Network Hyperparameters &amp; Receptive Field Ledger
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; font-size: 0.85rem;">
+        <div>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Temporal Receptive Field</span>
+          <strong style="color: var(--text-primary); font-family: var(--font-mono);">4.00 Seconds</strong>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">40 timesteps @ 10 Hz sampling</span>
+        </div>
+        <div>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Exponential Dilations</span>
+          <strong style="color: var(--text-primary); font-family: var(--font-mono);">d &isin; {1, 2, 4, 8}</strong>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Zero future-frame causal leakage</span>
+        </div>
+        <div>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Channel Attention</span>
+          <strong style="color: var(--text-primary);">Squeeze-and-Excitation</strong>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Adaptive axis reweighting</span>
+        </div>
+        <div>
+          <span class="mono-label" style="display: block; margin-bottom: 0.25rem;">Execution Footprint</span>
+          <strong style="color: var(--accent-emerald); font-family: var(--font-mono);">&lt;8% Mobile CPU</strong>
+          <span style="color: var(--text-muted); display: block; font-size: 0.8rem; margin-top: 0.15rem;">Runs continuously on NPU</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Monograph Footer -->
+  <footer class="monograph-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>IDR-Navigator</strong> &bull; Smart India Hackathon 2026 &bull; Team Inventor (#133715)
+        <p style="margin-top: 0.25rem;">Developed for the Indian Space Research Organisation (ISRO IISU / SAC)</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="index.html#abstract">Monograph</a></li>
+        <li><a href="index.html#benchmarks">Benchmarks</a></li>
+        <li><a href="video">Field Video (/video)</a></li>
+        <li><a href="https://github.com/YashEkhande24/idr-desktop-simulator" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</body>
+</html>
