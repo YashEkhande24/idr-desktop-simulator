@@ -42,9 +42,9 @@ Global Navigation Satellite Systems (GNSS—including GPS, NavIC, GLONASS, and G
 
 ### Validated Engineering Benchmarks:
 * **Zero External Hardware CapEx:** Operates 100% on internal smartphone MEMS sensors (accelerometer, gyroscope, magnetometer, barometer).
-* **Drift Suppression on Tunnel Sequence S-Vta23:** Bounded to **0.42 m drift (0.05% error)** over an 850-meter subterranean tunnel blackout on the international IO-VNBD dataset, compared to **184.2 m drift (21.7% error)** in classical INS.
-* **Held-Out Generalization:** Achieved a **93.8% pass rate** (<10% drift rule) across 64 held-out evaluation trips.
-* **Deterministic Execution:** 2.1 MB INT8 quantized ONNX model executes in **11.2 ms on mobile NPUs**; native C++20 SIMD linear algebra core executes at **200 Hz with < 7 µs latency per step**.
+* **Highway Outage Drift Suppression:** Bounded to **6.81 m drift (0.43% error)** over a 1.6 km highway tunnel blackout on the IO-VNBD dataset, compared to **150+ m drift** in classical INS.
+* **Empirical Generalization:** Achieved a **100% pass rate (5/5 scenarios)** and **3.47% mean drift** (<10% ISRO drift rule) across all evaluated scenarios.
+* **Deterministic Execution:** 2.1 MB INT8 quantized ONNX model executes in **2.2 ms per step on mobile NPUs**; native C++20 SIMD linear algebra core executes at **200 Hz with < 7 µs latency per step**.
 
 ---
 
@@ -141,11 +141,11 @@ $$J_k = d_{\text{lat}} + 2.5 \cdot |p_z - z_{\text{road}}| + 6.0 \cdot (1 - |\co
 
 | Metric | Benchmark Criterion | IDR-Navigator (Achieved) |
 | :--- | :---: | :---: |
-| **Held-Out Sequence Pass Rate** | High Reliability | **★ 93.8% (60 of 64 Trips Passed)** |
-| **850 m Tunnel Outage Drift (Seq. S-Vta23)** | < 10.0% of Distance | **★ 0.05% Drift (0.42 m Error)** |
-| **Minimum Recorded Tunnel Drift** | Continuous Tracking | **★ 0.02% Drift (0.17 m Error)** |
-| **Forward Speed Tracking MAE** | Ground-Truth CAN Match | **★ 0.50 m/s (1.8 km/h)** |
-| **Classical INS Double-Integration Drift** | Reference Baseline | **184.2 m Drift (21.7% Error)** |
+| **All-Scenario Pass Rate** | High Reliability | **★ 100.0% (5 of 5 Scenarios Passed)** |
+| **Highway Tunnel Outage Drift** | < 10.0% of Distance | **★ 0.43% Drift (6.81 m Error)** |
+| **Overall Mean Outage Drift** | < 10.0% of Distance | **★ 3.47% Mean Drift** |
+| **Forward Speed Tracking MAE** | Ground-Truth CAN Match | **★ 0.60 m/s Mean MAE (Best: 0.37 m/s)** |
+| **Classical INS Double-Integration Drift** | Reference Baseline | **150+ m Drift (Exceeds 10% in <10s)** |
 | **Active Mobile Battery Consumption** | < 10% / hour | **★ < 5.8% / hour** |
 | **Mobile NPU Inference Latency** | < 100 ms Deadline | **★ 11.2 ms (INT8 ONNX)** |
 | **SIMD C++ Filter Execution Latency** | High-Rate Real-Time | **★ < 7 µs per update (200 Hz)** |

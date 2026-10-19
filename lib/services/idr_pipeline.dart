@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import '../core/constants.dart';
 import '../core/math_utils.dart';
-import '../models/ekf_state.dart';
 import '../models/nav_solution.dart';
 import '../models/sensor_data.dart';
 import 'baseline_dr.dart';
@@ -19,7 +18,6 @@ import 'tcn_speed_engine.dart';
 import 'turn_detector.dart';
 import 'vibration_gate.dart';
 import 'native_bridge.dart';
-import 'secret_bt_receiver.dart';
 import '../widgets/car_3d_marker.dart';
 
 
@@ -60,156 +58,6 @@ class IdrPipeline extends ChangeNotifier {
     }
   }
 
-  // Secret Bluetooth Demo Mode for Stage Presentations
-  final SecretBtReceiver _secretBtReceiver = SecretBtReceiver();
-  SecretBtReceiver get secretBtReceiver => _secretBtReceiver;
-  StreamSubscription<GhostNavState>? _ghostNavSub;
-
-  bool get isSecretDemoModeActive => _secretBtReceiver.isEnabled;
-
-  void toggleSecretDemoMode(bool enabled) {
-    _secretBtReceiver.setEnabled(enabled);
-    if (enabled) {
-      _ghostNavSub?.cancel();
-      _ghostNavSub = _secretBtReceiver.stateStream.listen(_processGhostNavState);
-    } else {
-      _ghostNavSub?.cancel();
-      _ghostNavSub = null;
-    }
-    notifyListeners();
-  }
-
-  void _processGhostNavState(GhostNavState ghost) {
-    if (!_secretBtReceiver.isEnabled) return;
-
-    if (_sensorService.refLat == null || _sensorService.refLon == null) {
-      _sensorService.setReferenceAnchor(ghost.driftedPosition.latitude, ghost.driftedPosition.longitude, 550.0);
-      _nativeBridge.setReferenceAnchor(ghost.driftedPosition.latitude, ghost.driftedPosition.longitude, 550.0);
-    }
-
-    final enu = MathUtils.wgs84ToEnu(
-      lat: ghost.driftedPosition.latitude,
-      lon: ghost.driftedPosition.longitude,
-      alt: 550.0,
-      refLat: _sensorService.refLat!,
-      refLon: _sensorService.refLon!,
-      refAlt: _sensorService.refAlt ?? 550.0,
-    );
-
-    _latestLatitude = ghost.driftedPosition.latitude;
-    _latestLongitude = ghost.driftedPosition.longitude;
-
-    final yawEnuRad = MathUtils.compassToEnuRad(ghost.headingDeg);
-    _ekf.initializeHeading(yawEnuRad);
-    _ekf.translatePosition(enu - _ekf.state.position);
-    _ekf.setLatitude(ghost.driftedPosition.latitude);
-
-    _dynamicMapService.onLocationUpdate(ghost.driftedPosition.latitude, ghost.driftedPosition.longitude, this);
-
-    if (idrTrajectory.isEmpty || (enu - idrTrajectory.last).normSquared > 0.3) {
-      idrTrajectory.add(enu);
-      if (idrTrajectory.length > maxHistoryPoints) idrTrajectory.removeAt(0);
-    }
-
-    final speedMps = ghost.speedKmh / 3.6;
-    final isOutage = _forceTunnelOutage || _liveGnssDenied;
-
-    // Classic Double Integration DR trajectory and geodetic coordinates
-    final classicEnu = isOutage
-        ? enu + Vec3(
-            ghost.cumulativeDriftM * 8.5 * math.sin(yawEnuRad + 1.2),
-            ghost.cumulativeDriftM * 8.5 * math.cos(yawEnuRad + 1.2),
-            0.0,
-          )
-        : enu;
-
-    final classicWgs = MathUtils.enuToWgs84(
-      enu: classicEnu,
-      refLat: _sensorService.refLat!,
-      refLon: _sensorService.refLon!,
-      refAlt: _sensorService.refAlt ?? 550.0,
-    );
-
-    if (classicTrajectory.isEmpty || (classicEnu - classicTrajectory.last).normSquared > 0.3) {
-      classicTrajectory.add(classicEnu);
-      if (classicTrajectory.length > maxHistoryPoints) classicTrajectory.removeAt(0);
-    }
-
-    // Map matching for road snapping
-    MapSnapResult? match;
-    if (!_forcePedestrian) {
-      match = _mapSnapper.snapWithHeading(
-        enu,
-        yawEnuRad,
-        hdop: isOutage ? 25.0 : 0.8,
-        vTcn: speedMps,
-        tcnVariance: 0.1,
-      );
-    }
-
-    // Turn-by-turn route navigation progress
-    if (_navigationService.isNavigating) {
-      _navigationService.updateVehicleProgress(enu, MathUtils.enuToCompassDeg(yawEnuRad), this);
-    }
-
-    _latestSolution = NavSolution(
-      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
-      idrState: EkfState(
-        position: enu,
-        velocity: Vec3(
-          speedMps * math.cos(yawEnuRad),
-          speedMps * math.sin(yawEnuRad),
-          0.0,
-        ),
-        attitude: Vec3(
-          ghost.rollDeg * (math.pi / 180.0),
-          ghost.pitchDeg * (math.pi / 180.0),
-          yawEnuRad,
-        ),
-        covariance: _ekf.state.covariance,
-      ),
-      classicDrState: EkfState(
-        position: classicEnu,
-        velocity: Vec3(
-          speedMps * math.cos(yawEnuRad),
-          speedMps * math.sin(yawEnuRad),
-          0.0,
-        ),
-        attitude: Vec3(0, 0, yawEnuRad),
-        covariance: _classicDr.state.covariance,
-      ),
-      gnssStatus: isOutage ? GnssStatus.denied : GnssStatus.available,
-      hdop: isOutage ? 25.0 : 0.8,
-      isGnssDenied: isOutage,
-      idrDriftError: ghost.cumulativeDriftM,
-      classicDriftError: ghost.cumulativeDriftM * 8.5,
-      shockDetected: false,
-      rawJerk: 0.0,
-      jerkVariance: 0.0,
-      tcnEstimatedSpeed: speedMps,
-      baroAltitude: 550.0,
-      cabinConfidence: 0.95,
-      isCabinLocked: true,
-      mountPitchDeg: 0.0,
-      mountRollDeg: 0.0,
-      isTcnModelLoaded: _tcnSpeed.isModelLoaded,
-      isMapMatched: match != null,
-      matchedRoadName: match?.branchName,
-      crossTrackMeters: match?.crossTrackDistance ?? 0.0,
-      roadHeadingRad: match?.roadHeadingRad,
-      latitude: ghost.driftedPosition.latitude,
-      longitude: ghost.driftedPosition.longitude,
-      classicLatitude: classicWgs.latitude,
-      classicLongitude: classicWgs.longitude,
-      accuracyMeters: 1.8,
-      gpsStatusMessage: isOutage ? 'IDR Inertial Ghost Mode' : 'Ghost GPS Synced (±1.8m)',
-      drDistanceTraveled: ghost.cumulativeDistanceM,
-      drOutageDurationSec: ghost.cumulativeDistanceM / (speedMps > 0.1 ? speedMps : 1.0),
-      gnssSpeed: isOutage ? null : speedMps,
-    );
-
-    _throttledNotifyListeners();
-  }
 
 
   void _applyOsmMapResult(({List<MapBranch> branches, double refLat, double refLon, double refAlt}) result) {
@@ -416,10 +264,7 @@ class IdrPipeline extends ChangeNotifier {
     _initTcnModel();
     _navigationService.addListener(notifyListeners);
     if (autoStart) {
-      // Eagerly start GPS acquisition so coordinates are available on first frame
-      _sensorService.start();
-      // Auto-start the pipeline so GNSS stream is subscribed and the 50km
-      // dynamic map auto-download triggers on first GPS fix.
+      // Auto-start the pipeline and sensor service
       start();
     }
   }
@@ -546,7 +391,6 @@ class IdrPipeline extends ChangeNotifier {
     _dynamicMapService.reset();
     _navigationService.cancelNavigation();
     _sensorService.resetReferenceAnchor();
-    _secretBtReceiver.resetDrift();
     _drDistanceTraveled = 0.0;
     _drOutageDurationSec = 0.0;
     _lastDrPos = null;
@@ -618,7 +462,7 @@ class IdrPipeline extends ChangeNotifier {
 
   // --- Live Sensor Handlers ---
   void _processLiveImu(ImuSample imu) {
-    if (!_isRunning || isSecretDemoModeActive) return;
+    if (!_isRunning) return;
     double dt = IdrConstants.dtImu;
     if (_lastLiveImuTimestamp != null) {
       final diff = imu.timestamp - _lastLiveImuTimestamp!;
@@ -635,7 +479,7 @@ class IdrPipeline extends ChangeNotifier {
   }
 
   void _processLiveMag(MagSample mag) {
-    if (!_isRunning || isSecretDemoModeActive) return;
+    if (!_isRunning) return;
     final bNorm = mag.magneticField.norm;
     // Quasi-Static Magnetic Field (QSMF) check: reject severe electromagnetic interference
     if (bNorm > 0.0 && (bNorm < 15.0 || bNorm > 80.0)) return;
@@ -678,7 +522,7 @@ class IdrPipeline extends ChangeNotifier {
   void processGnssForTesting(GnssSample gnss) => _processLiveGnss(gnss);
 
   void _processLiveGnss(GnssSample gnss) {
-    if (!_isRunning || isSecretDemoModeActive) return;
+    if (!_isRunning) return;
 
     var effectiveGnss = gnss;
     if (_forceTunnelOutage) {
@@ -839,7 +683,7 @@ class IdrPipeline extends ChangeNotifier {
   }
 
   void _processLiveBaro(BaroSample baro) {
-    if (!_isRunning || isSecretDemoModeActive) return;
+    if (!_isRunning) return;
     _lastBaroPressureHpa = baro.pressureHpa;
     final alt = (_calibratedP0 != 1013.25 && baro.pressureHpa > 0.0)
         ? MathUtils.altitudeFromCalibratedPressure(baro.pressureHpa, _calibratedP0)

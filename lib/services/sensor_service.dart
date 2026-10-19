@@ -80,6 +80,7 @@ class SensorService {
   /// Request permissions, check hardware toggles, and start hardware sensor listening.
   Future<bool> start() async {
     if (_isListening) return true;
+    _isListening = true;
 
     // 1. Accelerometer (using gameInterval ~50-60 Hz for optimal stability without burst jitter)
     try {
@@ -167,13 +168,12 @@ class SensorService {
   /// obtains instant cached position, fires active GPS fix, and begins stream.
   Future<void> initGps() async {
     try {
-      // 1. Immediate instant fix from cache (<50ms) to unblock UI & anchor immediately
+      // 1. Load cached position for initial UI viewport centering without injecting as live measurement
       try {
         final cached = await Geolocator.getLastKnownPosition();
         if (cached != null) {
           _lastKnownPosition = cached;
-          _handleGpsPosition(cached);
-          _updateGpsStatus(GpsHardwareStatus.locked, 'Instant fix (±${cached.accuracy.toStringAsFixed(1)}m)');
+          _updateGpsStatus(GpsHardwareStatus.searching, 'Cached location loaded (awaiting live satellites...)');
         }
       } catch (e) {
         debugPrint('Last known position note: $e');
@@ -384,10 +384,7 @@ class SensorService {
         final alt = (map['alt'] as num?)?.toDouble() ?? 0.0;
         final acc = (map['acc'] as num?)?.toDouble() ?? 10.0;
 
-        _refLat ??= lat;
-        _refLon ??= lon;
-        _refAlt ??= alt;
-
+        // Center map viewport on user's persistent cached coordinates without anchoring ENU
         final cachedPos = Position(
           longitude: lon,
           latitude: lat,
@@ -402,8 +399,7 @@ class SensorService {
         );
 
         _lastKnownPosition ??= cachedPos;
-        _handleGpsPosition(cachedPos);
-        debugPrint('[SensorService] Loaded persistent last-known position: $lat, $lon');
+        debugPrint('[SensorService] Loaded persistent last-known position for viewport: $lat, $lon');
       }
     } catch (e) {
       debugPrint('[SensorService] Cache load error: $e');

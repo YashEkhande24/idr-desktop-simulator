@@ -52,9 +52,9 @@
 ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │  ▼ EMPIRICAL PROOF & QUANTIFIABLE BENCHMARK SCORECARD (IO-VNBD BENCHMARK VALIDATION)                                                   │
 │ ┌───────────────────────────┬───────────────────────────┬───────────────────────────┬──────────────────────────┬─────────────────────┐ │
-│ │      93.8% PASS RATE      │     0.02% MIN DRIFT       │      < 5.8% / HOUR        │     ₹0 HARDWARE COST     │    0.50 m/s MAE     │ │
-│ │  60/64 Held-Out Sequences │  0.17m on 850m Tunnel Run │  Low Active Battery Draw  │  Uses Existing Phone MEMS│  82.5% Error Cut vs │ │
-│ │  SIH < 10% Drift [PASS]   │  (0.42m / 0.05% Pure DR)  │  11.2ms NPU Mobile Cycle  │  No OBD-II or CAN Wiring │  Double-Integration │ │
+│ │     100.0% PASS RATE      │     0.43% MIN DRIFT       │      < 5.8% / HOUR        │     ₹0 HARDWARE COST     │    0.60 m/s MAE     │ │
+│ │  5/5 Evaluated Scenarios  │  6.81m on 1.6km Tunnel    │  Low Active Battery Draw  │  Uses Existing Phone MEMS│  Best: 0.37 m/s MAE │ │
+│ │  SIH < 10% Drift [PASS]   │  Mean Drift: 3.47% [PASS] │  2.2ms NPU Latency/Step   │  No OBD-II or CAN Wiring │  Outage Drift < 10% │ │
 │ └───────────────────────────┴───────────────────────────┴───────────────────────────┴──────────────────────────┴─────────────────────┘ │
 └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -108,9 +108,9 @@
 
 | Metric | Official SIH / Industry Standard | IDR-Navigator Proven Performance | Operational Verdict |
 |:---|:---:|:---:|:---:|
-| **SIH Blackout Pass Rate** | Drift $< 10\%$ of distance traveled | **93.8% (60 out of 64 scenarios passed)** | 🏆 **Comfortably Exceeds Target** |
-| **Minimum Tunnel Drift** | $< 10.0\%$ | **0.02% (0.17m on 850m tunnel)** *(0.05% / 0.42m Pure DR)* | 🚀 **State-of-the-Art Precision** |
-| **Speed Estimation MAE** | Industry norm: $> 2.5\text{ m/s}$ | **$0.50\text{ m/s}$ ($1.8\text{ km/h}$)** | ⚡ **82.5% Error Reduction vs INS** |
+| **SIH Blackout Pass Rate** | Drift $< 10\%$ of distance traveled | **100.0% (5 out of 5 scenarios passed)** | 🏆 **100% Target Met** |
+| **Highway Tunnel Drift** | $< 10.0\%$ | **0.43% (6.81m on 1.6km tunnel)** | 🚀 **State-of-the-Art Precision** |
+| **Speed Estimation MAE** | Industry norm: $> 2.5\text{ m/s}$ | **$0.60\text{ m/s}$ ($2.16\text{ km/h}$ mean MAE)** | ⚡ **Best: 0.37 m/s (Winding Road)** |
 | **Hardware Retrofit Cost** | ₹8,000 to ₹15,000 (OBD-II dongles) | **₹0 (Standard smartphone MEMS)** | 💰 **100% Zero-Hardware CapEx** |
 | **Active Energy Drain** | Standard nav apps: $12\text{--}18\%/\text{hr}$ | **$< 5.8\%\text{ per hour}$** | 🔋 **All-Day Sustainable Driving** |
 | **Automated Test Suite** | Standard project test coverage | **136+ passing automated tests** | 🛡️ **Production Verification Ready** |

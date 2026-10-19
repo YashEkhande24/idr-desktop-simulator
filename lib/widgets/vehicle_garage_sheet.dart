@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../services/idr_pipeline.dart';
 import 'car_3d_marker.dart';
@@ -38,8 +37,6 @@ class _VehicleGarageSheetState extends State<VehicleGarageSheet>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF0F172A),

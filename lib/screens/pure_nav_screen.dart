@@ -13,8 +13,6 @@ import '../widgets/oscilloscope_widget.dart';
 import '../widgets/rotating_compass.dart';
 import '../widgets/unified_tools_sheet.dart';
 import '../widgets/vehicle_garage_sheet.dart';
-import '../widgets/secret_bt_sheet.dart';
-import 'package:flutter/services.dart';
 
 /// Pure Navigation Screen
 ///
@@ -35,29 +33,6 @@ class _PureNavScreenState extends State<PureNavScreen> {
   bool _isCourseUp = true; // Google Maps course-up driving mode default
   int _recenterCounter = 0;
   double _smoothSpeedKmh = 0.0;
-  int _secretTapCount = 0;
-  DateTime? _firstSecretTapTime;
-
-  void _onSecretBadgeTap(IdrPipeline pipeline) {
-    final now = DateTime.now();
-    if (_firstSecretTapTime == null || now.difference(_firstSecretTapTime!).inMilliseconds > 2500) {
-      _secretTapCount = 1;
-      _firstSecretTapTime = now;
-    } else {
-      _secretTapCount++;
-      if (_secretTapCount >= 5) {
-        _secretTapCount = 0;
-        _firstSecretTapTime = null;
-        HapticFeedback.heavyImpact();
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => SecretBtSheet(pipeline: pipeline),
-        );
-      }
-    }
-  }
 
   @override
   void initState() {
@@ -411,52 +386,36 @@ class _PureNavScreenState extends State<PureNavScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // IDR v2.4 Active Label (Secret 5-Tap Gesture Trigger for Demo Bluetooth Mode)
-              GestureDetector(
-                onTap: () => _onSecretBadgeTap(pipeline),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0284C7).withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: pipeline.isSecretDemoModeActive
-                          ? const Color(0xFF10B981) // Emerald glow when active
-                          : const Color(0xFF38BDF8),
-                      width: pipeline.isSecretDemoModeActive ? 1.5 : 1.0,
+              // IDR v2.4 Active Label
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0284C7).withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF38BDF8),
+                    width: 1.0,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.gps_fixed,
+                      size: 12,
+                      color: Color(0xFF38BDF8),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        pipeline.isSecretDemoModeActive ? Icons.lock_open_rounded : Icons.gps_fixed,
-                        size: 12,
-                        color: pipeline.isSecretDemoModeActive ? const Color(0xFF10B981) : const Color(0xFF38BDF8),
+                    const SizedBox(width: 5),
+                    Text(
+                      'IDR v2.4 ACTIVE',
+                      style: GoogleFonts.rajdhani(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
-                      const SizedBox(width: 5),
-                      Text(
-                        'IDR v2.4 ACTIVE',
-                        style: GoogleFonts.rajdhani(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      if (pipeline.isSecretDemoModeActive) ...[
-                        const SizedBox(width: 4),
-                        Container(
-                          width: 5,
-                          height: 5,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF10B981),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 

@@ -32,21 +32,21 @@
 │ │ • 8-Channel Kinematic Tensor: │ │ ┌───────────────────────────────────┐ │ │ ▼ COMPUTATIONAL & OPERATIONAL FEASIBILITY              │ │
 │ │   - 3-axis accel (gravity-free│ │ │       IO-VNBD BENCHMARK PLOT      │ │ │ • On-Device Latency: < 4.5ms NPU / 11.2ms Mobile     │ │
 │ │   - 3-axis angular rates (ω)  │ │ │   [Visual Trajectory & Speed]     │ │ │ • Battery Consumption: < 5.8% / hour (All-day nav)   │ │
-│ │   - 2 Euclidean vector norms  │ │ │   • Green: IDR Lane-Hold (0.02%)  │ │ │ • Memory Footprint: < 45 MB RAM | Storage: ~15 MB    │ │
-│ │ • 4-Stage Dilated Causal TCN: │ │ │   • Red: Classical INS (+194m)    │ │ │ • Commercial CapEx: ₹0 (Eliminates ₹8k–₹15k OBD)     │ │
+│ │   - 2 Euclidean vector norms  │ │ │   • Green: IDR Lane-Hold (0.43%)  │ │ │ • Memory Footprint: < 45 MB RAM | Storage: ~15 MB    │ │
+│ │ • 4-Stage Dilated Causal TCN: │ │ │   • Red: Classical INS (+150m+)   │ │ │ • Commercial CapEx: ₹0 (Eliminates ₹8k–₹15k OBD)     │ │
 │ │   - Dilations d in {1, 2, 4, 8│ │ └───────────────────────────────────┘ │ ├────────────────────────────────────────────────────────┤ │
 │ │   - Kernel K = 3; strictly    │ │                                       │ │ ▼ TOP 3 GROUND RISKS & DETERMINISTIC DEFENSES          │ │
-│ │     causal (zero future leak) │ │ • 850m Tunnel Outage (S-Vta23):       │ │                                                        │ │
-│ │ • 31-Step Receptive Field:    │ │   - Baseline (INS): 184m drift (21.7%)│ │ 1. Potholes & Road Shocks (+3.5g impact spikes):       │ │
-│ │   - 3.1s temporal history     │ │   - Proposed (Only DR): 0.42m (0.05%) │ │    ➔ Savitzky-Golay Jerk Gate (τ=450 m²/s⁶) flags     │ │
-│ │ • Squeeze-and-Excitation (SE):│ │   - Proposed (Lane-Hold): 0.17m(0.02%)│ │      shock; inflates Kalman Q × 50 to coast.           │ │
+│ │     causal (zero future leak) │ │ • Highway Tunnel Outage (1.6 km):     │ │                                                        │ │
+│ │ • 31-Step Receptive Field:    │ │   - Baseline (INS): 150m+ drift       │ │ 1. Potholes & Road Shocks (+3.5g impact spikes):       │ │
+│ │   - 3.1s temporal history     │ │   - Proposed IDR: 6.81m drift (0.43%) │ │    ➔ Savitzky-Golay Jerk Gate (τ=450 m²/s⁶) flags     │ │
+│ │ • Squeeze-and-Excitation (SE):│ │   - Pass Criteria: < 10% [PASSED]     │ │      shock; inflates Kalman Q × 50 to coast.           │ │
 │ │   - Channel attention (r = 4) │ │ • Speed Regression Precision:         │ │                                                        │ │
-│ │ • Dual Heteroscedastic Heads: │ │   - MAE: 0.50 m/s (82.5% error cut)   │ │ 2. Traffic Signal Engine Idle (15–25 Hz rumble creep): │ │
-│ │   1. Forward speed v̂ (m/s)    │ │   - RMSE: 0.68 m/s                    │ │    ➔ Centripetal ZUPT (a_lat = v·ω) clamps velocity    │ │
+│ │ • Dual Heteroscedastic Heads: │ │   - Mean MAE: 0.60 m/s (0.40 m/s hwy) │ │ 2. Traffic Signal Engine Idle (15–25 Hz rumble creep): │ │
+│ │   1. Forward speed v̂ (m/s)    │ │   - Mean Drift across runs: 3.47%     │ │    ➔ Centripetal ZUPT (a_lat = v·ω) clamps velocity    │ │
 │ │   2. Log-variance s = log(σ²) │ │ • SIH Benchmark Criteria:             │ │      strictly to 0.0 km/h at red lights.               │ │
-│ │ • Quantization & Footprint:   │ │   - Pass Rate: 93.8% (60/64 passed)   │ │                                                        │ │
+│ │ • Quantization & Footprint:   │ │   - Pass Rate: 100% (5/5 passed)      │ │                                                        │ │
 │ │   - 2.09M Parameters          │ │   - Max Allowed Drift: < 10.0% [PASS] │ │ 3. Multi-Level Flyovers (Upper deck vs lower road flip)│ │
-│ │   - 8.4 MB FP32 ➔ 2.1 MB INT8 │ │   - Average Fleet Drift: 2.1% [PASS]  │ │    ➔ 3D Altimetry Cost: J = d_lat + 2.5|Δz| + 6|Δψ|    │ │
+│ │   - 8.4 MB FP32 ➔ 2.1 MB INT8 │ │   - Mean Outage Drift: 3.47% [PASS]   │ │    ➔ 3D Altimetry Cost: J = d_lat + 2.5|Δz| + 6|Δψ|    │ │
 │ └───────────────────────────────┘ └───────────────────────────────────────┘ └────────────────────────────────────────────────────────┘ │
 ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ ★ EDGE & FIELD READINESS : 136+ Automated Unit/E2E Tests | Field-Tested on Katraj Tunnel & Mumbai-Pune Expressway (OnePlus Nord CE4) │
@@ -96,11 +96,11 @@
 # 3. COLUMN 2: BENCHMARK PLOT & VALIDATION METRICS
 
 * **IO-VNBD Benchmark Graph**: Trajectory comparison showing:
-  * **Green Line (IDR Lane-Hold)**: Holds true highway centerlines throughout the 850m tunnel outage (**0.17m drift / 0.02% error**).
-  * **Cyan Line (Only DR)**: Pure inertial dead reckoning without map matching (**0.42m drift / 0.05% error**).
-  * **Red Line (Classical INS)**: Explodes quadratically into $>184\text{m}$ drift ($21.7\%$ error).
-* **Speed Tracking Precision**: Mean Absolute Error (MAE) of **$0.50\text{ m/s}$ ($1.8\text{ km/h}$)** against NovAtel RTK + CAN-bus Doppler ground truth (82.5% error reduction).
-* **SIH Criterion Compliance**: **93.8% Pass Rate** across 64 held-out evaluation trips under the SIH $< 10\%$ drift threshold.
+  * **Green Line (IDR-Navigator)**: Accurately maintains trajectory with **3.47% mean drift** across 5 test scenarios (best: **0.43% / 6.8m** in 1.6km highway tunnel).
+  * **Red Line (Classical INS)**: Explodes quadratically into $>150\text{m}$ drift.
+* **Speed Tracking Precision**: Mean Absolute Error (MAE) of **$0.60\text{ m/s}$ ($2.16\text{ km/h}$)** across 5 evaluation scenarios in `results.json`.
+* **SIH Criterion Compliance**: **100% Pass Rate (5/5 scenarios)** under the SIH $< 10\%$ drift threshold.
+* **Note on Presentation Graphics**: The trajectory graphic on Slide 4 serves as an illustrative visualization of blackout divergence; all quantitative benchmarks are validated in `idr_model_submission/results.json`.
 
 ---
 
@@ -110,11 +110,11 @@
 > 
 > In **Column 1**, you see our deep learning speed engine: an 8-Channel Dilated Causal SE-TCN with a 31-step receptive field that captures 3.1 seconds of vehicle vibration history. We quantized the 2.09-million-parameter model to INT8, shrinking its footprint to just **2.1 MB**. On a standard phone NPU, it infers forward speed in under **4.5 milliseconds**—consuming less than 5% of our 10-hertz timing budget with under 5.8% battery draw per hour.
 > 
-> In **Column 2**, our benchmark trajectory plot from the IO-VNBD dataset demonstrates the result: over an 850-meter highway tunnel blackout, classical double-integration explodes by 184 meters, while our system holds the lane with only **0.17 meters of drift (0.02% error)**, achieving a **93.8% pass rate** across 64 evaluation runs.
+> In **Column 2**, our benchmark evaluations on IO-VNBD scenarios demonstrate the result: while classical double-integration explodes by over 150 meters, our neural-inertial fusion bounds mean drift to just **3.47%**, achieving a **100% pass rate** across all tested blackout scenarios against ISRO's 10% threshold.
 > 
 > Finally, in **Column 3**, we engineer deterministic defenses for real Indian road challenges:
 > 1. Pothole shocks are isolated by our **Savitzky-Golay Jerk Gate**, which inflates Kalman noise $50\times$.
 > 2. Red-light engine idle rumble is clamped to zero by our **Centripetal ZUPT**.
 > 3. Multi-tier flyovers are disambiguated by our **3D Barometric Altimeter Cost Engine**.
 > 
-> Verified across 136 automated test cases and road-tested on the Mumbai-Pune Expressway, IDR-Navigator is 100% feasible and edge-ready."*
+> Verified across automated test cases and road-tested on real roads, IDR-Navigator is 100% feasible and edge-ready."*

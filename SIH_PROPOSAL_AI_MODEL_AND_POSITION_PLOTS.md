@@ -53,7 +53,7 @@ Beyond existing open-access research benchmarks, **our team is actively conducti
 1. **Consumer Smartphone Hardware & IMU Chipsets**:
    - Primary testbed: **OnePlus Nord CE4** (Qualcomm Snapdragon 7 Gen 3 platform with low-noise Bosch Sensortec BMI270 / BMI323 6-DOF IMUs).
    - Additional test fleet: Mid-range and flagship Android smartphones (MediaTek Dimensity and Qualcomm Snapdragon architectures with STMicroelectronics LSM6DSO/LSM6DSV and InvenSense/TDK IMUs).
-   - Logging architecture: Dedicated companion telemetry broadcaster ([`idr_bt_companion`](file:///e:/inventor/idr_bt_companion)) and built-in background telemetry logging service streaming synchronized 100 Hz raw IMU, attitude quaternions, and high-rate GNSS Doppler fixes.
+   - Logging architecture: Built-in background telemetry logging service streaming synchronized 100 Hz raw IMU, attitude quaternions, and high-rate GNSS Doppler fixes.
 
 2. **Target Indian Road Geographies & Operational Scenarios**:
    - **Dense Urban Congestion & Stop-and-Go Queues**: High-traffic corridors with frequent idling at traffic signals, rapid clutch engagements, auto-rickshaw/two-wheeler maneuvering, and pavement irregularities (speed bumps, potholes, rumble strips).
