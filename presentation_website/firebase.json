@@ -13,7 +13,29 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(js|css|jpg|jpeg|png|svg|webp|onnx|pth|json)",
+        "source": "**/*.@(html|htm)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, must-revalidate"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|png|svg|webp|onnx|pth|json)",
         "headers": [
           {
             "key": "Cache-Control",
