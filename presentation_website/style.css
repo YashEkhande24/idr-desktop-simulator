@@ -1012,3 +1012,16 @@ code, pre {
     grid-template-columns: 1fr;
   }
 }
+
+/* Video Player & Subtitles Styling */
+video::cue {
+  background-color: rgba(15, 23, 42, 0.88);
+  color: #ffffff;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.4;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}

@@ -18,6 +18,7 @@ migrate_working_dir/
 cpp_mobile_app/build/
 model/experiments/
 *.mp4
+!presentation_website/assets/videos/*.mp4
 *.pptx
 open_training_log.bat
 view_training_csv.bat
