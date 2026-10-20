@@ -69,3 +69,4 @@ app.*.map.json
 video_temp/
 video upload/
 app_core_math_engine/
+.firebase/
