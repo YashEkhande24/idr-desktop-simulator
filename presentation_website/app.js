@@ -182,6 +182,17 @@ function initVideoControls() {
   const video = document.getElementById('demoVideo');
   if (!video) return;
 
+  // Prevent duplicate caption rendering since subtitles are burned into the video
+  const disableTracks = () => {
+    if (video.textTracks) {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+    }
+  };
+  disableTracks();
+  video.addEventListener('loadedmetadata', disableTracks);
+
   const jumpButtons = document.querySelectorAll('[data-jump-time]');
   jumpButtons.forEach(btn => {
     btn.addEventListener('click', () => {
