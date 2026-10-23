@@ -32,7 +32,7 @@ python -m http.server 8088
    - In-cabin cockpit HUD visual preview.
 
 2. **Demo Video Theater & Video Uploader (`#video-demo`)**:
-   - Integrated HTML5 video player hosting the real field test recording (`assets/videos/demo_recording.mp4`, 6.87 MB).
+   - Integrated HTML5 video player hosting the real field test recording (`assets/videos/demo_recording.mp4`, 79.4 MB).
    - 5 interactive milestone chapter buttons to jump directly to key test phases (Open-Sky calibration, Outage entry, Divergence vs IDR, Pothole jerk gating, Standstill ZUPT).
    - Playback speed switcher (0.5x, 1.0x, 1.5x, 2.0x).
    - **Interactive Custom Video Drop Zone**: Drag and drop any custom `.mp4` / `.webm` test recording to immediately preview it in the player using client-side object URLs! Includes a one-click button to reset back to the official SIH recording.
@@ -102,7 +102,7 @@ presentation_website/
 │   │   ├── 3d_car.png
 │   │   └── nav_car_3d.png
 │   └── videos/
-│       └── demo_recording.mp4   # 6.87 MB recorded field test video
+│       └── demo_recording.mp4   # 79.4 MB recorded field test video with dual-view telemetry
 └── downloads/
     ├── idr_navigator_v1.0.apk   # 111.6 MB Production Flutter Release APK
     ├── idr_pure_cpp_engine.apk  # 933 KB Pure C++20 SIMD NativeActivity APK

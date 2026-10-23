@@ -172,7 +172,7 @@ Key Benchmark Findings:
 ## 6. YOUTUBE LINK (OPTIONAL)
 * **Field Requirement:** "Youtube Link: (Optional)"
 * **Recommendations:**
-  - If you have recorded a video demonstration (e.g. of the running Flutter Cockpit HUD or the MP4 demo in your repo: [`Record_2026-09-25-18-51-20_281cd788c2fa2c82e5415ffa998b613e.mp4`](file:///e:/inventor/Record_2026-09-25-18-51-20_281cd788c2fa2c82e5415ffa998b613e.mp4)):
+  - If you have recorded a video demonstration (e.g. the synchronized dual-feed field trial in your repo: [`presentation_website/assets/videos/demo_recording.mp4`](file:///e:/inventor/presentation_website/assets/videos/demo_recording.mp4) or hosted at [https://yashekhande24.github.io/idr-desktop-simulator/video](https://yashekhande24.github.io/idr-desktop-simulator/video)):
     Upload it as an **Unlisted** or **Public** video on YouTube and paste the link here.
   - If you do not have a YouTube link ready right now:
     **Leave this field completely blank.** It is explicitly marked as *(Optional)* on the portal and will not block your submission.
