@@ -176,7 +176,7 @@ function initBenchmarkChart() {
 }
 
 /* --------------------------------------------------------------------------
-   4. Video Player & Jump Controller
+   4. Video Player & Jump Controller with GA4 Telemetry Tracking
    -------------------------------------------------------------------------- */
 function initVideoControls() {
   const video = document.getElementById('demoVideo');
@@ -193,13 +193,69 @@ function initVideoControls() {
   disableTracks();
   video.addEventListener('loadedmetadata', disableTracks);
 
+  const milestones = { 25: false, 50: false, 75: false, 100: false };
+
+  video.addEventListener('play', () => {
+    if (typeof gtag === 'function') {
+      gtag('event', 'video_play', {
+        video_title: 'Synchronized Dual-Feed HUD Field Demonstration',
+        video_current_time: Math.round(video.currentTime),
+        video_duration: Math.round(video.duration || 359)
+      });
+    }
+  });
+
+  video.addEventListener('pause', () => {
+    if (video.currentTime < (video.duration || 359) - 1) {
+      if (typeof gtag === 'function') {
+        gtag('event', 'video_pause', {
+          video_title: 'Synchronized Dual-Feed HUD Field Demonstration',
+          video_current_time: Math.round(video.currentTime)
+        });
+      }
+    }
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (!video.duration) return;
+    const pct = Math.floor((video.currentTime / video.duration) * 100);
+    [25, 50, 75, 100].forEach(m => {
+      if (pct >= m && !milestones[m]) {
+        milestones[m] = true;
+        if (typeof gtag === 'function') {
+          gtag('event', 'video_progress', {
+            video_title: 'Synchronized Dual-Feed HUD Field Demonstration',
+            video_percent: m,
+            video_current_time: Math.round(video.currentTime)
+          });
+        }
+      }
+    });
+  });
+
+  video.addEventListener('ended', () => {
+    if (typeof gtag === 'function') {
+      gtag('event', 'video_complete', {
+        video_title: 'Synchronized Dual-Feed HUD Field Demonstration',
+        video_duration: Math.round(video.duration || 359)
+      });
+    }
+  });
+
   const jumpButtons = document.querySelectorAll('[data-jump-time]');
   jumpButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const time = parseFloat(btn.getAttribute('data-jump-time'));
+      const chapterLabel = btn.innerText.trim();
       if (!isNaN(time)) {
         video.currentTime = time;
         video.play();
+        if (typeof gtag === 'function') {
+          gtag('event', 'video_chapter_jump', {
+            chapter_name: chapterLabel,
+            jump_time_sec: time
+          });
+        }
       }
     });
   });
