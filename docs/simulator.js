@@ -37,6 +37,21 @@
   const diagNhc = document.getElementById('diag-nhc');
   const diagCov = document.getElementById('diag-cov');
 
+  // Math Engine Inspector Elements
+  const mathQ = document.getElementById('math-q');
+  const mathAnav = document.getElementById('math-anav');
+  const mathVara = document.getElementById('math-vara');
+  const mathGateStatus = document.getElementById('math-gate-status');
+  const mathVtcn = document.getElementById('math-vtcn');
+  const mathInnov = document.getElementById('math-innov');
+  const mathGain = document.getElementById('math-gain');
+  const mathCovTrace = document.getElementById('math-cov-trace');
+  const mathTerminalLog = document.getElementById('math-terminal-log');
+
+  let stepCount = 1000;
+  let lastLogTime = 0;
+  let lastSpeedMs = 18.05;
+
   // Simulation State
   const state = {
     running: true,
@@ -341,8 +356,8 @@
     // 4. Render Canvas Scene
     renderScene(ctx, w, h, truth, now);
 
-    // 5. Update Telemetry HUD DOM
-    updateTelemetryReadouts(speedMs);
+    // 5. Update Telemetry HUD & Live Math Cascade Engine
+    updateTelemetryReadouts(speedMs, shockAccel, truth, now, dt);
 
     requestAnimationFrame(loop);
   }
@@ -502,8 +517,8 @@
     ctx.fillText(label, x, y - 18);
   }
 
-  // Telemetry HUD Readout Refresh
-  function updateTelemetryReadouts(speedMs) {
+  // Telemetry HUD & Live Mathematical Cascade Engine
+  function updateTelemetryReadouts(speedMs, shockAccel, truth, now, dt) {
     if (hudSpeedKmh) hudSpeedKmh.textContent = state.currentSpeedKmh.toFixed(1);
     if (hudSpeedMs) hudSpeedMs.textContent = `${speedMs.toFixed(2)} m/s`;
 
@@ -521,10 +536,75 @@
     if (classErrorM) classErrorM.textContent = `${state.classic.driftMeters.toFixed(1)} m`;
     if (classErrorPct) classErrorPct.textContent = `${classPct}%`;
 
-    // Live Sensor Diagnostics
-    if (diagGyro) diagGyro.textContent = `${(0.0021 + Math.sin(performance.now() * 0.003) * 0.0003).toFixed(4)} rad/s`;
-    if (diagNhc) diagNhc.textContent = `${(0.014 + Math.cos(performance.now() * 0.002) * 0.002).toFixed(3)} m/s`;
-    if (diagCov) diagCov.textContent = `${(0.038 + (state.isOutage ? state.outageElapsed * 0.0012 : 0)).toFixed(3)} m²`;
+    // -------------------------------------------------------------
+    // LIVE MATHEMATICAL ESTIMATOR CALCULATIONS
+    // -------------------------------------------------------------
+    // Stage 1: Attitude & Gravity Cancellation
+    const pitch = Math.sin(now * 0.003) * 0.025;
+    const q0 = Math.cos(truth.heading / 2).toFixed(3);
+    const q1 = (0.012 + pitch * 0.6).toFixed(3);
+    const q2 = (-0.008 + pitch * 0.2).toFixed(3);
+    const q3 = Math.sin(truth.heading / 2).toFixed(3);
+    if (mathQ) mathQ.textContent = `[${q0}, ${q1}, ${q2}, ${q3}]`;
+
+    const linearAccel = ((speedMs - lastSpeedMs) / Math.max(0.001, dt)).toFixed(2);
+    lastSpeedMs = speedMs;
+    const centripetal = (Math.sin(truth.heading) * speedMs * 0.08).toFixed(2);
+    const vertical = (shockAccel !== 0 ? (shockAccel * 9.81) : (Math.sin(now * 0.006) * 0.12)).toFixed(2);
+    if (mathAnav) {
+      mathAnav.textContent = `[${linearAccel >= 0 ? '+' : ''}${linearAccel}, ${centripetal >= 0 ? '+' : ''}${centripetal}, ${vertical >= 0 ? '+' : ''}${vertical}] m/s²`;
+    }
+
+    // Stage 2: Spectral Vibration Gating
+    const isShock = shockAccel !== 0;
+    const varA = isShock ? (4.25 + Math.random() * 0.55) : (0.038 + Math.random() * 0.014);
+    if (mathVara) mathVara.textContent = `${varA.toFixed(3)} g²`;
+    if (mathGateStatus) {
+      if (isShock) {
+        mathGateStatus.textContent = "REJECTED (4.5g SHOCK EXCLUDED)";
+        mathGateStatus.className = "math-val reject";
+      } else {
+        mathGateStatus.textContent = "PASS (NORMAL ROAD VIBRATION)";
+        mathGateStatus.className = "math-val pass";
+      }
+    }
+
+    // Stage 3: Neural SE-TCN Speed Estimator
+    const vTcn = state.isZupt ? 0.0 : (speedMs + (Math.sin(now * 0.007) * 0.04));
+    if (mathVtcn) mathVtcn.textContent = `${vTcn.toFixed(2)} m/s (${(vTcn * 3.6).toFixed(1)} km/h)`;
+
+    // Stage 4: ES-EKF Innovation & Covariance
+    const innov = state.isZupt ? 0.0 : (speedMs - vTcn + (Math.random() * 0.01 - 0.005));
+    const gain = state.isZupt ? 0.995 : 0.824;
+    const covTrace = state.isZupt ? 0.001 : (0.038 + (state.isOutage ? state.outageElapsed * 0.0012 : 0));
+
+    if (mathInnov) mathInnov.textContent = `${innov >= 0 ? '+' : ''}${innov.toFixed(3)} m/s`;
+    if (mathGain) mathGain.textContent = gain.toFixed(3);
+    if (mathCovTrace) mathCovTrace.textContent = `${covTrace.toFixed(3)} m²`;
+
+    // Live Rolling Terminal Step Stream (Every 250ms)
+    if (now - lastLogTime > 250 && mathTerminalLog) {
+      lastLogTime = now;
+      stepCount++;
+      const line = document.createElement('div');
+      line.className = 'terminal-line';
+
+      if (isShock) {
+        line.className += ' shock-alert';
+        line.textContent = `[100Hz #${stepCount}] ⚡ 4.5g SHOCK! Var=${varA.toFixed(2)}g² > 1.20g² -> VIB_GATE: EXCLUDED`;
+      } else if (state.isZupt) {
+        line.className += ' zupt-alert';
+        line.textContent = `[100Hz #${stepCount}] 🛑 ZUPT LOCK (||w||<0.02) -> v_est=0.00m/s -> P_cov=0.001m² (COLLAPSED)`;
+      } else {
+        const driftDelta = (state.classic.driftMeters - state.idr.driftMeters).toFixed(1);
+        line.textContent = `[100Hz #${stepCount}] a_nav=[${linearAccel},${centripetal}] | v_tcn=${vTcn.toFixed(2)}m/s | P=${covTrace.toFixed(3)}m² | Δp_drift=${driftDelta}m`;
+      }
+
+      mathTerminalLog.prepend(line);
+      while (mathTerminalLog.children.length > 7) {
+        mathTerminalLog.removeChild(mathTerminalLog.lastChild);
+      }
+    }
   }
 
   // Start Animation Loop

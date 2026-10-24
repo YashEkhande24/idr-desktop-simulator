@@ -189,19 +189,51 @@
             </div>
           </div>
 
-          <!-- Live Covariance / IMU Noise Readout -->
-          <div class="imu-diagnostic-box">
-            <div class="diag-row">
-              <span>Gyro Bias (&omega;_bias):</span>
-              <strong id="diag-gyro">0.0021 rad/s</strong>
+          <!-- Live Mathematical Estimator Engine Inspector -->
+          <div class="math-inspector-panel">
+            <div class="math-panel-header">
+              <span class="math-pulse"></span>
+              <h3>100 Hz MATHEMATICAL CASCADE</h3>
+              <span class="math-status-tag">ACTIVE ENGINE</span>
             </div>
-            <div class="diag-row">
-              <span>NHC Lateral Res:</span>
-              <strong id="diag-nhc">0.014 m/s</strong>
+
+            <!-- Stage 1: Attitude & Gravity Cancellation -->
+            <div class="math-stage-card">
+              <div class="stage-badge">STAGE 01 &middot; 6-DoF QUATERNION &amp; GRAVITY</div>
+              <div class="math-eq">a<sub>nav</sub> = R(q)&otimes;a<sub>body</sub> - [0, 0, g]<sup>T</sup></div>
+              <div class="math-metrics-grid">
+                <div>q<sub>0..3</sub>: <span id="math-q" class="math-val">[0.998, 0.012, 0.045, 0.003]</span></div>
+                <div>a<sub>nav</sub>: <span id="math-anav" class="math-val">[+0.14, -0.08, +0.02] m/s&sup2;</span></div>
+              </div>
             </div>
-            <div class="diag-row">
-              <span>ES-EKF Trace(P):</span>
-              <strong id="diag-cov">0.038 m&sup2;</strong>
+
+            <!-- Stage 2: Spectral Vibration Gating -->
+            <div class="math-stage-card">
+              <div class="stage-badge">STAGE 02 &middot; SPECTRAL VIBRATION GATING</div>
+              <div class="math-eq">Var(a) = &sigma;&sup2;<sub>a</sub> &lt; &gamma;<sub>threshold</sub> (1.20 g&sup2;)</div>
+              <div class="math-metrics-grid">
+                <div>&sigma;&sup2;<sub>a</sub>: <span id="math-vara" class="math-val">0.042 g&sup2;</span></div>
+                <div>Gate: <span id="math-gate-status" class="math-val pass">PASS (NORMAL ROAD)</span></div>
+              </div>
+            </div>
+
+            <!-- Stage 3 & 4: Neural SE-TCN & ES-EKF Innovation -->
+            <div class="math-stage-card">
+              <div class="stage-badge">STAGE 03 &amp; 04 &middot; SE-TCN + ES-EKF INNOVATION</div>
+              <div class="math-eq">v&#770;<sub>k</sub> = f<sub>TCN</sub>(a<sub>100Hz</sub>) &middot; K = P H<sup>T</sup>(H P H<sup>T</sup> + R)<sup>-1</sup></div>
+              <div class="math-metrics-grid">
+                <div>v&#770;<sub>TCN</sub>: <span id="math-vtcn" class="math-val">18.06 m/s (65.0 km/h)</span></div>
+                <div>Innovation y&#771;: <span id="math-innov" class="math-val">+0.014 m/s</span></div>
+                <div>Kalman K: <span id="math-gain" class="math-val">0.824</span> &middot; P: <span id="math-cov-trace" class="math-val">0.038 m&sup2;</span></div>
+              </div>
+            </div>
+
+            <!-- Live Telemetry Calculation Terminal -->
+            <div class="math-terminal-box">
+              <div class="terminal-title">LIVE STEP LOG (100 Hz PIPELINE STREAM):</div>
+              <div id="math-terminal-log" class="terminal-stream">
+                <!-- Dynamically populated via simulator.js -->
+              </div>
             </div>
           </div>
         </aside>
