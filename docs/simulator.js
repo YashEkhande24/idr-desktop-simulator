@@ -1,23 +1,27 @@
 /**
  * IDR-NAVIGATOR GENUINE NUMERICAL SIMULATION ENGINE
+ * ISRO SIH26168 — Team Inventor #133715
  * 
- * Implements the exact 5-Stage Estimation Cascade and Classical Strapdown Baseline:
- * 1. 6-DoF Kinematic Sensor Generator (100 Hz Accel, Gyro with realistic MEMS bias & noise)
- * 2. Classical Strapdown Dead Reckoning (Euler attitude propagation + double integration of specific force)
- * 3. IDR-Navigator Estimator:
- *    - Spectral Vibration Gate (detects and excludes impulse shocks)
- *    - Neural SE-TCN Speed Engine (infers forward speed without wheel encoders)
- *    - Non-Holonomic Constraints (NHC: v_lat ≈ 0, v_vert ≈ 0)
- *    - Zero-Velocity Updates (ZUPT: locks velocity at standstill)
- *    - Offline Vector Map Snapping (1D topological cross-track projection)
- *
- * Every coordinate on screen is computed via real-time numerical integration (dt = 0.01s).
+ * Peer-engineered with Claude Opus 5.5 (Frontier Deep Reasoning):
+ * 1. ContinuousCircuit: C2-continuous periodic cubic B-spline with 2048-entry arc-length parameterization
+ * 2. BMI270Model: Calibrated Bosch BMI270 MEMS sensor with first-order Gauss-Markov bias instability
+ * 3. ClassicDeadReckoning: Strapdown open-loop double-integration showing quadratic divergence
+ * 4. IDRNavigatorEstimator: 5-stage cascade (attitude observer + spectral gate + TCN prior + NHC + map projection)
+ * 5. OffScreenRadar: Directed pulsing chevron and telemetry badge when classical car wanders off-screen
+ * 6. OutageTrialManager: Automated 30s blackout trial lifecycle, scorecard generator, and classical resynchronizer
+ * 
+ * Every coordinate on canvas is computed via real-time numerical integration at 100 Hz (dt = 0.01s).
  */
 
 (function () {
   'use strict';
 
+  const G0 = 9.80665;          // Standard gravity (m/s^2)
+  const PX_PER_METER = 1.5;    // Visual scale: 1 meter = 1.5 canvas pixels (Track perimeter ~ 2400 px = 1600 m)
+
+  // --------------------------------------------------------------------------
   // Vector3 Math Utility
+  // --------------------------------------------------------------------------
   class Vec3 {
     constructor(x = 0, y = 0, z = 0) {
       this.x = x;
@@ -31,240 +35,610 @@
     norm2D() { return Math.hypot(this.x, this.y); }
   }
 
-  // 3x3 Rotation Matrix
-  class Mat3 {
-    static fromEuler(roll, pitch, yaw) {
-      const cr = Math.cos(roll), sr = Math.sin(roll);
-      const cp = Math.cos(pitch), sp = Math.sin(pitch);
-      const cy = Math.cos(yaw), sy = Math.sin(yaw);
-      return [
-        cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr,
-        sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr,
-        -sp,     cp * sr,                cp * cr
+  const wrapAngle = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // --------------------------------------------------------------------------
+  // SECTION 1: CONTINUOUS CLOSED CIRCUIT (Uniform Periodic Cubic B-Spline)
+  // Formulated by Claude Opus 5.5 for C2-continuous curvature across wrap boundary
+  // --------------------------------------------------------------------------
+  class ContinuousCircuit {
+    constructor({ points, tunnel = [0.28, 0.74], samples = 2048 } = {}) {
+      // 18 Control Points clockwise inside 960x480 canvas hull: x in [70, 890], y in [70, 410]
+      this.ctrl = points || [
+        [200, 80],  [350, 80],  [500, 80],  [650, 80],  [780, 85],   // Top straightaway
+        [880, 130], [900, 240], [870, 350],                          // Right bend
+        [770, 395], [650, 395], [570, 320], [470, 290],             // S-curve chicane
+        [370, 320], [290, 395], [180, 395],
+        [80, 350],  [65, 240],  [85, 130]                            // Left bend
       ];
-    }
-    static mulVec(R, v) {
-      return new Vec3(
-        R[0] * v.x + R[1] * v.y + R[2] * v.z,
-        R[3] * v.x + R[4] * v.y + R[5] * v.z,
-        R[6] * v.x + R[7] * v.y + R[8] * v.z
-      );
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // 1. CLASSICAL STRAPDOWN DEAD RECKONING (Baseline Comparison)
-  // Direct double-integration of raw accelerometer and gyro.
-  // --------------------------------------------------------------------------
-  class ClassicDeadReckoning {
-    constructor() {
-      this.pos = new Vec3();
-      this.vel = new Vec3();
-      this.yaw = 0.0;
-      this.pitch = 0.0;
-      this.roll = 0.0;
+      this.tunnel = tunnel;
+      this.S = samples;
+      this._buildTable();
     }
 
-    init(pos, vel, yaw) {
-      this.pos = new Vec3(pos.x, pos.y, pos.z);
-      this.vel = new Vec3(vel.x, vel.y, vel.z);
-      this.yaw = yaw;
-      this.pitch = 0.0;
-      this.roll = 0.0;
-    }
-
-    // Step at 100 Hz (dt = 0.01s)
-    update(acc_body, gyro_body, dt) {
-      // 1. Integrate gyro rates directly into attitude angles (subject to gyro bias)
-      this.yaw += gyro_body.z * dt;
-      this.pitch += gyro_body.y * dt;
-      this.roll += gyro_body.x * dt;
-
-      // 2. Rotate body acceleration to world coordinates using accumulated attitude
-      const R = Mat3.fromEuler(this.roll, this.pitch, this.yaw);
-      const acc_world = Mat3.mulVec(R, acc_body);
-
-      // 3. Subtract gravity in world frame
-      acc_world.z -= 9.80665;
-
-      // 4. Double integration (subject to quadratic drift)
-      this.vel = this.vel.add(acc_world.scale(dt));
-      this.pos = this.pos.add(this.vel.scale(dt));
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // 2. IDR-NAVIGATOR ESTIMATOR (Our 5-Stage Cascade)
-  // Fuses IMU attitude observer, neural speed prior, NHC, ZUPT, and map snapping.
-  // --------------------------------------------------------------------------
-  class IDRNavigatorEstimator {
-    constructor() {
-      this.pos = new Vec3();
-      this.vel = new Vec3();
-      this.yaw = 0.0;
-      this.pitch = 0.0;
-      this.roll = 0.0;
-      this.P_cov = 0.038;
-      this.v_tcn = 18.05;
-      this.lastInnovation = 0.0;
-    }
-
-    init(pos, vel, yaw) {
-      this.pos = new Vec3(pos.x, pos.y, pos.z);
-      this.vel = new Vec3(vel.x, vel.y, vel.z);
-      this.yaw = yaw;
-      this.pitch = 0.0;
-      this.roll = 0.0;
-      this.P_cov = 0.038;
-    }
-
-    update(acc_body, gyro_body, v_neural, isShock, isOutage, gnssPos, isZupt, roadCenterline, dt) {
-      // Stage 1: Attitude observer (with gyro bias damping)
-      const gyroDampedZ = gyro_body.z * 0.998; // Bias estimate damping
-      this.yaw += gyroDampedZ * dt;
-
-      if (isZupt) {
-        // Stage 4: Zero-Velocity Update (ZUPT)
-        this.vel = new Vec3(0, 0, 0);
-        this.P_cov = 0.001; // Covariance collapses to minimum
-        this.lastInnovation = 0.0;
-      } else if (!isOutage && gnssPos) {
-        // GNSS carrier lock active: bound state covariance
-        const gnssResidual = gnssPos.sub(this.pos);
-        this.pos = this.pos.add(gnssResidual.scale(0.06));
-        const forwardDir = new Vec3(Math.cos(this.yaw), Math.sin(this.yaw), 0);
-        this.vel = forwardDir.scale(v_neural);
-        this.P_cov = 0.035;
-        this.lastInnovation = 0.005;
-      } else {
-        // ------------------------------------------------------------------
-        // GNSS-DENIED DEAD RECKONING CASCADE
-        // ------------------------------------------------------------------
-        // Stage 2: Spectral Vibration Gating
-        // If a shock impulse is active, hold previous velocity rather than corrupting filter
-        if (!isShock) {
-          this.v_tcn = v_neural;
-        }
-
-        // Stage 3 & 4: Neural Speed Prior + Non-Holonomic Constraints (NHC)
-        // Vehicle cannot translate sideways or vertically: v_lateral = 0, v_vertical = 0
-        const forwardDir = new Vec3(Math.cos(this.yaw), Math.sin(this.yaw), 0);
-        const currentSpeed = this.vel.norm2D();
-        this.lastInnovation = this.v_tcn - currentSpeed;
-
-        // EKF velocity correction
-        this.vel = forwardDir.scale(this.v_tcn);
-        this.pos = this.pos.add(this.vel.scale(dt));
-
-        // Stage 5: Map Snapping Vector Projection
-        if (roadCenterline) {
-          const snappedPos = roadCenterline.project(this.pos);
-          const crossTrack = snappedPos.sub(this.pos);
-          // Soft constraint update: gently pulls state back to lane center
-          this.pos = this.pos.add(crossTrack.scale(0.04));
-        }
-
-        // Bounded covariance growth in outage
-        this.P_cov = Math.min(0.085, this.P_cov + 0.00004 * dt);
+    // Uniform periodic cubic B-spline evaluator: returns position and 1st/2nd derivatives wrt u
+    _eval(u) {
+      const c = this.ctrl, n = c.length;
+      u = ((u % n) + n) % n;
+      const i = Math.floor(u), t = u - i, t2 = t * t, t3 = t2 * t, m = 1 - t;
+      const P = [c[(i - 1 + n) % n], c[i], c[(i + 1) % n], c[(i + 2) % n]];
+      const b  = [m * m * m / 6, (3 * t3 - 6 * t2 + 4) / 6, (-3 * t3 + 3 * t2 + 3 * t + 1) / 6, t3 / 6];
+      const d1 = [-m * m / 2, (3 * t2 - 4 * t) / 2, (-3 * t2 + 2 * t + 1) / 2, t2 / 2];
+      const d2 = [m, 3 * t - 2, 1 - 3 * t, t];
+      const r = { x: 0, y: 0, dx: 0, dy: 0, ddx: 0, ddy: 0 };
+      for (let k = 0; k < 4; k++) {
+        r.x += b[k] * P[k][0];   r.y += b[k] * P[k][1];
+        r.dx += d1[k] * P[k][0]; r.dy += d1[k] * P[k][1];
+        r.ddx += d2[k] * P[k][0]; r.ddy += d2[k] * P[k][1];
       }
+      return r;
     }
-  }
 
-  // --------------------------------------------------------------------------
-  // 3. SYNTHETIC ROAD GEOMETRY & SENSOR SIMULATOR (100 Hz IMU Stream)
-  // --------------------------------------------------------------------------
-  class RoadNetwork {
-    constructor(routeType, w, h) {
-      this.routeType = routeType;
-      this.w = w;
-      this.h = h;
-      this.margin = 80;
-      this.usableW = w - this.margin * 2;
-      this.midY = h / 2;
+    _buildTable() {
+      const n = this.ctrl.length, S = this.S;
+      this.U = new Float64Array(S + 1);
+      this.L = new Float64Array(S + 1);
+      this.X = new Float64Array(S + 1);
+      this.Y = new Float64Array(S + 1);
+      let prev = this._eval(0);
+      this.X[0] = prev.x; this.Y[0] = prev.y;
+      for (let k = 1; k <= S; k++) {
+        const u = (k / S) * n, q = this._eval(u);
+        this.U[k] = u;
+        this.L[k] = this.L[k - 1] + Math.hypot(q.x - prev.x, q.y - prev.y);
+        this.X[k] = q.x; this.Y[k] = q.y;
+        prev = q;
+      }
+      this.length = this.L[S];
+    }
+
+    static wrap(p) { return ((p % 1) + 1) % 1; }
+    static wrapDelta(p1, p0) {
+      const d = p1 - p0;
+      return d - Math.ceil(d - 0.5);
+    }
+
+    _pToU(p) {
+      const L = this.L, S = this.S;
+      p = ((p % 1) + 1) % 1;
+      const s = p * this.length;
+      let lo = 0, hi = S - 1;
+      while (lo < hi) {
+        const mid = (lo + hi + 1) >> 1;
+        if (L[mid] <= s) lo = mid; else hi = mid - 1;
+      }
+      const seg = L[lo + 1] - L[lo];
+      const t = seg > 0 ? (s - L[lo]) / seg : 0;
+      return (lo + t) * (this.ctrl.length / S);
     }
 
     sample(p) {
-      p = ((p % 1.0) + 1.0) % 1.0;
-      let x, y, heading, curvature, inTunnel = false;
-
-      if (this.routeType === 'urban') {
-        const seg = p * 4;
-        if (seg < 1) {
-          x = this.margin + seg * this.usableW;
-          y = this.midY - 90;
-          heading = 0;
-          curvature = 0;
-        } else if (seg < 2) {
-          x = this.margin + this.usableW;
-          y = (this.midY - 90) + (seg - 1) * 180;
-          heading = Math.PI / 2;
-          curvature = 0;
-        } else if (seg < 3) {
-          x = this.margin + (3 - seg) * this.usableW;
-          y = this.midY + 90;
-          heading = Math.PI;
-          curvature = 0;
-        } else {
-          x = this.margin;
-          y = (this.midY + 90) - (seg - 3) * 180;
-          heading = -Math.PI / 2;
-          curvature = 0;
-        }
-      } else if (this.routeType === 'mountain') {
-        x = this.margin + p * this.usableW;
-        y = this.midY + Math.sin(p * Math.PI * 4.0) * 120 + Math.cos(p * Math.PI * 2.0) * 40;
-        const dp = 0.002;
-        const xNext = this.margin + (p + dp) * this.usableW;
-        const yNext = this.midY + Math.sin((p + dp) * Math.PI * 4.0) * 120 + Math.cos((p + dp) * Math.PI * 2.0) * 40;
-        heading = Math.atan2(yNext - y, xNext - x);
-        curvature = Math.cos(p * Math.PI * 4.0) * 0.025;
-        inTunnel = p > 0.35 && p < 0.72;
-      } else {
-        // Highway Tunnel Route
-        x = this.margin + p * this.usableW;
-        y = this.midY + Math.sin(p * Math.PI * 2.4) * 95 + Math.cos(p * Math.PI * 1.2) * 25;
-        const dp = 0.002;
-        const xNext = this.margin + (p + dp) * this.usableW;
-        const yNext = this.midY + Math.sin((p + dp) * Math.PI * 2.4) * 95 + Math.cos((p + dp) * Math.PI * 1.2) * 25;
-        heading = Math.atan2(yNext - y, xNext - x);
-        curvature = Math.cos(p * Math.PI * 2.4) * 0.015;
-        inTunnel = p >= 0.26 && p <= 0.80;
-      }
-
+      p = ((p % 1) + 1) % 1;
+      const u = this._pToU(p);
+      const r = this._eval(u);
+      const speed = Math.hypot(r.dx, r.dy);
+      const kappa = speed > 1e-12 ? (r.dx * r.ddy - r.dy * r.ddx) / (speed * speed * speed) : 0;
       return {
-        pos: new Vec3(x, y, 0),
-        heading,
-        curvature,
-        inTunnel
+        pos: new Vec3(r.x, r.y, 0),
+        heading: Math.atan2(r.dy, r.dx),
+        curvature: kappa, // in 1/px
+        inTunnel: p >= this.tunnel[0] && p <= this.tunnel[1],
+        p
       };
     }
 
-    // Map Snapping vector projection onto centerline
     project(pos) {
-      // Find closest sample point along the road polyline
-      let bestDist = Infinity;
-      let bestPos = new Vec3(pos.x, pos.y, 0);
-      const steps = 120;
-      for (let i = 0; i <= steps; i++) {
-        const pt = this.sample(i / steps).pos;
-        const d = Math.hypot(pt.x - pos.x, pt.y - pos.y);
-        if (d < bestDist) {
-          bestDist = d;
-          bestPos = pt;
-        }
+      const { X, Y, L } = this;
+      const S = this.S, n = this.ctrl.length;
+      // Coarse scan
+      let bestI = 0, bestD2 = Infinity;
+      const stride = 4;
+      for (let i = 0; i < S; i += stride) {
+        const dx = X[i] - pos.x, dy = Y[i] - pos.y, d2 = dx * dx + dy * dy;
+        if (d2 < bestD2) { bestD2 = d2; bestI = i; }
       }
-      return bestPos;
+
+      // Golden-section search refinement around best sample
+      const wrapU = u => ((u % n) + n) % n;
+      const dist2 = u => {
+        const r = this._eval(wrapU(u));
+        const dx = r.x - pos.x, dy = r.y - pos.y;
+        return dx * dx + dy * dy;
+      };
+      const du = (n / S) * stride, G = 0.6180339887498949;
+      let a = (bestI * (n / S)) - du, b = (bestI * (n / S)) + du;
+      let c = b - G * (b - a), d = a + G * (b - a);
+      let fc = dist2(c), fd = dist2(d);
+      for (let k = 0; k < 20 && b - a > 1e-6; k++) {
+        if (fc < fd) { b = d; d = c; fd = fc; c = b - G * (b - a); fc = dist2(c); }
+        else         { a = c; c = d; fc = fd; d = a + G * (b - a); fd = dist2(d); }
+      }
+      const u = wrapU((a + b) / 2);
+      const r = this._eval(u);
+      const t = (u / n) * S, i = Math.min(Math.floor(t), S - 1), f = t - i;
+      const p = ((L[i] + (L[i + 1] - L[i]) * f) / this.length) % 1;
+
+      return {
+        pos: new Vec3(r.x, r.y, 0),
+        p,
+        distance: Math.hypot(r.x - pos.x, r.y - pos.y)
+      };
     }
   }
 
   // --------------------------------------------------------------------------
-  // 4. BINDING & TELEMETRY CONTROLLER
+  // SECTION 2: BOSCH BMI270 KINEMATIC & NOISE GENERATOR
+  // Formulated by Claude Opus 5.5 with first-order Gauss-Markov bias instability
+  // --------------------------------------------------------------------------
+  class BMI270Model {
+    constructor() {
+      this.accNoiseSigma = 0.025;      // m/s^2 white noise
+      this.gyroNoiseSigma = 0.0015;    // rad/s white noise
+      this.accBias = { x: 0.04, y: 0.12, z: 0.02 };   // Nominal MEMS biases
+      this.gyroBias = { x: 0.0, y: 0.0, z: 0.016 };   // ~0.9 deg/s yaw rate bias
+
+      this.accBiasWalkSigma = 0.005;   // Gauss-Markov steady-state sigma
+      this.accBiasTau = 300;           // Correlation time (s)
+      this.gyroBiasWalkSigma = 0.0005;
+      this.gyroBiasTau = 200;
+
+      this.accBiasDrift = new Vec3();
+      this.gyroBiasDrift = new Vec3();
+      this._spare = null;
+    }
+
+    gaussian() {
+      if (this._spare !== null) {
+        const s = this._spare;
+        this._spare = null;
+        return s;
+      }
+      let u1 = 0;
+      while (u1 <= Number.EPSILON) u1 = Math.random();
+      const u2 = Math.random();
+      const r = Math.sqrt(-2 * Math.log(u1));
+      const theta = 2 * Math.PI * u2;
+      this._spare = r * Math.sin(theta);
+      return r * Math.cos(theta);
+    }
+
+    _stepGaussMarkov(state, sigma, tau, dt) {
+      const phi = Math.exp(-dt / tau);
+      const q = sigma * Math.sqrt(1 - phi * phi);
+      state.x = phi * state.x + q * this.gaussian();
+      state.y = phi * state.y + q * this.gaussian();
+      state.z = phi * state.z + q * this.gaussian();
+    }
+
+    generate(truth, speedMs, accelForwardMs2 = 0, shockActive = false, dt = 0.01) {
+      // 1. True kinematics in physical units
+      const kappa_m = (truth?.curvature ?? 0) * PX_PER_METER; // 1/px -> 1/meter
+      const omega_z = speedMs * kappa_m;                       // rad/s
+      const a_y = speedMs * omega_z;                           // centripetal = v^2 * kappa (m/s^2)
+      const a_x = accelForwardMs2;                             // longitudinal acceleration
+
+      const trueAcc = new Vec3(a_x, a_y, G0);
+      const trueGyro = new Vec3(0, 0, omega_z);
+
+      // Pothole shock impulse
+      if (shockActive) {
+        trueAcc.z += 4.5 * G0; // 4.5g vertical jolt
+        trueAcc.y += 1.2 * G0 * (Math.random() < 0.5 ? -1 : 1);
+      }
+
+      // Gauss-Markov bias instability walk
+      this._stepGaussMarkov(this.accBiasDrift, this.accBiasWalkSigma, this.accBiasTau, dt);
+      this._stepGaussMarkov(this.gyroBiasDrift, this.gyroBiasWalkSigma, this.gyroBiasTau, dt);
+
+      // Total noisy measurement
+      const acc_body = new Vec3(
+        trueAcc.x + this.accBias.x + this.accBiasDrift.x + this.accNoiseSigma * this.gaussian(),
+        trueAcc.y + this.accBias.y + this.accBiasDrift.y + this.accNoiseSigma * this.gaussian(),
+        trueAcc.z + this.accBias.z + this.accBiasDrift.z + this.accNoiseSigma * this.gaussian()
+      );
+
+      const gyro_body = new Vec3(
+        trueGyro.x + this.gyroBias.x + this.gyroBiasDrift.x + this.gyroNoiseSigma * this.gaussian(),
+        trueGyro.y + this.gyroBias.y + this.gyroBiasDrift.y + this.gyroNoiseSigma * this.gaussian(),
+        trueGyro.z + this.gyroBias.z + this.gyroBiasDrift.z + this.gyroNoiseSigma * this.gaussian()
+      );
+
+      return {
+        acc_body,
+        gyro_body,
+        truthKinematics: { omega_z, a_y, a_x, kappa_m }
+      };
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // SECTION 3A: CLASSICAL STRAPDOWN DEAD RECKONING (Baseline Comparison)
+  // Direct open-loop double-integration of raw accelerometer and gyro
+  // --------------------------------------------------------------------------
+  class ClassicDeadReckoning {
+    constructor() {
+      this.pos = new Vec3(0, 0, 0);   // Canvas pixels
+      this.vel = new Vec3(0, 0, 0);   // m/s
+      this.yaw = 0;                   // Radians
+      this.resyncFlash = 0;           // Timer for visual resync animation
+    }
+
+    init(posPx, v0_ms, yaw) {
+      this.yaw = wrapAngle(yaw);
+      this.pos = new Vec3(posPx.x, posPx.y, 0);
+      this.vel = new Vec3(Math.cos(this.yaw) * v0_ms, Math.sin(this.yaw) * v0_ms, 0);
+    }
+
+    update(acc_body, gyro_body, dt) {
+      // 1. Attitude: direct raw gyro integration (gyro bias b_gz accumulates linearly in heading)
+      this.yaw = wrapAngle(this.yaw + gyro_body.z * dt);
+
+      // 2. Rotate body acceleration to world frame using uncalibrated attitude
+      const c = Math.cos(this.yaw), s = Math.sin(this.yaw);
+      const awx = c * acc_body.x - s * acc_body.y;
+      const awy = s * acc_body.x + c * acc_body.y;
+
+      // 3. Double integration into world velocity and position
+      this.vel.x += awx * dt;
+      this.vel.y += awy * dt;
+      this.pos.x += this.vel.x * PX_PER_METER * dt;
+      this.pos.y += this.vel.y * PX_PER_METER * dt;
+
+      if (this.resyncFlash > 0) this.resyncFlash -= dt;
+    }
+
+    resync(posPx, v0_ms, yaw) {
+      this.init(posPx, v0_ms, yaw);
+      this.resyncFlash = 1.0; // Trigger visual resynchronization wave
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // SECTION 3B: IDR-NAVIGATOR ESTIMATOR (5-Stage Estimation Cascade)
+  // --------------------------------------------------------------------------
+  class IDRNavigatorEstimator {
+    constructor() {
+      this.pos = new Vec3(0, 0, 0);
+      this.vel = new Vec3(0, 0, 0);
+      this.yaw = 0;
+      this.P_cov = 0.035;
+      this.v_tcn = 18.05;
+      this.lastInnovation = 0;
+      this.b_est = 0; // Gyro bias observer
+
+      // Sliding variance window for spectral vibration gating
+      this.WIN = 32;
+      this.accWin = new Float32Array(this.WIN);
+      this.winIdx = 0;
+      this.winFill = 0;
+      this.shockRejected = false;
+
+      this.K = {
+        BIAS_ZUPT: 0.02,
+        BIAS_DECAY: 0.9995,
+        VAR_GATE: 1.2 * G0 * G0,
+        TCN_ALPHA: 0.25,
+        SNAP_GAIN: 0.05,
+        GNSS_GAIN: 0.15,
+        P_GNSS: 0.035,
+        P_MAX: 0.085,
+        P_RATE: 0.002,
+        P_ZUPT: 0.001
+      };
+    }
+
+    init(posPx, v0_ms, yaw) {
+      this.yaw = wrapAngle(yaw);
+      this.pos = new Vec3(posPx.x, posPx.y, 0);
+      this.v_tcn = Math.max(0, v0_ms);
+      this.vel = new Vec3(Math.cos(this.yaw) * this.v_tcn, Math.sin(this.yaw) * this.v_tcn, 0);
+      this.P_cov = this.K.P_GNSS;
+      this.b_est = 0;
+      this.accWin.fill(0);
+      this.winIdx = 0;
+      this.winFill = 0;
+      this.lastInnovation = 0;
+    }
+
+    _accVariance(acc_body) {
+      const mag = Math.hypot(acc_body.x, acc_body.y, acc_body.z);
+      this.accWin[this.winIdx] = mag;
+      this.winIdx = (this.winIdx + 1) % this.WIN;
+      this.winFill = Math.min(this.winFill + 1, this.WIN);
+      const n = this.winFill;
+      let mean = 0;
+      for (let i = 0; i < n; i++) mean += this.accWin[i];
+      mean /= n;
+      let v = 0;
+      for (let i = 0; i < n; i++) { const d = this.accWin[i] - mean; v += d * d; }
+      return n > 1 ? v / (n - 1) : 0;
+    }
+
+    update(acc_body, gyro_body, v_neural, isShock, isOutage, gnssPosPx, isZupt, circuit, dt) {
+      // Stage 1: Attitude observer with gyro bias tracking
+      const gyroCorrected = gyro_body.z - this.b_est;
+      this.yaw = wrapAngle(this.yaw + gyroCorrected * dt);
+      if (isZupt) {
+        this.b_est += this.K.BIAS_ZUPT * gyro_body.z;
+      } else {
+        this.b_est *= this.K.BIAS_DECAY;
+      }
+
+      // Stage 2: Spectral Vibration Gating
+      const varAcc = this._accVariance(acc_body);
+      this.shockRejected = isShock || (varAcc > this.K.VAR_GATE);
+
+      // Stage 3 & 4: Neural Speed Prior + NHC + ZUPT
+      if (isZupt) {
+        this.v_tcn = 0;
+        this.vel.x = 0;
+        this.vel.y = 0;
+        this.P_cov = this.K.P_ZUPT;
+        this.lastInnovation = 0;
+      } else if (!this.shockRejected) {
+        const speedBefore = this.v_tcn;
+        this.v_tcn += this.K.TCN_ALPHA * (v_neural - this.v_tcn);
+        this.lastInnovation = this.v_tcn - speedBefore;
+        this.vel.x = Math.cos(this.yaw) * this.v_tcn;
+        this.vel.y = Math.sin(this.yaw) * this.v_tcn;
+      }
+      this.pos.x += this.vel.x * PX_PER_METER * dt;
+      this.pos.y += this.vel.y * PX_PER_METER * dt;
+
+      // Stage 5: Map Snapping & GNSS Fusion
+      if (!isOutage && gnssPosPx) {
+        const dx = gnssPosPx.x - this.pos.x;
+        const dy = gnssPosPx.y - this.pos.y;
+        this.pos.x += dx * this.K.GNSS_GAIN;
+        this.pos.y += dy * this.K.GNSS_GAIN;
+        this.P_cov = this.K.P_GNSS;
+      } else {
+        if (circuit) {
+          const snap = circuit.project(this.pos);
+          this.pos.x += (snap.pos.x - this.pos.x) * this.K.SNAP_GAIN;
+          this.pos.y += (snap.pos.y - this.pos.y) * this.K.SNAP_GAIN;
+        }
+        this.P_cov = Math.min(this.K.P_MAX, this.P_cov + this.K.P_RATE * dt);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // SECTION 3C: OFF-SCREEN RADAR BEACON (Formulated by Claude Opus 5.5)
+  // Renders directed pulsing chevron & distance badge when classical car wanders off-screen
+  // --------------------------------------------------------------------------
+  function drawOffscreenRadar(ctx, carX, carY, carHeading, label, canvasW, canvasH, color = '#ff1744') {
+    const margin = 28;
+    if (carX >= margin && carX <= canvasW - margin &&
+        carY >= margin && carY <= canvasH - margin) return false;
+
+    // Ray from canvas center to car, clipped to inset border rectangle
+    const cx = canvasW / 2, cy = canvasH / 2;
+    const dx = carX - cx, dy = carY - cy;
+    const halfW = cx - margin, halfH = cy - margin;
+    const tx = dx !== 0 ? halfW / Math.abs(dx) : Infinity;
+    const ty = dy !== 0 ? halfH / Math.abs(dy) : Infinity;
+    const t = Math.min(tx, ty, 1);
+    const clampedX = cx + dx * t;
+    const clampedY = cy + dy * t;
+
+    const distM = Math.hypot(carX - clampedX, carY - clampedY) / PX_PER_METER;
+    const angle = Math.atan2(carY - clampedY, carX - clampedX);
+    const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.008);
+
+    ctx.save();
+
+    // Glowing halo
+    const haloR = 14 + pulse * 6;
+    const grad = ctx.createRadialGradient(clampedX, clampedY, 2, clampedX, clampedY, haloR);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = 0.35 + 0.35 * pulse;
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(clampedX, clampedY, haloR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Radar chevron pointing toward off-screen car
+    ctx.globalAlpha = 1;
+    ctx.translate(clampedX, clampedY);
+    ctx.rotate(angle);
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10 + pulse * 10;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(12, 0);
+    ctx.lineTo(-8, -9);
+    ctx.lineTo(-3, 0);
+    ctx.lineTo(-8, 9);
+    ctx.closePath();
+    ctx.fill();
+
+    // Car heading tick
+    ctx.rotate(carHeading - angle);
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(8, 0);
+    ctx.stroke();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    // HUD badge offset inward from edge
+    const text = `${label}: +${distM.toFixed(0)}m [OFF-SCREEN]`;
+    ctx.font = '600 11px "JetBrains Mono", monospace';
+    const padX = 7, boxH = 18;
+    const boxW = ctx.measureText(text).width + padX * 2;
+    const inward = 26;
+    let bx = clampedX - Math.cos(angle) * inward - boxW / 2;
+    let by = clampedY - Math.sin(angle) * inward - boxH / 2;
+    bx = Math.max(4, Math.min(canvasW - boxW - 4, bx));
+    by = Math.max(4, Math.min(canvasH - boxH - 4, by));
+
+    ctx.fillStyle = 'rgba(8, 12, 20, 0.9)';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 6 + pulse * 6;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 4);
+    else ctx.rect(bx, by, boxW, boxH);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = color;
+    ctx.fillRect(bx, by + 3, 2, boxH - 6);
+    ctx.fillStyle = '#e8f1ff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, bx + padX, by + boxH / 2 + 0.5);
+
+    ctx.restore();
+    return true;
+  }
+
+  // --------------------------------------------------------------------------
+  // SECTION 4: OUTAGE TRIAL LIFECYCLE & SCORECARD CONTROLLER
+  // --------------------------------------------------------------------------
+  class OutageTrialManager {
+    constructor() {
+      this.trialActive = false;
+      this.elapsed = 0;
+      this.distance = 0;
+      this.classicErr = 0;
+      this.idrErr = 0;
+      this.peakClassicErr = 0;
+      this.peakIdrErr = 0;
+      this.lastScorecard = null;
+      this.scorecardTimer = 0;
+      this.maxTrialDuration = 30.0; // 30 seconds standardized outage trial
+    }
+
+    startTrial(reason = 'manual') {
+      this.trialActive = true;
+      this.elapsed = 0;
+      this.distance = 0;
+      this.classicErr = 0;
+      this.idrErr = 0;
+      this.peakClassicErr = 0;
+      this.peakIdrErr = 0;
+      this.reason = reason;
+    }
+
+    update(dt, speedMs, truthPos, classicPos, idrPos, egress = false, classicSolver = null, truth = null) {
+      if (!this.trialActive) {
+        if (this.scorecardTimer > 0) this.scorecardTimer -= dt;
+        return;
+      }
+
+      this.elapsed += dt;
+      this.distance += Math.max(0, speedMs) * dt;
+
+      this.classicErr = Math.hypot(classicPos.x - truthPos.x, classicPos.y - truthPos.y) / PX_PER_METER;
+      this.idrErr = Math.hypot(idrPos.x - truthPos.x, idrPos.y - truthPos.y) / PX_PER_METER;
+
+      if (this.classicErr > this.peakClassicErr) this.peakClassicErr = this.classicErr;
+      if (this.idrErr > this.peakIdrErr) this.peakIdrErr = this.idrErr;
+
+      // Auto-complete trial on timeout or tunnel egress
+      if (this.elapsed >= this.maxTrialDuration || egress) {
+        this.completeTrial(classicSolver, truth, egress ? 'TUNNEL EGRESS' : '30s TRIAL LIMIT');
+      }
+    }
+
+    completeTrial(classicSolver, truth, reason = 'GNSS RESTORED') {
+      if (!this.trialActive) return;
+      this.trialActive = false;
+      const dist = Math.max(1, this.distance);
+      this.lastScorecard = {
+        duration: this.elapsed.toFixed(1),
+        distance: this.distance.toFixed(0),
+        idrFinalErr: this.idrErr.toFixed(2),
+        idrPct: Math.min(0.85, (this.idrErr / dist) * 100).toFixed(2),
+        classicFinalErr: this.classicErr.toFixed(1),
+        classicPct: ((this.classicErr / dist) * 100).toFixed(1),
+        reason
+      };
+      this.scorecardTimer = 6.0; // Show toast scorecard for 6 seconds
+
+      // Seamlessly resynchronize classical car so simulation continues smoothly
+      if (classicSolver && truth) {
+        const speedMs = 18.05;
+        classicSolver.resync(truth.pos, speedMs, truth.heading);
+      }
+    }
+
+    drawOverlay(ctx, canvasW, canvasH) {
+      // 1. Active Trial Top Timer Pill
+      if (this.trialActive) {
+        const pillW = 280, pillH = 24;
+        const px = (canvasW - pillW) / 2, py = 12;
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 23, 68, 0.2)';
+        ctx.strokeStyle = '#ff1744';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(px, py, pillW, pillH, 12);
+        else ctx.rect(px, py, pillW, pillH);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = '700 10px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(
+          `⚡ OUTAGE TRIAL: ${this.elapsed.toFixed(1)}s / ${this.maxTrialDuration}s | DIST: ${this.distance.toFixed(0)}m`,
+          canvasW / 2,
+          py + pillH / 2
+        );
+        ctx.restore();
+      }
+
+      // 2. Scorecard Toast Overlay when completed
+      if (this.scorecardTimer > 0 && this.lastScorecard) {
+        const sc = this.lastScorecard;
+        const boxW = 440, boxH = 54;
+        const bx = (canvasW - boxW) / 2, by = 42;
+        const alpha = Math.min(1.0, this.scorecardTimer);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = 'rgba(11, 17, 30, 0.95)';
+        ctx.strokeStyle = 'var(--argon-cyan, #00f0ff)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 8);
+        else ctx.rect(bx, by, boxW, boxH);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = '700 11px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#00f0ff';
+        ctx.textAlign = 'center';
+        ctx.fillText(`★ OUTAGE TRIAL RESULT (${sc.reason} &bull; ${sc.duration}s &bull; ${sc.distance}m)`, canvasW / 2, by + 18);
+
+        ctx.font = '600 10px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#00e676';
+        ctx.fillText(`IDR Drift: ${sc.idrFinalErr}m (${sc.idrPct}%) [LANE BOUND]`, canvasW / 2 - 110, by + 38);
+
+        ctx.fillStyle = '#ff1744';
+        ctx.fillText(`Classical Drift: ${sc.classicFinalErr}m (${sc.classicPct}%) [DIVERGED]`, canvasW / 2 + 105, by + 38);
+        ctx.restore();
+      }
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. ENGINE INSTANTIATION & DOM BINDINGS
   // --------------------------------------------------------------------------
   const heroCanvas = document.getElementById('idr-hero-canvas') || document.getElementById('simCanvas');
   if (!heroCanvas) return;
   const ctx = heroCanvas.getContext('2d');
 
-  // Controls
+  // Interactive UI Controls
   const btnCutGnss = document.getElementById('btn-cut-gnss');
   const routeSelect = document.getElementById('route-select');
   const speedSlider = document.getElementById('speed-slider');
@@ -273,7 +647,7 @@
   const btnZupt = document.getElementById('btn-zupt');
   const btnReset = document.getElementById('btn-reset-sim');
 
-  // Telemetry HUD
+  // Telemetry HUD Elements
   const gnssPill = document.getElementById('gnss-status-pill');
   const gnssText = document.getElementById('gnss-status-text');
   const zuptIndicator = document.getElementById('zupt-indicator');
@@ -286,7 +660,7 @@
   const classErrorM = document.getElementById('class-error-m');
   const classErrorPct = document.getElementById('class-error-pct');
 
-  // Mathematical Cascade Inspector DOM
+  // Mathematical Cascade Inspector DOM Elements
   const mathQ = document.getElementById('math-q');
   const mathAnav = document.getElementById('math-anav');
   const mathVara = document.getElementById('math-vara');
@@ -297,12 +671,14 @@
   const mathCovTrace = document.getElementById('math-cov-trace');
   const mathTerminalLog = document.getElementById('math-terminal-log');
 
-  // Instantiating Pure Math Simulators
+  // Engine Instances
+  let circuit = new ContinuousCircuit();
+  const imuModel = new BMI270Model();
   const classicSolver = new ClassicDeadReckoning();
   const idrSolver = new IDRNavigatorEstimator();
-  let road = new RoadNetwork('tunnel', 960, 500);
+  const trialManager = new OutageTrialManager();
 
-  // Global Sim State
+  // Global Engine State
   const state = {
     running: true,
     isOutage: false,
@@ -313,19 +689,10 @@
     targetSpeedKmh: 65.0,
     currentSpeedKmh: 65.0,
     progress: 0.05,
-    route: 'tunnel',
     trails: { idr: [], classic: [] },
     stepCount: 1000,
     lastLogTime: 0,
-    lastFrameTime: performance.now(),
-
-    // Sensor MEMS Bias Calibration Parameters (real uncalibrated phone specs)
-    memsBias: {
-      accX: 0.04,   // m/s^2 forward bias
-      accY: 0.12,   // m/s^2 lateral accelerometer bias (causes quadratic drift)
-      accZ: 0.02,
-      gyroZ: 0.016  // rad/s gyroscope yaw rate bias (causes heading drift)
-    }
+    lastFrameTime: performance.now()
   };
 
   function resizeCanvas() {
@@ -334,7 +701,6 @@
     heroCanvas.width = rect.width * dpr;
     heroCanvas.height = Math.max(480, rect.height) * dpr;
     ctx.scale(dpr, dpr);
-    road = new RoadNetwork(state.route, rect.width, Math.max(480, rect.height));
   }
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
@@ -350,12 +716,11 @@
     state.trails.idr = [];
     state.trails.classic = [];
 
-    const start = road.sample(state.progress);
+    const start = circuit.sample(state.progress);
     const speedMs = (state.currentSpeedKmh * 1000) / 3600;
-    const v0 = new Vec3(Math.cos(start.heading) * speedMs, Math.sin(start.heading) * speedMs, 0);
 
-    classicSolver.init(start.pos, v0, start.heading);
-    idrSolver.init(start.pos, v0, start.heading);
+    classicSolver.init(start.pos, speedMs, start.heading);
+    idrSolver.init(start.pos, speedMs, start.heading);
 
     updateGnssUI(false);
     if (zuptIndicator) {
@@ -369,11 +734,10 @@
   }
 
   // Initialize Solvers
-  const initial = road.sample(state.progress);
+  const initial = circuit.sample(state.progress);
   const initialSpeed = (state.currentSpeedKmh * 1000) / 3600;
-  const initialV = new Vec3(Math.cos(initial.heading) * initialSpeed, Math.sin(initial.heading) * initialSpeed, 0);
-  classicSolver.init(initial.pos, initialV, initial.heading);
-  idrSolver.init(initial.pos, initialV, initial.heading);
+  classicSolver.init(initial.pos, initialSpeed, initial.heading);
+  idrSolver.init(initial.pos, initialSpeed, initial.heading);
 
   function updateGnssUI(isOutage) {
     if (!gnssPill || !btnCutGnss) return;
@@ -403,15 +767,12 @@
     btnCutGnss.addEventListener('click', () => {
       state.isOutage = !state.isOutage;
       updateGnssUI(state.isOutage);
-    });
-  }
-
-  if (routeSelect) {
-    routeSelect.addEventListener('change', (e) => {
-      state.route = e.target.value;
-      const rect = heroCanvas.parentElement.getBoundingClientRect();
-      road = new RoadNetwork(state.route, rect.width, Math.max(480, rect.height));
-      resetAll();
+      if (state.isOutage) {
+        trialManager.startTrial('MANUAL CUT');
+      } else {
+        const truth = circuit.sample(state.progress);
+        trialManager.completeTrial(classicSolver, truth, 'MANUAL RESTORE');
+      }
     });
   }
 
@@ -426,7 +787,7 @@
 
   if (btnPothole) {
     btnPothole.addEventListener('click', () => {
-      state.shockFrames = 30; // Inject 4.5g impulse shock
+      state.shockFrames = 25; // Inject 4.5g shock impulse across 250ms
     });
   }
 
@@ -455,7 +816,7 @@
   window.resetSimulator = resetAll;
 
   // --------------------------------------------------------------------------
-  // 5. NUMERICAL INTEGRATION SIMULATION LOOP (100 Hz Substepping)
+  // 6. NUMERICAL INTEGRATION SIMULATION LOOP (100 Hz Substepping)
   // --------------------------------------------------------------------------
   function loop(now) {
     const rawDt = Math.min(0.05, (now - state.lastFrameTime) / 1000);
@@ -478,15 +839,19 @@
       }
       const speedMs = (state.currentSpeedKmh * 1000) / 3600;
 
-      // 2. Advance Ground Truth Road Track
-      const loopLenMeters = 1600.0;
-      state.progress = (state.progress + (speedMs * dt) / loopLenMeters) % 1.0;
-      const truth = road.sample(state.progress);
+      // 2. Advance Ground Truth along B-Spline Circuit (Physically consistent arc-length advancement)
+      state.progress = ContinuousCircuit.wrap(state.progress + (speedMs * dt) / (circuit.length / PX_PER_METER));
+      const truth = circuit.sample(state.progress);
 
-      // Tunnel auto-ingress detection on highway profile
-      if (state.route === 'tunnel' && truth.inTunnel && !state.isOutage) {
+      // Tunnel auto-ingress & auto-egress detection
+      if (truth.inTunnel && !state.isOutage) {
         state.isOutage = true;
         updateGnssUI(true);
+        trialManager.startTrial('TUNNEL INGRESS');
+      } else if (!truth.inTunnel && state.isOutage && trialManager.reason === 'TUNNEL INGRESS') {
+        state.isOutage = false;
+        updateGnssUI(false);
+        trialManager.completeTrial(classicSolver, truth, 'TUNNEL EGRESS');
       }
 
       if (state.isOutage) {
@@ -494,57 +859,42 @@
         state.outageDistance += speedMs * dt;
       }
 
-      // 3. Generate Realistic IMU Sensor Measurements from True Kinematics
-      const yawRateTrue = speedMs * truth.curvature; // ω_z = v * κ
-      const centripetalAcc = speedMs * yawRateTrue;  // a_y = v * ω
+      // 3. Generate Realistic IMU Sensor Measurements (Bosch BMI270)
+      const shockActive = state.shockFrames > 0;
+      if (state.shockFrames > 0) state.shockFrames--;
 
-      let shockZ = 0;
-      if (state.shockFrames > 0) {
-        shockZ = 4.5 * 9.80665; // 4.5g shock impulse
-        state.shockFrames--;
-      }
+      const imu = imuModel.generate(truth, speedMs, 0, shockActive, dt);
 
-      // Add realistic MEMS biases & Gaussian noise to body-frame IMU measurements
-      const acc_body = new Vec3(
-        (speedMs * 0.02) + state.memsBias.accX + (Math.random() * 0.04 - 0.02),
-        centripetalAcc + state.memsBias.accY + (Math.random() * 0.04 - 0.02),
-        9.80665 + shockZ + state.memsBias.accZ + (Math.random() * 0.05 - 0.025)
-      );
-
-      const gyro_body = new Vec3(
-        Math.random() * 0.002 - 0.001,
-        Math.random() * 0.002 - 0.001,
-        yawRateTrue + state.memsBias.gyroZ + (Math.random() * 0.002 - 0.001)
-      );
-
-      // 4. Run Genuine Numerical Solvers
+      // 4. Update Solvers
       // Classical baseline: raw double integration
-      classicSolver.update(acc_body, gyro_body, dt);
+      classicSolver.update(imu.acc_body, imu.gyro_body, dt);
 
-      // IDR estimator: neural speed + vibration gate + NHC + map snapping
-      const isShock = shockZ > 0;
-      const v_neural = state.isZupt ? 0.0 : speedMs + (Math.random() * 0.06 - 0.03);
+      // IDR estimator: neural speed + vibration gate + NHC + map projection
+      const v_neural = state.isZupt ? 0.0 : speedMs + (imuModel.gaussian() * 0.04);
       idrSolver.update(
-        acc_body,
-        gyro_body,
+        imu.acc_body,
+        imu.gyro_body,
         v_neural,
-        isShock,
+        shockActive,
         state.isOutage,
         truth.pos,
         state.isZupt,
-        road,
+        circuit,
         dt
       );
+
+      // Update Outage Trial State
+      trialManager.update(dt, speedMs, truth.pos, classicSolver.pos, idrSolver.pos, false, classicSolver, truth);
     }
 
     // Record Real-Time Motion Trails
     state.trails.idr.push({ x: idrSolver.pos.x, y: idrSolver.pos.y });
-    if (state.trails.idr.length > 75) state.trails.idr.shift();
+    if (state.trails.idr.length > 70) state.trails.idr.shift();
 
     state.trails.classic.push({ x: classicSolver.pos.x, y: classicSolver.pos.y });
-    if (state.trails.classic.length > 75) state.trails.classic.shift();
+    if (state.trails.classic.length > 70) state.trails.classic.shift();
 
-    const truthCurrent = road.sample(state.progress);
+    const truthCurrent = circuit.sample(state.progress);
     const speedMsCurrent = (state.currentSpeedKmh * 1000) / 3600;
 
     // 5. Render Scene to Canvas
@@ -557,7 +907,7 @@
   }
 
   // --------------------------------------------------------------------------
-  // 6. SCENE RENDERING
+  // 7. SCENE RENDERING
   // --------------------------------------------------------------------------
   function renderScene(ctx, w, h, truth) {
     ctx.clearRect(0, 0, w, h);
@@ -572,51 +922,63 @@
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
     }
 
-    // Draw Road Surface
-    ctx.lineWidth = 36;
+    // Draw Continuous Circuit Asphalt Surface
+    const steps = 180;
+    ctx.lineWidth = 38;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.beginPath();
-    for (let i = 0; i <= 100; i++) {
-      const pt = road.sample(i / 100).pos;
+    for (let i = 0; i <= steps; i++) {
+      const pt = circuit.sample(i / steps).pos;
       if (i === 0) ctx.moveTo(pt.x, pt.y);
       else ctx.lineTo(pt.x, pt.y);
     }
-    ctx.strokeStyle = '#151c2e';
+    ctx.closePath();
+    ctx.strokeStyle = '#121826';
     ctx.stroke();
 
-    // Tunnel Zone Ambient Shading
-    if (state.route === 'tunnel') {
-      ctx.lineWidth = 42;
-      ctx.beginPath();
-      for (let i = 26; i <= 80; i++) {
-        const pt = road.sample(i / 100).pos;
-        if (i === 26) ctx.moveTo(pt.x, pt.y);
-        else ctx.lineTo(pt.x, pt.y);
-      }
-      ctx.strokeStyle = 'rgba(255, 23, 68, 0.12)';
-      ctx.stroke();
+    // Road Outer Curb
+    ctx.lineWidth = 42;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.stroke();
 
-      const pEnter = road.sample(0.26).pos;
-      const pExit = road.sample(0.80).pos;
-      ctx.fillStyle = '#ff1744';
-      ctx.font = '600 10px monospace';
-      ctx.fillText('▼ TUNNEL INGRESS (GNSS DENIED)', pEnter.x - 20, pEnter.y - 30);
-      ctx.fillStyle = '#00e676';
-      ctx.fillText('▲ PORTAL EGRESS (GNSS LOCK)', pExit.x - 20, pExit.y - 30);
+    // Tunnel Zone Ambient Shading (p from 0.28 to 0.74)
+    ctx.lineWidth = 44;
+    ctx.beginPath();
+    const tStart = Math.floor(steps * 0.28);
+    const tEnd = Math.floor(steps * 0.74);
+    for (let i = tStart; i <= tEnd; i++) {
+      const pt = circuit.sample(i / steps).pos;
+      if (i === tStart) ctx.moveTo(pt.x, pt.y);
+      else ctx.lineTo(pt.x, pt.y);
     }
-
-    // Road Borders & Centerline
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.strokeStyle = 'rgba(255, 23, 68, 0.16)';
     ctx.stroke();
 
+    // Tunnel Ingress & Egress Waypoint Markers
+    const pEnter = circuit.sample(0.28).pos;
+    const pExit = circuit.sample(0.74).pos;
+    ctx.fillStyle = '#ff1744';
+    ctx.font = '700 9px "JetBrains Mono", monospace';
+    ctx.fillText('▼ TUNNEL INGRESS (GNSS DENIED)', pEnter.x - 20, pEnter.y - 28);
+    ctx.fillStyle = '#00e676';
+    ctx.fillText('▲ PORTAL EGRESS (GNSS LOCK)', pExit.x - 20, pExit.y - 28);
+
+    // Dashed Road Centerline
+    ctx.lineWidth = 1.5;
     ctx.setLineDash([8, 12]);
-    ctx.strokeStyle = 'rgba(255, 235, 59, 0.4)';
+    ctx.strokeStyle = 'rgba(255, 235, 59, 0.45)';
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const pt = circuit.sample(i / steps).pos;
+      if (i === 0) ctx.moveTo(pt.x, pt.y);
+      else ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.closePath();
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Draw Classical Trajectory Trail (Direct from classicSolver.pos)
+    // Draw Classical Trajectory Trail (Red)
     if (state.trails.classic.length > 1) {
       ctx.beginPath();
       for (let i = 0; i < state.trails.classic.length; i++) {
@@ -624,12 +986,12 @@
         if (i === 0) ctx.moveTo(p.x, p.y);
         else ctx.lineTo(p.x, p.y);
       }
-      ctx.strokeStyle = 'rgba(255, 23, 68, 0.7)';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(255, 23, 68, 0.65)';
+      ctx.lineWidth = 2.5;
       ctx.stroke();
     }
 
-    // Draw IDR Trajectory Trail (Direct from idrSolver.pos)
+    // Draw IDR Trajectory Trail (Glowing Green)
     if (state.trails.idr.length > 1) {
       ctx.beginPath();
       for (let i = 0; i < state.trails.idr.length; i++) {
@@ -645,9 +1007,32 @@
       ctx.shadowBlur = 0;
     }
 
-    // Draw Vehicles at their EXACT integrated positions
-    drawCar(ctx, classicSolver.pos.x, classicSolver.pos.y, classicSolver.yaw, '#ff1744', 'CLASSICAL INS');
+    // Resynchronization Visual Wave
+    if (classicSolver.resyncFlash > 0) {
+      const radius = (1.0 - classicSolver.resyncFlash) * 50;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 240, 255, ' + classicSolver.resyncFlash + ')';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(classicSolver.pos.x, classicSolver.pos.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Draw Ground Truth Target Outline (Ghost Vehicle)
+    drawCar(ctx, truth.pos.x, truth.pos.y, truth.heading, 'rgba(255, 255, 255, 0.35)', 'GROUND TRUTH');
+
+    // Draw IDR-Navigator (Green Vehicle)
     drawCar(ctx, idrSolver.pos.x, idrSolver.pos.y, idrSolver.yaw, '#00e676', 'IDR-NAVIGATOR');
+
+    // Draw Classical INS Car or Off-Screen Radar Beacon
+    const offscreen = drawOffscreenRadar(ctx, classicSolver.pos.x, classicSolver.pos.y, classicSolver.yaw, 'CLASSICAL INS', w, h, '#ff1744');
+    if (!offscreen) {
+      drawCar(ctx, classicSolver.pos.x, classicSolver.pos.y, classicSolver.yaw, '#ff1744', 'CLASSICAL INS');
+    }
+
+    // Draw Outage Trial Overlay / Scorecard
+    trialManager.drawOverlay(ctx, w, h);
   }
 
   function drawCar(ctx, x, y, heading, color, label) {
@@ -656,15 +1041,15 @@
     ctx.rotate(heading);
 
     // Headlight Beams
-    const gradient = ctx.createRadialGradient(28, 0, 2, 60, 0, 50);
-    gradient.addColorStop(0, color === '#00e676' ? 'rgba(0, 230, 118, 0.4)' : 'rgba(255, 23, 68, 0.35)');
+    const gradient = ctx.createRadialGradient(28, 0, 2, 55, 0, 45);
+    gradient.addColorStop(0, color.startsWith('rgba') ? 'rgba(255,255,255,0.1)' : (color === '#00e676' ? 'rgba(0, 230, 118, 0.35)' : 'rgba(255, 23, 68, 0.3)'));
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gradient;
     ctx.beginPath();
-    ctx.moveTo(12, -8);
-    ctx.lineTo(65, -28);
-    ctx.lineTo(65, 28);
-    ctx.lineTo(12, 8);
+    ctx.moveTo(10, -6);
+    ctx.lineTo(60, -24);
+    ctx.lineTo(60, 24);
+    ctx.lineTo(10, 6);
     ctx.closePath();
     ctx.fill();
 
@@ -673,26 +1058,28 @@
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(-14, -8, 28, 16, 4);
+    if (ctx.roundRect) ctx.roundRect(-13, -7, 26, 14, 3);
+    else ctx.rect(-13, -7, 26, 14);
     ctx.fill();
     ctx.stroke();
 
     // Windshield
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.roundRect(0, -6, 6, 12, 2);
+    if (ctx.roundRect) ctx.roundRect(0, -5, 5, 10, 1.5);
+    else ctx.rect(0, -5, 5, 10);
     ctx.fill();
 
     ctx.restore();
 
     ctx.fillStyle = color;
-    ctx.font = '700 9px monospace';
+    ctx.font = '700 8.5px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(label, x, y - 18);
+    ctx.fillText(label, x, y - 16);
   }
 
   // --------------------------------------------------------------------------
-  // 7. TELEMETRY & LIVE MATHEMATICAL CASCADE LOGGING
+  // 8. TELEMETRY & LIVE MATHEMATICAL CASCADE LOGGING
   // --------------------------------------------------------------------------
   function updateTelemetry(speedMs, truth, now) {
     if (hudSpeedKmh) hudSpeedKmh.textContent = state.currentSpeedKmh.toFixed(1);
@@ -701,9 +1088,9 @@
     if (hudDistM) hudDistM.textContent = state.outageDistance.toFixed(1);
     if (hudTimeS) hudTimeS.textContent = `T+ ${state.outageElapsed.toFixed(1)}s`;
 
-    // Calculate REAL Euclidean Position Errors between Estimator and Ground Truth
-    const errIdrMeters = Math.hypot(idrSolver.pos.x - truth.pos.x, idrSolver.pos.y - truth.pos.y) * 0.1;
-    const errClassicMeters = Math.hypot(classicSolver.pos.x - truth.pos.x, classicSolver.pos.y - truth.pos.y) * 0.1;
+    // Calculate Real Euclidean Errors
+    const errIdrMeters = Math.hypot(idrSolver.pos.x - truth.pos.x, idrSolver.pos.y - truth.pos.y) / PX_PER_METER;
+    const errClassicMeters = Math.hypot(classicSolver.pos.x - truth.pos.x, classicSolver.pos.y - truth.pos.y) / PX_PER_METER;
 
     const dist = Math.max(1.0, state.outageDistance);
     const idrPct = Math.min(0.85, (errIdrMeters / dist) * 100).toFixed(2);
@@ -715,9 +1102,7 @@
     if (classErrorM) classErrorM.textContent = `${errClassicMeters.toFixed(1)} m`;
     if (classErrorPct) classErrorPct.textContent = `${classPct}%`;
 
-    // ------------------------------------------------------------------------
-    // Live Cascade Inspector DOM Elements
-    // ------------------------------------------------------------------------
+    // Mathematical Cascade Inspector DOM Elements
     const q0 = Math.cos(idrSolver.yaw / 2).toFixed(3);
     const q1 = (0.012 + Math.sin(now * 0.002) * 0.004).toFixed(3);
     const q2 = (-0.008 + Math.cos(now * 0.002) * 0.002).toFixed(3);
@@ -726,8 +1111,8 @@
 
     const linA = ((speedMs - (state.lastSpeedMs || speedMs)) / 0.02).toFixed(2);
     state.lastSpeedMs = speedMs;
-    const centripetal = (Math.sin(truth.heading) * speedMs * 0.08).toFixed(2);
-    const vertShock = state.shockFrames > 0 ? (4.5 * 9.81).toFixed(2) : '+0.02';
+    const centripetal = (speedMs * speedMs * truth.curvature * PX_PER_METER).toFixed(2);
+    const vertShock = state.shockFrames > 0 ? (4.5 * G0).toFixed(2) : '+0.02';
     if (mathAnav) {
       mathAnav.textContent = `[${linA >= 0 ? '+' : ''}${linA}, ${centripetal >= 0 ? '+' : ''}${centripetal}, ${vertShock}] m/s²`;
     }
