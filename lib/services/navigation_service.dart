@@ -21,6 +21,8 @@ class NavigationService extends ChangeNotifier {
   bool _isOffRoute = false;
   bool _hasArrived = false;
   DateTime? _lastRerouteTime;
+  bool _isRerouting = false;
+  double _smoothedSpeedMps = 11.11;
 
   bool get isNavigating => _isNavigating;
   NavDestination? get destination => _destination;
@@ -127,6 +129,41 @@ class NavigationService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Shifts all active route waypoints and destination coordinates when the ENU local origin moves.
+  void translateRoute(Vec3 delta) {
+    if (_destination != null) {
+      _destination = NavDestination(
+        name: _destination!.name,
+        subtitle: _destination!.subtitle,
+        targetEnu: _destination!.targetEnu + delta,
+        latitude: _destination!.latitude,
+        longitude: _destination!.longitude,
+        isCustomPin: _destination!.isCustomPin,
+      );
+    }
+    if (_route != null) {
+      final shiftedPoints = _route!.points.map((p) => p + delta).toList();
+      final shiftedSteps = _route!.steps.map((s) => RouteStep(
+        instruction: s.instruction,
+        maneuver: s.maneuver,
+        distanceMeters: s.distanceMeters,
+        startPosEnu: s.startPosEnu + delta,
+        endPosEnu: s.endPosEnu + delta,
+        roadName: s.roadName,
+        expectedSpeedMps: s.expectedSpeedMps,
+      )).toList();
+      _route = NavRoute(
+        destination: _destination ?? _route!.destination,
+        points: shiftedPoints,
+        steps: shiftedSteps,
+        totalDistanceMeters: _route!.totalDistanceMeters,
+        estimatedDurationSeconds: _route!.estimatedDurationSeconds,
+        isOfflineAStar: _route!.isOfflineAStar,
+      );
+    }
+    notifyListeners();
+  }
+
   /// Updates vehicle progress along the route at real-time telemetry rates
   void updateVehicleProgress(Vec3 vehiclePos, double vehicleHeadingDeg, IdrPipeline pipeline) {
     if (!_isNavigating || _route == null || _route!.points.length < 2) return;
@@ -140,6 +177,7 @@ class NavigationService extends ChangeNotifier {
     // 1. Destination Arrival Check (< 25m horizontal and < 40m vertical, or full 3D norm < 25m)
     if ((dist2d < 25.0 && dz < 40.0) || (dest.targetEnu - vehiclePos).norm < 25.0) {
       _hasArrived = true;
+      _isNavigating = false;
       _remainingDistanceMeters = 0.0;
       _distanceToNextManeuverMeters = 0.0;
       _remainingTimeSeconds = 0.0;
@@ -223,15 +261,19 @@ class NavigationService extends ChangeNotifier {
 
     // 5. Dynamic ETA
     final currentSpeed = (pipeline.latestSolution?.speedKmh ?? 0.0) / 3.6;
-    final effectiveSpeed = currentSpeed > 2.0 ? currentSpeed : 13.89; // fallback ~50 km/h
-    _remainingTimeSeconds = _remainingDistanceMeters / effectiveSpeed;
+    if (currentSpeed > 2.0) {
+      _smoothedSpeedMps = _smoothedSpeedMps * 0.8 + currentSpeed * 0.2;
+    }
+    final effectiveSpeed = currentSpeed > 2.0 ? currentSpeed : _smoothedSpeedMps;
+    _remainingTimeSeconds = _remainingDistanceMeters / math.max(1.0, effectiveSpeed);
 
     notifyListeners();
   }
 
   /// Automatically re-plans route from current location to target destination
   Future<void> recalculateRoute(IdrPipeline pipeline) async {
-    if (!_isNavigating || _destination == null) return;
+    if (!_isNavigating || _destination == null || _isRerouting) return;
+    _isRerouting = true;
     final vehiclePos = pipeline.latestSolution?.idrState.position ?? Vec3.zero;
 
     try {
@@ -254,6 +296,8 @@ class NavigationService extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[NavigationService] Error recalculating route: $e');
+    } finally {
+      _isRerouting = false;
     }
   }
 }

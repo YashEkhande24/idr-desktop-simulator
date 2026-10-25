@@ -277,6 +277,7 @@ class NativeBridge {
     }
   }
 
+
   void processImu(ImuSample sample) {
     if (!_isAvailable || _pipelineHandle == null) return;
     _processImu(

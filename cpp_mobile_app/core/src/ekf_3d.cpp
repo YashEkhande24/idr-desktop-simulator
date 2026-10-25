@@ -32,13 +32,35 @@ void Ekf3D::reset(const Vec3& initPos, double initYaw) {
     accelBiasX_ = 0.0;
 }
 
+bool Ekf3D::scalarUpdate(const RowVector6d& H, double innov, double R, double nisGate) {
+    const Vector6d PHt = P_ * H.transpose();
+    const double S = (H * PHt)(0) + R;
+    if (!(S > 1e-12) || !std::isfinite(innov)) return false;
+    if (nisGate > 0.0 && (innov * innov / S) > nisGate) return false;
+    const Vector6d K = PHt / S;
+    x_ += K * innov;
+    const Matrix6d IKH = Matrix6d::Identity() - K * H;
+    P_ = IKH * P_ * IKH.transpose() + R * (K * K.transpose());
+    conditionCovariance();
+    return true;
+}
+
+void Ekf3D::conditionCovariance() {
+    x_(3) = wrapPi(x_(3));
+    P_ = 0.5 * (P_ + P_.transpose());
+    for (int i = 0; i < 6; ++i) {
+        if (P_(i, i) < 1e-6) P_(i, i) = 1e-6;
+    }
+}
+
 void Ekf3D::predict(double dt, double vForward, double omegaZ, double pitchRad, double rollRad, double trustWeight) {
+    if (dt <= 0.0 || dt > 1.0) dt = 0.02;
     pitch_ = pitchRad;
     roll_ = rollRad;
     double unbiasOmegaZ = omegaZ - gyroBiasZ_;
 
     double psi = x_(3);
-    double psiNext = psi + unbiasOmegaZ * dt;
+    double psiNext = wrapPi(psi + unbiasOmegaZ * dt);
 
     bool isMoving = std::abs(vForward) >= 0.02;
 
@@ -99,9 +121,6 @@ void Ekf3D::predict(double dt, double vForward, double omegaZ, double pitchRad, 
         Q(2, 5) = 0.5 * sa * dt2 * 0.5;
         Q(5, 2) = Q(2, 5);
 
-        // Speed-dependent heading process noise scheduling:
-        // Yaw uncertainty tightens at higher vehicle speed due to strong non-holonomic kinematic directionality,
-        // and relaxes at low speed / crawl where turning maneuvers dominate.
         double speedFactor = std::max(0.35, 1.0 / (1.0 + 0.08 * std::max(0.0, forwardSpeed())));
         Q(3, 3) = 0.002 * dt * speedFactor;
         Q(4, 4) = sa * dt;
@@ -109,14 +128,16 @@ void Ekf3D::predict(double dt, double vForward, double omegaZ, double pitchRad, 
 
         // Covariance propagation: P = F * P * F^T + Q
         P_ = F * P_ * F.transpose() + Q;
+        conditionCovariance();
     } else {
-        // Standstill: completely freeze position propagation to prevent noise-driven creep!
+        // Standstill: freeze position propagation to prevent noise-driven creep
         x_(3) = psiNext;
         x_(4) = 0.0;
         x_(5) = 0.0;
 
         // Propagate heading covariance only
         P_(3, 3) += 0.0005 * dt;
+        conditionCovariance();
     }
 
     // Normalize yaw to [-PI, PI]
@@ -155,24 +176,22 @@ void Ekf3D::applyZacu(double rawAccelX, double dt) {
 }
 
 void Ekf3D::applyStandstill(double rawGyroZ, double rawAccelX) {
-    // Zero-velocity update: clamp forward velocity and climb rate
+    // Zero-velocity update: enforce v_fwd = 0 and v_z = 0 using scalar updates to maintain covariance consistency
     x_(4) = 0.0;
     x_(5) = 0.0;
-    P_(4, 4) = 0.0001;
-    P_(5, 5) = 0.0001;
+    RowVector6d Hv4 = RowVector6d::Zero();
+    Hv4(4) = 1.0;
+    scalarUpdate(Hv4, -x_(4), 1e-4);
 
-    // Shrink position covariance via congruent transformation preserving positive semi-definiteness
-    for (int k = 0; k < 3; ++k) {
-        if (P_(k, k) > 0.01) {
-            double scale = 0.9959919678; // sqrt(0.992)
-            P_.row(k) *= scale;
-            P_.col(k) *= scale;
-        }
-    }
+    RowVector6d Hv5 = RowVector6d::Zero();
+    Hv5(5) = 1.0;
+    scalarUpdate(Hv5, -x_(5), 1e-4);
 
     // Continuously trim gyro z-bias and forward accel bias while stopped
     gyroBiasZ_ = std::clamp(gyroBiasZ_ * 0.95 + rawGyroZ * 0.05, -0.08, 0.08);
-    accelBiasX_ = std::clamp(accelBiasX_ * 0.95 + rawAccelX * 0.05, -0.20, 0.20);
+    double dynamicFwd = rawAccelX - 9.80665 * std::sin(pitch_);
+    accelBiasX_ = std::clamp(accelBiasX_ * 0.95 + dynamicFwd * 0.05, -0.20, 0.20);
+    conditionCovariance();
 }
 
 void Ekf3D::updateGnss(const Vec3& gnssEnu, double hdop, double sigmaBase) {
@@ -204,6 +223,7 @@ void Ekf3D::updateGnss(const Vec3& gnssEnu, double hdop, double sigmaBase) {
         P_(0, 0) = varPos;
         P_(1, 1) = varPos;
         P_(2, 2) = varPos * 3.0;
+        conditionCovariance();
         return;
     }
 
@@ -217,11 +237,14 @@ void Ekf3D::updateGnss(const Vec3& gnssEnu, double hdop, double sigmaBase) {
         return; // Reject GNSS outlier during degraded multi-path or outage
     }
 
-    // Measurement matrix H: 3x6 observing [x, y, z]
+    // Measurement matrix H: 3x6 observing [x, y, z] with lever-arm yaw sensitivity coupling
     Eigen::Matrix<double, 3, 6> H = Eigen::Matrix<double, 3, 6>::Zero();
     H(0, 0) = 1.0;
     H(1, 1) = 1.0;
     H(2, 2) = 1.0;
+    double psi = x_(3);
+    H(0, 3) = -mountLeverArm_.x * std::sin(psi) - mountLeverArm_.y * std::cos(psi);
+    H(1, 3) =  mountLeverArm_.x * std::cos(psi) - mountLeverArm_.y * std::sin(psi);
 
     Eigen::Matrix3d R = Eigen::Matrix3d::Identity() * varPos;
     R(2, 2) *= 3.0; // Altitude is ~3x noisier
@@ -248,40 +271,19 @@ void Ekf3D::updateGnss(const Vec3& gnssEnu, double hdop, double sigmaBase) {
     P_(0, 0) = std::max(0.05, P_(0, 0));
     P_(1, 1) = std::max(0.05, P_(1, 1));
     P_(2, 2) = std::max(0.10, P_(2, 2));
+    conditionCovariance();
 }
 
 void Ekf3D::updateBaro(double altitudeM, double sigmaBaro) {
-    double r = sigmaBaro * sigmaBaro;
-    double y = altitudeM - x_(2);
-    double s = P_(2, 2) + r;
-    if (s > 1e-9) {
-        Eigen::Matrix<double, 6, 1> K = P_.col(2) / s;
-        x_ += K * y;
-
-        Matrix6d I = Matrix6d::Identity();
-        Eigen::Matrix<double, 1, 6> H = Eigen::Matrix<double, 1, 6>::Zero();
-        H(2) = 1.0;
-        Matrix6d I_KH = I - K * H;
-        P_ = I_KH * P_ * I_KH.transpose() + K * r * K.transpose();
-        P_(2, 2) = std::max(1e-6, P_(2, 2));
-    }
+    RowVector6d H = RowVector6d::Zero();
+    H(2) = 1.0;
+    scalarUpdate(H, altitudeM - x_(2), sigmaBaro * sigmaBaro);
 }
 
 void Ekf3D::updateBaroClimbRate(double vZBaro, double sigmaVz) {
-    double r = sigmaVz * sigmaVz;
-    double y = vZBaro - x_(5);
-    double s = P_(5, 5) + r;
-    if (s > 1e-9) {
-        Eigen::Matrix<double, 6, 1> K = P_.col(5) / s;
-        x_ += K * y;
-
-        Matrix6d I = Matrix6d::Identity();
-        Eigen::Matrix<double, 1, 6> H = Eigen::Matrix<double, 1, 6>::Zero();
-        H(5) = 1.0;
-        Matrix6d I_KH = I - K * H;
-        P_ = I_KH * P_ * I_KH.transpose() + K * r * K.transpose();
-        P_(5, 5) = std::max(1e-6, P_(5, 5));
-    }
+    RowVector6d H = RowVector6d::Zero();
+    H(5) = 1.0;
+    scalarUpdate(H, vZBaro - x_(5), sigmaVz * sigmaVz);
 }
 
 void Ekf3D::updateCourse(double courseRad, double speed, double hdop) {
@@ -291,43 +293,25 @@ void Ekf3D::updateCourse(double courseRad, double speed, double hdop) {
     if (speed > 1.0 && hdop <= 4.0 && P_(3, 3) >= 0.008) {
         x_(3) = courseRad;
         P_(3, 3) = 0.002;
+        conditionCovariance();
         return;
     }
 
-    double diff = courseRad - x_(3);
-    while (diff > PI)  diff -= 2.0 * PI;
-    while (diff < -PI) diff += 2.0 * PI;
-
-    // Innovation gating: reject > 45 deg yaw jump from reverse gear or multi-path
-    if (std::abs(diff) > 0.785) return;
+    double diff = wrapPi(courseRad - x_(3));
+    if (std::abs(diff) > 0.785) return; // Innovation gating: reject > 45 deg yaw jump
 
     double speedFactor = std::max(0.2, speed / 3.0);
     double rCourse = (0.04 / (speedFactor * speedFactor)) * std::max(1.0, hdop);
-    double s = P_(3, 3) + rCourse;
-    if (s > 1e-6) {
-        double nis = (diff * diff) / s;
-        if (nis > 9.0) return; // 1 DOF 3-sigma Chi-Square gate (critical value 9.0 for p=0.0027)
-
-        double k = P_(3, 3) / s;
-        x_(3) += k * diff;
-        P_(3, 3) = std::max(1e-6, (1.0 - k) * P_(3, 3));
-        while (x_(3) > PI)  x_(3) -= 2.0 * PI;
-        while (x_(3) < -PI) x_(3) += 2.0 * PI;
-    }
+    RowVector6d H = RowVector6d::Zero();
+    H(3) = 1.0;
+    scalarUpdate(H, diff, rCourse, 9.0);
 }
 
 void Ekf3D::updateCompass(double compassYawRad, double weight, bool isStationary, double magneticFieldNorm, double expectedFieldNorm) {
-    double diff = compassYawRad - x_(3);
-    while (diff > PI)  diff -= 2.0 * PI;
-    while (diff < -PI) diff += 2.0 * PI;
+    double diff = wrapPi(compassYawRad - x_(3));
+    if (std::abs(diff) < 0.02) return; // Angular deadband
 
-    // Angular deadband: skip update if angular noise is tiny (< 0.02 rad ~ 1.1 deg)
-    if (std::abs(diff) < 0.02) return;
-
-    // Gentle gain at rest (0.01) to prevent heading micro-oscillations driving position creep
     double effWeight = isStationary ? 0.01 : std::min(0.5, std::max(0.001, weight));
-
-    // Adaptive magnetic disturbance rejection: downweight if field magnitude deviates from expected
     if (magneticFieldNorm > 0.0 && expectedFieldNorm > 0.0) {
         double devPct = std::abs(magneticFieldNorm - expectedFieldNorm) / expectedFieldNorm;
         if (devPct > 0.15) {
@@ -335,18 +319,10 @@ void Ekf3D::updateCompass(double compassYawRad, double weight, bool isStationary
         }
     }
 
-    // Scalar Kalman update on heading with covariance reduction
-    double rCompass = P_(3, 3) * (1.0 / effWeight - 1.0);
-    rCompass = std::max(rCompass, 1e-4);
-    double s = P_(3, 3) + rCompass;
-    if (s > 1e-6) {
-        double k = P_(3, 3) / s;
-        x_(3) += k * diff;
-        P_(3, 3) = std::max(1e-6, (1.0 - k) * P_(3, 3));
-
-        while (x_(3) > PI)  x_(3) -= 2.0 * PI;
-        while (x_(3) < -PI) x_(3) += 2.0 * PI;
-    }
+    double rCompass = std::max(0.01 / effWeight, 1e-4);
+    RowVector6d H = RowVector6d::Zero();
+    H(3) = 1.0;
+    scalarUpdate(H, diff, rCompass, 9.0);
 }
 
 void Ekf3D::updateMapMatching(const Vec3& normal2D, double crossTrackDistance, double sigma, double roadElevation, double sigmaAlt) {
@@ -407,38 +383,23 @@ void Ekf3D::updateMapMatchingIterated(const Vec3& normal2D, double crossTrackDis
 
 void Ekf3D::updateMapHeading(double roadHeadingRad, double confidence) {
     if (confidence < 0.45) return;
-    double resid = roadHeadingRad - x_(3);
-    while (resid > PI)  resid -= 2.0 * PI;
-    while (resid < -PI) resid += 2.0 * PI;
-
+    double resid = wrapPi(roadHeadingRad - x_(3));
+    if (std::abs(resid) > PI / 2.0) {
+        resid = wrapPi(resid + PI);
+    }
     if (std::abs(resid) > 0.52) return; // ~30 degrees max alignment threshold
 
     double rHead = 0.08 / std::max(0.1, confidence);
-    double s = P_(3, 3) + rHead;
-    if (s > 1e-9) {
-        double k = P_(3, 3) / s;
-        x_(3) += k * resid;
-        P_(3, 3) = std::max(1e-6, P_(3, 3) * (1.0 - k));
-        while (x_(3) > PI)  x_(3) -= 2.0 * PI;
-        while (x_(3) < -PI) x_(3) += 2.0 * PI;
-    }
+    RowVector6d H = RowVector6d::Zero();
+    H(3) = 1.0;
+    scalarUpdate(H, resid, rHead, 9.0);
 }
 
 void Ekf3D::updateTcnSpeed(double vTcn, double variance) {
     double rTcn = (variance > 0.0) ? std::clamp(variance, 0.04, 4.0) : (0.25 * 0.25);
-    double s = P_(4, 4) + rTcn;
-    if (s > 1e-9) {
-        Eigen::Matrix<double, 6, 1> K = P_.col(4) / s;
-        double inn = vTcn - x_(4);
-        x_ += K * inn;
-
-        Matrix6d I = Matrix6d::Identity();
-        Eigen::Matrix<double, 1, 6> H = Eigen::Matrix<double, 1, 6>::Zero();
-        H(4) = 1.0;
-        Matrix6d I_KH = I - K * H;
-        P_ = I_KH * P_ * I_KH.transpose() + K * rTcn * K.transpose();
-        P_(4, 4) = std::max(1e-6, P_(4, 4));
-    }
+    RowVector6d H = RowVector6d::Zero();
+    H(4) = 1.0;
+    scalarUpdate(H, vTcn - x_(4), rTcn);
 }
 
 void Ekf3D::translatePosition(const Vec3& delta) {

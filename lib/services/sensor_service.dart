@@ -82,6 +82,13 @@ class SensorService {
     if (_isListening) return true;
     _isListening = true;
 
+    await _accelSub?.cancel();
+    _accelSub = null;
+    await _gyroSub?.cancel();
+    _gyroSub = null;
+    await _magSub?.cancel();
+    _magSub = null;
+
     // 1. Accelerometer (using gameInterval ~50-60 Hz for optimal stability without burst jitter)
     try {
       _accelSub = accelerometerEventStream(samplingPeriod: SensorInterval.gameInterval).listen(
@@ -145,8 +152,7 @@ class SensorService {
     _autoRetryTimer?.cancel();
     _autoRetryTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       if (!_isListening) {
-        timer.cancel();
-        return;
+        return; // Retain timer during initial startup & permission dialogs
       }
       if (_gpsStatus == GpsHardwareStatus.serviceDisabled) {
         final enabled = await Geolocator.isLocationServiceEnabled();
@@ -384,11 +390,18 @@ class SensorService {
         final alt = (map['alt'] as num?)?.toDouble() ?? 0.0;
         final acc = (map['acc'] as num?)?.toDouble() ?? 10.0;
 
+        final timestampMs = (map['timestamp'] as num?)?.toInt();
+        final timestamp = timestampMs != null ? DateTime.fromMillisecondsSinceEpoch(timestampMs) : null;
+        if (timestamp != null && DateTime.now().difference(timestamp).inHours > 48) {
+          debugPrint('[SensorService] Stale cached position (>48h old) ignored.');
+          return;
+        }
+
         // Center map viewport on user's persistent cached coordinates without anchoring ENU
         final cachedPos = Position(
           longitude: lon,
           latitude: lat,
-          timestamp: DateTime.now(),
+          timestamp: timestamp ?? DateTime.now(),
           accuracy: acc,
           altitude: alt,
           altitudeAccuracy: 10.0,

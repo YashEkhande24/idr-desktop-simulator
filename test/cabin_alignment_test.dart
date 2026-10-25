@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:idr_navigator/core/constants.dart';
 import 'package:idr_navigator/core/math_utils.dart';
@@ -16,7 +17,7 @@ void main() {
         );
       }
 
-      expect(aligner.isLocked, isTrue);
+      expect(aligner.isTiltLocked, isTrue);
       expect(aligner.confidence, greaterThan(0.85));
       expect(aligner.mountPitchDeg.abs(), lessThan(2.0));
       expect(aligner.mountRollDeg.abs(), lessThan(2.0));
@@ -44,7 +45,7 @@ void main() {
       expect(aligner.mountPitchDeg, closeTo(20.0, 1.5));
     });
 
-    test('Mahony filter tracks orientation quaternion and integrates gyro bias', () {
+    test('Filter tracks orientation and estimates gyro bias', () {
       final aligner = CabinAligner();
 
       // Flat phone with constant gyro bias of 0.05 rad/s on x
@@ -60,7 +61,44 @@ void main() {
 
       // Quaternion should remain normalized and upright
       expect(aligner.attitudeQuaternion.norm, closeTo(1.0, 1e-5));
+      expect(aligner.isTiltLocked, isTrue);
+    });
+
+    test('PCA forward axis resolves yaw and achieves full isLocked when driving', () {
+      final aligner = CabinAligner();
+
+      // 1. Initial standstill: locks tilt, but yaw is not yet resolved
+      for (int i = 0; i < 30; i++) {
+        aligner.ingest(
+          const Vec3(0.0, 0.0, IdrConstants.gravity),
+          Vec3.zero,
+          vTcn: 0.0,
+        );
+      }
+      expect(aligner.isTiltLocked, isTrue);
+      expect(aligner.isYawResolved, isFalse);
+      expect(aligner.isLocked, isFalse);
+
+      // 2. Accelerate forward along phone X-axis: forward dynamics trigger PCA
+      for (int i = 0; i < 40; i++) {
+        final speed = 2.0 + i * 0.1;
+        final ax = 1.2 + 0.6 * math.sin(i * 0.4);
+        aligner.ingest(
+          Vec3(ax, 0.0, IdrConstants.gravity),
+          Vec3.zero,
+          vTcn: speed,
+          vGnss: speed,
+        );
+      }
+
+      expect(aligner.isYawResolved, isTrue);
       expect(aligner.isLocked, isTrue);
+      expect(aligner.mountYawDeg.abs(), lessThan(5.0));
+
+      // Acceleration transformed to vehicle frame should have ax ~ 1.5 and az ~ 0.0
+      final aVeh = aligner.transformAccel(const Vec3(1.5, 0.0, IdrConstants.gravity));
+      expect(aVeh.x, closeTo(1.5, 0.2));
+      expect(aVeh.z.abs(), lessThan(0.2));
     });
   });
 }

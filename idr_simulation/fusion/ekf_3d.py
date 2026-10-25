@@ -109,8 +109,7 @@ class IntelligentEKF:
         a_world = r_wb @ acc - np.array([0.0, 0.0, G])
         edot = euler_rates(roll, pitch, gyro)
 
-        # Attitude sensitivity of the specific-force rotation; finite differences
-        # keep the mechanisation readable without hand-expanding dR/dEuler.
+        # Attitude sensitivity of the specific-force rotation and Euler rates
         d_att = np.zeros((3, 3))
         eps = 1e-6
         for i in range(3):
@@ -118,10 +117,18 @@ class IntelligentEKF:
             pert[i] += eps
             d_att[:, i] = (rot_body_to_world(*pert) @ acc - (r_wb @ acc)) / eps
 
+        d_edot = np.zeros((3, 3))
+        for i in range(2):
+            ep, em = [roll, pitch], [roll, pitch]
+            ep[i] += eps
+            em[i] -= eps
+            d_edot[:, i] = (euler_rates(*ep, gyro) - euler_rates(*em, gyro)) / (2 * eps)
+
         f = np.eye(N)
         f[P_, V_] = np.eye(3) * dt
         f[V_, A_] = d_att * dt
         f[P_, A_] = 0.5 * d_att * dt * dt
+        f[A_, A_] = np.eye(3) + d_edot * dt
 
         self.x[P_] = self.x[P_] + self.x[V_] * dt + 0.5 * a_world * dt * dt
         self.x[V_] = self.x[V_] + a_world * dt
@@ -141,37 +148,45 @@ class IntelligentEKF:
         self._symmetrise()
 
     # ------------------------------------------------------------------ updates
+    def _axis_and_jac(self, col: int, eps: float = 1e-6):
+        """World-frame body axis `col` and d(axis)/d(roll,pitch,yaw), consistent with rot_body_to_world."""
+        e = self.x[A_].copy()
+        axis = rot_body_to_world(*e)[:, col]
+        jac = np.empty((3, 3))
+        for i in range(3):
+            ep, em = e.copy(), e.copy()
+            ep[i] += eps
+            em[i] -= eps
+            jac[:, i] = (rot_body_to_world(*ep)[:, col] - rot_body_to_world(*em)[:, col]) / (2 * eps)
+        return axis, jac
+
     def update_speed(self, v_fwd: float, sigma: float = 0.6) -> None:
-        roll, pitch, yaw = self.x[A_]
-        f_hat = forward_axis(pitch, yaw)
+        f_hat, jf = self._axis_and_jac(0)
+        v = self.x[V_]
         h = np.zeros((1, N))
         h[0, V_] = f_hat
-        v = self.x[V_]
-        cp, sp = np.cos(pitch), np.sin(pitch)
-        cy, sy = np.cos(yaw), np.sin(yaw)
-        h[0, 7] = float(v @ np.array([-sp * cy, -sp * sy, cp]))
-        h[0, 8] = float(v @ np.array([-cp * sy, cp * cy, 0.0]))
+        h[0, A_] = v @ jf
         self._update(h, np.array([v_fwd - float(v @ f_hat)]),
                      np.array([[sigma ** 2]]))
 
     def update_nhc(self, sigma_lat: float | None = None,
                    sigma_vert: float | None = None,
                    vertical_reference: float | None = None) -> None:
-        """Lateral velocity ~= 0 and vertical velocity ~= barometric climb rate."""
+        """Constrain body-frame lateral and vertical velocity to zero."""
         sigma_lat = self.sigma_nhc_lat if sigma_lat is None else sigma_lat
-        sigma_vert = self.sigma_nhc_vert if sigma_vert is None else sigma_vert
-        ref_vz = self._climb_rate if vertical_reference is None else vertical_reference
+        sigma_vert = 0.10 if sigma_vert is None else sigma_vert
 
-        yaw = self.x[8]
         v = self.x[V_]
-        lat = np.array([-np.sin(yaw), np.cos(yaw), 0.0])
+        lat_axis, lat_jac = self._axis_and_jac(1)
+        vert_axis, vert_jac = self._axis_and_jac(2)
 
         h = np.zeros((2, N))
-        h[0, V_] = lat
-        h[0, 8] = float(v @ np.array([-np.cos(yaw), -np.sin(yaw), 0.0]))
-        h[1, 5] = 1.0
+        h[0, V_] = lat_axis
+        h[0, A_] = v @ lat_jac
+        h[1, V_] = vert_axis
+        h[1, A_] = v @ vert_jac
 
-        y = np.array([0.0 - float(v @ lat), ref_vz - float(v[2])])
+        y = np.array([0.0 - float(v @ lat_axis), 0.0 - float(v @ vert_axis)])
         r = np.diag([sigma_lat ** 2, sigma_vert ** 2])
         self._update(h, y, r)
 

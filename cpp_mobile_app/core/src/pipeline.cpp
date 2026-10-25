@@ -21,6 +21,9 @@ void IdrPipeline::reset() {
     hasGnssRef_ = false;
     currentHdop_ = 1.0;
     latestGnssEnu_ = {0, 0, 0};
+    lastAlignedAx_ = 0.0;
+    lastGnssSpeed_ = -1.0;
+    lastGnssTime_ = 0.0;
 
     currentSolution_ = NavSolution();
 }
@@ -44,42 +47,48 @@ void IdrPipeline::processImu(const ImuSample& sample) {
     if (dt <= 0.0 || dt > 0.5) dt = 0.02;
     lastImuTimestamp_ = sample.timestamp;
 
-    // 1. Cabin Alignment
-    cabinAligner_.addSample(sample.accel);
+    // 1. Cabin Alignment (pass gyro for turn rejection)
+    cabinAligner_.addSample(sample.accel, sample.gyro);
+    if (!cabinAligner_.isCalibrated()) {
+        updateSolution();
+        return; // Prevent gravity-polluted data entering filters prior to leveling
+    }
     Vec3 aAligned = cabinAligner_.alignAccel(sample.accel);
     Vec3 wAligned = cabinAligner_.alignGyro(sample.gyro);
+    lastAlignedAx_ = aAligned.x;
 
-    // 2. Vibration & Jerk Gate
-    bool isStationary = tcnEngine_.isStandstill();
-    vibrationGate_.update(aAligned, dt, isStationary);
+    // 2. TCN Speed Engine (use leveled vehicle road pitch ~ 0, NOT cradle mount pitch)
+    const double vehPitch = 0.0;
+    tcnEngine_.update(aAligned, wAligned, dt, -1.0, vehPitch);
+    const bool standstill = tcnEngine_.isStandstill();
+
+    // 3. Vibration & Jerk Gate
+    vibrationGate_.update(aAligned, dt, standstill);
     double trust = vibrationGate_.trustWeight();
 
-    // 3. TCN Speed Engine & ZUPT
-    tcnEngine_.update(aAligned, wAligned, dt, -1.0, cabinAligner_.mountPitch());
-    double vFwd = tcnEngine_.isStandstill() ? 0.0 : tcnEngine_.speedMps();
-
-    if (tcnEngine_.isStandstill()) {
-        ekf_.applyStandstill(wAligned.z, aAligned.x);
-    }
-
-    // 4. EKF-3D Kinematic Prediction (freeze position integration at standstill)
-    if (!tcnEngine_.isStandstill()) {
-        ekf_.predict(dt, vFwd, wAligned.z, cabinAligner_.mountPitch(), cabinAligner_.mountRoll(), trust);
+    // 4. EKF-3D Kinematic Prediction & Standstill Updates
+    if (standstill) {
+        if (cabinAligner_.isLocked()) {
+            ekf_.applyStandstill(wAligned.z, aAligned.x);
+        } else {
+            ekf_.applyStandstill(wAligned.z, 0.0);
+        }
+    } else {
+        ekf_.predict(dt, tcnEngine_.speedMps(), wAligned.z, vehPitch, /*roll*/ 0.0, trust);
     }
     if (!tcnEngine_.isPedestrian()) {
         ekf_.applyNhc();
     }
 
-    // 5. Classic Dead Reckoning
-    if (isTunnelOutage_ || !hasGnssRef_ || currentHdop_ > 3.0) {
-        if (tcnEngine_.isStandstill()) {
+    // 5. Classic Dead Reckoning with unified HDOP threshold
+    const bool gnssUsable = hasGnssRef_ && !isTunnelOutage_ && currentHdop_ <= kMaxUsableHdop;
+    if (!gnssUsable) {
+        if (standstill) {
             baselineDr_.syncWithGnss(baselineDr_.position(), {0, 0, 0}, baselineDr_.yaw());
         } else {
-            // GNSS lost or Outage active: Open-loop double integration drifts
             baselineDr_.step(dt, aAligned, wAligned);
         }
     } else {
-        // Nominal GNSS: Synchronize Baseline DR to current solution (drift = 0.0 m)
         baselineDr_.syncWithGnss(ekf_.position(), ekf_.velocity(), ekf_.yaw());
     }
 
@@ -88,25 +97,38 @@ void IdrPipeline::processImu(const ImuSample& sample) {
 
 void IdrPipeline::processGnss(const GnssSample& sample) {
     std::lock_guard<std::mutex> lock(mutex_);
+    const bool courseValid = sample.speed >= 2.0 && sample.course >= 0.0;
 
     if (!hasGnssRef_) {
         refLat_ = sample.lat;
         refLon_ = sample.lon;
         refAlt_ = sample.alt;
         hasGnssRef_ = true;
-        ekf_.reset({0, 0, 0}, compassToEnuRad(sample.course));
-        baselineDr_.reset({0, 0, 0}, compassToEnuRad(sample.course));
+        const double yaw0 = courseValid ? compassToEnuRad(sample.course) : ekf_.yaw();
+        ekf_.reset({0, 0, 0}, yaw0);
+        baselineDr_.reset({0, 0, 0}, yaw0);
     }
 
     Eigen::Vector3d enu = geodeticToEnu(sample.lat, sample.lon, sample.alt, refLat_, refLon_, refAlt_);
     latestGnssEnu_ = Vec3::fromEigen(enu);
     currentHdop_ = sample.hdop;
 
+    // Resolve forward/backward pi ambiguity using GNSS dv/dt
+    if (lastGnssSpeed_ >= 0.0 && (sample.timestamp > lastGnssTime_)) {
+        double dt_gnss = sample.timestamp - lastGnssTime_;
+        if (dt_gnss > 0.05 && dt_gnss < 2.0) {
+            double aLong = (sample.speed - lastGnssSpeed_) / dt_gnss;
+            cabinAligner_.resolveForwardSign(aLong, lastAlignedAx_);
+        }
+    }
+    lastGnssSpeed_ = sample.speed;
+    lastGnssTime_ = sample.timestamp;
+
     tcnEngine_.synchronizeGnssSpeed(sample.speed, sample.hdop, isTunnelOutage_);
 
-    if (!isTunnelOutage_ && sample.hdop <= 4.0) {
+    if (!isTunnelOutage_ && sample.hdop <= kMaxUsableHdop) {
         ekf_.updateGnss(latestGnssEnu_, sample.hdop);
-        if (sample.speed >= 0.6) {
+        if (sample.speed >= 0.6 && sample.course >= 0.0) {
             double courseRad = compassToEnuRad(sample.course);
             ekf_.updateCourse(courseRad, sample.speed, sample.hdop);
         }
@@ -124,9 +146,15 @@ void IdrPipeline::processBaro(const BaroSample& sample) {
 
 void IdrPipeline::processMag(const MagSample& sample) {
     std::lock_guard<std::mutex> lock(mutex_);
-    double enuYaw = compassToEnuRad(sample.headingDeg);
+    if (!cabinAligner_.isLocked()) return;
+
+    // Compensate phone magnetic azimuth for cradle mount yaw and Android +Y axis 90 deg offset
+    const double psiPhone = compassToEnuRad(sample.headingDeg + declinationDeg_);
+    const double psiVeh = std::remainder(
+        psiPhone - kAzimuthAxisOffset - cabinAligner_.mountYaw(),
+        2.0 * 3.14159265358979323846);
     bool isStationary = tcnEngine_.isStandstill();
-    ekf_.updateCompass(enuYaw, 0.05, isStationary);
+    ekf_.updateCompass(psiVeh, 0.05, isStationary);
     updateSolution();
 }
 
@@ -165,6 +193,13 @@ bool IdrPipeline::isPedestrian() const {
 
 void IdrPipeline::setReferenceAnchor(double lat, double lon, double alt) {
     std::lock_guard<std::mutex> lock(mutex_);
+    if (hasGnssRef_ && (refLat_ != lat || refLon_ != lon)) {
+        Eigen::Vector3d deltaEnu = geodeticToEnu(refLat_, refLon_, refAlt_, lat, lon, alt);
+        Vec3 delta = Vec3::fromEigen(deltaEnu);
+        ekf_.translatePosition(delta);
+        baselineDr_.translatePosition(delta);
+        latestGnssEnu_ += delta;
+    }
     refLat_ = lat;
     refLon_ = lon;
     refAlt_ = alt;
@@ -177,11 +212,15 @@ void IdrPipeline::syncGnssSpeed(double speedMps, double hdop, bool isDenied) {
 }
 
 void IdrPipeline::stepSimulation(double dt) {
-    // Synthetic simulation tick for headless benchmarks
+    double ts;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        ts = lastImuTimestamp_ + dt;
+    }
     ImuSample imu;
-    imu.timestamp = lastImuTimestamp_ + dt;
+    imu.timestamp = ts;
     imu.accel = {0.0, 0.0, GRAVITY_STANDARD};
-    imu.gyro = {0.0, 0.0, 0.0};
+    imu.gyro  = {0.0, 0.0, 0.0};
     processImu(imu);
 }
 
@@ -191,8 +230,8 @@ void IdrPipeline::updateSolution() {
     currentSolution_.velocity = ekf_.velocity();
     currentSolution_.yawRad = ekf_.yaw();
     currentSolution_.headingDeg = enuToCompassDeg(ekf_.yaw());
-    currentSolution_.rollRad = cabinAligner_.mountRoll();
-    currentSolution_.pitchRad = cabinAligner_.mountPitch();
+    currentSolution_.rollRad = ekf_.roll();
+    currentSolution_.pitchRad = ekf_.pitch();
 
     currentSolution_.positionStd = ekf_.positionStd();
     currentSolution_.hdop = currentHdop_;
@@ -221,7 +260,7 @@ void IdrPipeline::updateSolution() {
     currentSolution_.covDiagonal[5] = P(5, 5);
 
     // Drift calculation relative to latest GNSS fix during outage / dead-reckoning
-    if (hasGnssRef_ && (isTunnelOutage_ || currentHdop_ > 5.0)) {
+    if (hasGnssRef_ && (isTunnelOutage_ || currentHdop_ > kMaxUsableHdop)) {
         Vec3 diffIdr = ekf_.position() - latestGnssEnu_;
         currentSolution_.idrDrift = std::sqrt(diffIdr.x * diffIdr.x + diffIdr.y * diffIdr.y);
 

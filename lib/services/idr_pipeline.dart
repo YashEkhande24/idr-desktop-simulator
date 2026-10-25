@@ -84,6 +84,7 @@ class IdrPipeline extends ChangeNotifier {
         if (_lastGnssPos != null) _lastGnssPos = _lastGnssPos! + delta;
         if (_lastDrPos != null) _lastDrPos = _lastDrPos! + delta;
         if (_lastMapMatchPos != null) _lastMapMatchPos = _lastMapMatchPos! + delta;
+        _navigationService.translateRoute(delta);
       }
       _mapSnapper.branches.clear();
       _mapSnapper.branches.addAll(result.branches);
@@ -721,6 +722,7 @@ class IdrPipeline extends ChangeNotifier {
       imu.gyro,
       vTcn: _tcnSpeed.estimatedSpeed,
       tcnVariance: _tcnSpeed.estimatedVariance,
+      vGnss: gnss?.speed ?? _latestGnssSpeed,
       dt: dt,
     );
     final aVeh = _aligner.transformAccel(imu.accel);
@@ -913,6 +915,7 @@ class IdrPipeline extends ChangeNotifier {
     final currentIdrPos = _ekf.state.position;
 
     _timeSinceLastMapMatch += dt;
+    bool shouldUpdateMapFilter = false;
 
     if (shouldApplyMapSnap) {
       final effectiveHdop = isDenied ? 25.0 : currentHdop;
@@ -924,7 +927,7 @@ class IdrPipeline extends ChangeNotifier {
         tcnVariance: _tcnSpeed.estimatedVariance,
       );
 
-      final bool shouldUpdateMapFilter = !isStationary &&
+      shouldUpdateMapFilter = !isStationary &&
           ((_timeSinceLastMapMatch >= 0.20) ||
               (_lastMapMatchPos == null) ||
               ((currentIdrPos - _lastMapMatchPos!).norm >= 1.0));
@@ -957,7 +960,7 @@ class IdrPipeline extends ChangeNotifier {
       _nativeBridge.processImu(imu);
       if (baro != null) _nativeBridge.processBaro(baro);
 
-      if (shouldApplyMapSnap && match != null && !isStationary) {
+      if (shouldApplyMapSnap && match != null && shouldUpdateMapFilter) {
         final effectiveHdop = isDenied ? 25.0 : currentHdop;
         final sigmaMap = _mapSnapper.lateralSigma(effectiveHdop, match);
         _nativeBridge.updateMapMatching(
@@ -1194,6 +1197,8 @@ class IdrPipeline extends ChangeNotifier {
     _navigationService.removeListener(notifyListeners);
     _timer?.cancel();
     _sensorService.dispose();
+    _tcnSpeed.dispose();
+    _nativeBridge.dispose();
     super.dispose();
   }
 }

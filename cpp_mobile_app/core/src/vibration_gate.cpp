@@ -1,4 +1,5 @@
 #include "idr/vibration_gate.hpp"
+#include "idr/common.hpp"
 #include <cmath>
 #include <numeric>
 #include <algorithm>
@@ -17,7 +18,7 @@ void VibrationGate::reset() {
 }
 
 void VibrationGate::update(const Vec3& alignedAccel, double dt, bool isStationary) {
-    if (dt <= 1e-4) return;
+    if (dt < 0.005) return;
 
     // Stationary bypass: if stationary, do not trip shock gate on handling tremors
     if (isStationary) {

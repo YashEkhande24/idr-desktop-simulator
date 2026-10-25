@@ -1047,9 +1047,9 @@ video::cue {
   color: #f1f5f9;
   border: 1px solid var(--argon-border);
   border-radius: 14px;
-  padding: 1.5rem 1.75rem 2rem;
-  margin-top: 1.5rem;
-  margin-bottom: 2.5rem;
+  padding: 1rem 1.25rem 1.5rem;
+  margin-top: 0.75rem;
+  margin-bottom: 2rem;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.08);
 }
 
@@ -1058,9 +1058,9 @@ video::cue {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  margin-bottom: 1.25rem;
+  gap: 0.75rem;
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.85rem;
   border-bottom: 1px solid var(--argon-border);
 }
 
@@ -1152,7 +1152,7 @@ video::cue {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 1.5rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 @media (max-width: 1080px) {
@@ -1168,7 +1168,8 @@ video::cue {
   border: 1px solid var(--argon-border);
   border-radius: 12px;
   overflow: hidden;
-  min-height: 480px;
+  height: 480px;
+  min-height: 440px;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
@@ -1178,7 +1179,6 @@ video::cue {
 #idr-hero-canvas {
   width: 100%;
   height: 100%;
-  min-height: 480px;
   display: block;
 }
 

@@ -85,12 +85,14 @@ class MapSnapper {
   String? _trellisBranchName;
   Vec3? _trellisSnappedPos;
   Vec3? _prevP;
+  int _consecutiveMissCount = 0;
 
   void reset() {
     _lastResult = null;
     _trellisBranchName = null;
     _trellisSnappedPos = null;
     _prevP = null;
+    _consecutiveMissCount = 0;
   }
 
   MapSnapper({
@@ -123,6 +125,8 @@ class MapSnapper {
     final effectiveSnapM = vTcn != null
         ? MathUtils.clamp(vTcn * 1.5 + 3.0 * math.sqrt(tcnVariance ?? 0.16) + 12.0, 15.0, maxLateralSnapM)
         : maxLateralSnapM;
+    final recoveryAllowance = math.min(80.0, _consecutiveMissCount * 4.0);
+    final allowedCorridor = effectiveSnapM + recoveryAllowance;
 
     MapSnapResult? bestResult;
     final branchBestScores = <String, double>{};
@@ -279,13 +283,15 @@ class MapSnapper {
       }
     }
 
-    if (bestResult == null || bestResult.crossTrackDistance.abs() > effectiveSnapM) {
+    if (bestResult == null || bestResult.crossTrackDistance.abs() > allowedCorridor) {
+      _consecutiveMissCount++;
       _lastResult = null;
       _trellisBranchName = null;
       _trellisSnappedPos = null;
       _prevP = null;
       return null;
     }
+    _consecutiveMissCount = 0;
 
     // Confidence metric: normalized margin between best and second-best candidate branches
     double confidence = 1.0;

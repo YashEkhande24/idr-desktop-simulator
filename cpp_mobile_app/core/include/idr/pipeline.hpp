@@ -1,7 +1,21 @@
 #pragma once
 
-#include <memory>
+#if defined(__MINGW32__) && !defined(_GLIBCXX_HAS_GTHREADS)
+namespace std {
+class mutex {
+public:
+    void lock() {}
+    void unlock() {}
+};
+template<typename T>
+class lock_guard {
+public:
+    explicit lock_guard(T&) {}
+};
+}
+#else
 #include <mutex>
+#endif
 #include "idr/types.hpp"
 #include "idr/cabin_aligner.hpp"
 #include "idr/vibration_gate.hpp"
@@ -56,6 +70,12 @@ public:
     const Ekf3D& ekf() const { return ekf_; }
     const BaselineDeadReckoning& baselineDr() const { return baselineDr_; }
 
+    void setMagneticDeclination(double declDeg) { declinationDeg_ = declDeg; }
+    double magneticDeclination() const { return declinationDeg_; }
+
+    static constexpr double kMaxUsableHdop = 4.0;
+    static constexpr double kAzimuthAxisOffset = 3.14159265358979323846 / 2.0;
+
 private:
     void updateSolution();
 
@@ -73,6 +93,11 @@ private:
     bool hasGnssRef_ = false;
     double currentHdop_ = 1.0;
     Vec3 latestGnssEnu_{0, 0, 0};
+
+    double lastAlignedAx_ = 0.0;
+    double lastGnssSpeed_ = -1.0;
+    double lastGnssTime_ = 0.0;
+    double declinationDeg_ = 0.0;
 
     NavSolution currentSolution_;
 };

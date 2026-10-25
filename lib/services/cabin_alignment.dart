@@ -9,16 +9,18 @@ import '../core/math_utils.dart';
 /// [x_fwd, y_lat, z_up].
 ///
 /// 1. Gravity Tracking (Tilt Compensation):
-///    g_hat = mean(a) / ||mean(a)||
 ///    Estimates mount roll (phi_0) and pitch (theta_0) such that g aligns with [0, 0, -1]^T.
-/// 2. Horizontal Forward Alignment:
-///    Tracks vehicle acceleration along horizontal plane to determine forward heading.
+///    Tilt is ONLY updated while stationary to prevent cornering/braking acceleration from corrupting tilt.
+/// 2. Horizontal Forward Alignment (PCA):
+///    In leveled frame, tracks vehicle acceleration along horizontal plane to determine forward heading.
+///    Continuous execution while driving until yaw is resolved.
 /// 3. Vehicle Frame Transform:
-///    a_v = R_bv * (a_m - b_a) - [0, 0, g]^T
+///    a_v = R_bv * a_m - [0, 0, g]^T
 class CabinAligner {
   final List<Vec3> _accelWindow = [];
   final List<Vec3> _gyroWindow = [];
   final List<double> _speedWindow = [];
+  final List<Vec3> _horizontalAccels = [];
 
   Vec3? _lowPassGravity;
   Mat3 _rBv = Mat3.identity; // Rotation from phone to vehicle body frame
@@ -29,11 +31,8 @@ class CabinAligner {
   double _mountPitch = 0.0;
   double _mountYaw = 0.0;
   double _confidence = 0.0;
-  bool _locked = false;
-
-  // Mahony filter gains
-  static const double _kp = 0.50; // Proportional gain for gravity orientation tracking
-  static const double _ki = 0.015; // Integral gain for gyroscope bias tracking
+  bool _tiltLocked = false;
+  bool _yawResolved = false;
 
   CabinAligner();
 
@@ -45,25 +44,30 @@ class CabinAligner {
   double get mountYawDeg => MathUtils.radToDeg(_mountYaw);
   double get mountYaw => _mountYaw;
   double get confidence => _confidence;
-  bool get isLocked => _locked;
+  bool get isTiltLocked => _tiltLocked;
+  bool get isYawResolved => _yawResolved;
+  bool get isLocked => _tiltLocked && _yawResolved;
 
   /// Ingest an IMU sample and update alignment filter.
   /// [vTcn]: Optional forward speed from TCN Speed Engine.
   /// [tcnVariance]: Optional predictive variance from TCN Speed Engine.
+  /// [vGnss]: Optional live speed from GNSS Doppler receiver.
   /// [dt]: sample period in seconds.
   void ingest(
     Vec3 rawAccel,
     Vec3 rawGyro, {
     double? vTcn,
     double? tcnVariance,
+    double? vGnss,
     double dt = IdrConstants.dtImu,
   }) {
-    final effectiveDt = MathUtils.clamp(dt, 0.001, 0.10);
     final wNorm = rawGyro.norm;
+    final aNorm = rawAccel.norm;
+    final speed = vGnss ?? vTcn ?? 0.0;
 
     _accelWindow.add(rawAccel);
     _gyroWindow.add(rawGyro);
-    _speedWindow.add(vTcn ?? 0.0);
+    _speedWindow.add(speed);
 
     if (_accelWindow.length > IdrConstants.alignmentSampleCount) {
       _accelWindow.removeAt(0);
@@ -71,68 +75,30 @@ class CabinAligner {
       _speedWindow.removeAt(0);
     }
 
-    // Strapdown Gyro-Assisted Gravity Tracking:
-    // Propagates gravity vector in sensor frame using angular velocity to eliminate phase lag
+    // 1. Tilt Adaptation: ONLY while stationary or quiet startup convergence
+    // Under cornering (e.g. 3 m/s^2 lateral) or throttle/braking, raw acceleration
+    // deviates significantly from true gravity. We only adapt gravity when the phone
+    // is stationary: wNorm < 0.05 rad/s and acceleration is close to 1g.
+    final bool isStationaryQuiet = (speed < 0.5) && (wNorm < 0.05) && ((aNorm - IdrConstants.gravity).abs() < 0.40);
+    final bool allowAdapt = isStationaryQuiet || (!_tiltLocked && aNorm > 7.5 && aNorm < 12.0);
+
     if (_lowPassGravity == null) {
       _lowPassGravity = rawAccel;
-    } else {
-      Vec3 gPred = _lowPassGravity!;
-      if (wNorm > 1e-4) {
-        final wUnit = rawGyro / wNorm;
-        // In the body frame, the gravity vector rotates opposite to body angular velocity
-        gPred = _rotateVector(_lowPassGravity!, wUnit, -wNorm * effectiveDt);
-      }
-
-      final aNorm = rawAccel.norm;
-      // Orientation can only change when phone is rotating (wNorm > 0.03) or during initial lock:
-      final bool allowAdapt = wNorm > 0.03 || !_locked;
-      if (allowAdapt && aNorm > 7.5 && aNorm < 12.0) {
-        // Fast adaptation (0.10) when actively rotating, 0.03 during startup convergence
-        final alpha = wNorm > 0.10 ? 0.10 : 0.03;
-        _lowPassGravity = gPred * (1.0 - alpha) + rawAccel * alpha;
-      } else {
-        // When wNorm < 0.03 and locked, any acceleration change is vehicle linear throttle/braking!
-        // Do NOT corrupt gravity vector with vehicle linear acceleration!
-        _lowPassGravity = gPred;
-      }
+    } else if (allowAdapt) {
+      final double alpha = !_tiltLocked ? 0.08 : 0.02;
+      _lowPassGravity = _lowPassGravity! * (1.0 - alpha) + rawAccel * alpha;
     }
 
-    // Dynamic Mahony SO(3) Attitude Observer:
-    final aNorm = rawAccel.norm;
-    // Only adapt gravity observer if acceleration magnitude is reasonably close to 1g (7.5 to 12.0 m/s^2)
-    // to prevent linear acceleration shocks from corrupting tilt.
-    // When locked and wNorm < 0.03, any horizontal deviation is vehicle linear throttle/braking;
-    // do not corrupt the attitude quaternion with linear vehicle acceleration!
-    final bool allowMahonyGravity = !_locked || wNorm > 0.03 || (aNorm - IdrConstants.gravity).abs() < 0.35;
-    if (allowMahonyGravity && aNorm > 7.5 && aNorm < 12.0) {
-      final aUnit = rawAccel.normalized;
-
-      // Estimated gravity direction in sensor frame via current orientation:
-      // In vehicle frame, gravity vector points in -Z: [0, 0, -1].
-      // Rotating [0, 0, 1] into sensor frame:
-      final gEstSensor = _qBv.inverseRotate(const Vec3(0.0, 0.0, 1.0));
-
-      // Error vector e = aUnit x gEstSensor
-      final e = aUnit.cross(gEstSensor);
-
-      // Dynamically de-weight Mahony gain if vehicle is accelerating aggressively according to TCN
-      double dynamicKp = _kp;
-      if (vTcn != null && vTcn > 2.0) {
-        dynamicKp *= 0.5; // Damped adaptation during forward cruising
-      }
-
-      // Integral gyroscope bias update
-      _gyroBias = _gyroBias - (e * (_ki * effectiveDt));
-
-      // Corrected angular rate
-      final wCorr = (rawGyro - _gyroBias) + (e * dynamicKp);
-
-      // Quaternion kinematics: q_dot = 0.5 * q * [0, wCorr]
-      final dq = _qBv * Quaternion(0.0, wCorr.x, wCorr.y, wCorr.z);
-      _qBv = (_qBv + dq.scale(0.5 * effectiveDt)).normalized;
+    // Update gyro bias when stationary
+    if (isStationaryQuiet) {
+      _gyroBias = _gyroBias * 0.98 + rawGyro * 0.02;
     }
 
-    _updateAlignment(vTcn: vTcn, tcnVariance: tcnVariance);
+    _updateAlignment(
+      vTcn: vTcn,
+      tcnVariance: tcnVariance,
+      vGnss: vGnss,
+    );
   }
 
   /// Force instantaneous calibration using current accumulated window.
@@ -145,6 +111,7 @@ class CabinAligner {
     _accelWindow.clear();
     _gyroWindow.clear();
     _speedWindow.clear();
+    _horizontalAccels.clear();
     _lowPassGravity = null;
     _rBv = Mat3.identity;
     _qBv = Quaternion.identity;
@@ -153,23 +120,30 @@ class CabinAligner {
     _mountPitch = 0.0;
     _mountYaw = 0.0;
     _confidence = 0.0;
-    _locked = false;
+    _tiltLocked = false;
+    _yawResolved = false;
   }
 
   Vec3? get lowPassGravity => _lowPassGravity;
 
-  void _updateAlignment({bool forceLock = false, double? vTcn, double? tcnVariance}) {
+  void _updateAlignment({
+    bool forceLock = false,
+    double? vTcn,
+    double? tcnVariance,
+    double? vGnss,
+  }) {
     if (_lowPassGravity == null) return;
 
-    // Estimate gravity unit vector in sensor frame
-    final gHat = _lowPassGravity!.normalized;
     final gNorm = _lowPassGravity!.norm;
+    if (gNorm < 7.0 || gNorm > 12.5) return;
 
-    // Check consistency with earth gravity 9.8 m/s^2
+    final gHat = _lowPassGravity!.normalized;
+
+    // Check consistency with earth gravity 9.80665 m/s^2
     final gravityResidual = (gNorm - IdrConstants.gravity).abs();
     final gravityScore = math.max(0.0, 1.0 - (gravityResidual / 3.0));
 
-    // Check dynamic variance (phone is reasonably stable)
+    // Dynamic variance stability
     var varSum = 0.0;
     if (_accelWindow.isNotEmpty) {
       for (final a in _accelWindow) {
@@ -179,151 +153,144 @@ class CabinAligner {
     }
     final accelVariance = _accelWindow.isNotEmpty ? (varSum / _accelWindow.length) : 0.0;
     final stabilityScore = math.max(0.0, 1.0 - (accelVariance / 2.0));
-
     _confidence = MathUtils.clamp(gravityScore * 0.6 + stabilityScore * 0.4, 0.0, 1.0);
 
-    // Continuous provisional tilt removal — active immediately from sample 0
-    if (gNorm > 7.0 && gNorm < 12.5) {
-      final pitch = math.atan2(-gHat.x, math.sqrt(gHat.y * gHat.y + gHat.z * gHat.z));
-      final roll = math.atan2(gHat.y, gHat.z);
-
-      if (!_locked || forceLock) {
-        _mountPitch = pitch;
-        _mountRoll = roll;
-
-        final cp = math.cos(pitch);
-        final sp = math.sin(pitch);
-        final cr = math.cos(roll);
-        final sr = math.sin(roll);
-
-        final rRoll = Mat3([
-          1.0, 0.0, 0.0,
-          0.0, cr,  -sr,
-          0.0, sr,   cr,
-        ]);
-
-        final rPitch = Mat3([
-          cp,  0.0, sp,
-          0.0, 1.0, 0.0,
-          -sp, 0.0, cp,
-        ]);
-
-        if (_mountYaw.abs() > 1e-4) {
-          final cy = math.cos(_mountYaw);
-          final sy = math.sin(_mountYaw);
-          final rYaw = Mat3([
-            cy, -sy, 0.0,
-            sy,  cy, 0.0,
-            0.0, 0.0, 1.0,
-          ]);
-          _rBv = rYaw * (rPitch * rRoll);
-        } else {
-          _rBv = rPitch * rRoll;
-        }
-        _qBv = Quaternion.fromEuler(roll, pitch, _mountYaw);
-      } else {
-        // When locked, attitude is actively maintained by the dynamic Mahony SO(3) filter
-        _rBv = _qBv.toRotationMatrix();
-        final euler = _qBv.toEuler();
-        _mountPitch = euler.pitch;
-        _mountRoll = euler.roll;
-      }
+    // Compute mount pitch and roll from gravity vector
+    if (!_tiltLocked || forceLock) {
+      _mountPitch = math.atan2(-gHat.x, math.sqrt(gHat.y * gHat.y + gHat.z * gHat.z));
+      _mountRoll = math.atan2(gHat.y, gHat.z);
+      _updateMatrices();
     }
 
-    if ((!_locked || forceLock) && (_confidence >= 0.70 || forceLock) && _accelWindow.length >= 20) {
-      // Module 1 Section 3.2: PCA for horizontal forward axis alignment
-      // Condition PCA on vehicle motion if TCN speed is provided
-      final bool allowPca = (vTcn == null) || (vTcn > 1.2 && (tcnVariance ?? 0.16) < 0.40);
-      if (_accelWindow.length >= 20 && allowPca) {
-        _computePcaForwardAxis();
-      }
+    if ((!_tiltLocked || forceLock) && (_confidence >= 0.70 || forceLock) && _accelWindow.length >= 20) {
+      _tiltLocked = true;
+    }
 
-      _locked = true;
+    // PCA Forward Axis Alignment:
+    // Continue attempting PCA while driving until yaw is resolved.
+    final effectiveSpeed = vGnss ?? vTcn;
+    final bool isDriving = (effectiveSpeed != null && effectiveSpeed > 1.2) ||
+        (vGnss == null && vTcn == null && _accelWindow.length >= 20);
+
+    if (!_yawResolved || forceLock) {
+      if (forceLock) {
+        _yawResolved = true;
+        _updateMatrices();
+      } else if (_tiltLocked && isDriving) {
+        _attemptPcaAlignment(effectiveSpeed);
+      }
     }
   }
 
-  void _computePcaForwardAxis() {
-    var sumX = 0.0;
-    var sumY = 0.0;
-    final leveledSamples = <Vec3>[];
+  void _attemptPcaAlignment(double? effectiveSpeed) {
+    if (_accelWindow.isEmpty) return;
+
     final rTilt = Mat3.fromEuler(_mountRoll, _mountPitch, 0.0);
-    for (final rawA in _accelWindow) {
-      final leveled = rTilt.transform(rawA);
-      leveledSamples.add(leveled);
-      sumX += leveled.x;
-      sumY += leveled.y;
+    final rawA = _accelWindow.last;
+    final rawW = _gyroWindow.last;
+
+    // Turn rejection: centripetal acceleration corrupts longitudinal PCA
+    final wZ = rTilt.transform(rawW).z;
+    if (wZ.abs() > 0.08) return; // ~4.6 deg/s turn rejection
+
+    final aLvl = rTilt.transform(rawA);
+    _horizontalAccels.add(aLvl);
+    if (_horizontalAccels.length > 200) {
+      _horizontalAccels.removeAt(0);
     }
 
-    final meanX = sumX / leveledSamples.length;
-    final meanY = sumY / leveledSamples.length;
+    if (_horizontalAccels.length < 20) return;
 
-    // Sample covariance Sigma in R^{2x2} (Eqn 9)
+    // Compute sample covariance of horizontal acceleration
+    var sumX = 0.0;
+    var sumY = 0.0;
+    for (final s in _horizontalAccels) {
+      sumX += s.x;
+      sumY += s.y;
+    }
+    final meanX = sumX / _horizontalAccels.length;
+    final meanY = sumY / _horizontalAccels.length;
+
     var covXX = 0.0;
     var covXY = 0.0;
     var covYY = 0.0;
-
-    for (final s in leveledSamples) {
+    for (final s in _horizontalAccels) {
       final dx = s.x - meanX;
       final dy = s.y - meanY;
       covXX += dx * dx;
       covXY += dx * dy;
       covYY += dy * dy;
     }
+    final n = _horizontalAccels.length - 1;
+    covXX /= n;
+    covXY /= n;
+    covYY /= n;
 
-    final n = leveledSamples.length - 1;
-    if (n > 0) {
-      covXX /= n;
-      covXY /= n;
-      covYY /= n;
+    // 2x2 eigenvalue decomposition for dominant longitudinal direction
+    final trace = covXX + covYY;
+    final diff = covXX - covYY;
+    final disc = math.sqrt(diff * diff + 4.0 * covXY * covXY);
+    final lambda1 = 0.5 * (trace + disc);
+    final lambda2 = 0.5 * (trace - disc);
 
-      // 2x2 symmetric eigenvalue decomposition for dominant forward direction (Eqn 10)
-      final trace = covXX + covYY;
-      final diff = covXX - covYY;
-      final disc = math.sqrt(diff * diff + 4.0 * covXY * covXY);
-      final lambda1 = 0.5 * (trace + disc);
+    // Require longitudinal dynamic energy AND anisotropy
+    if (lambda1 > 0.05 && lambda1 > 2.5 * math.max(lambda2, 1e-4)) {
+      final thetaPca = MathUtils.pcaOrientationAngle(covXX, covXY, covYY);
+      var uX = math.cos(thetaPca);
+      var uY = math.sin(thetaPca);
 
-      // Only fit forward axis if genuine vehicle dynamics are present (variance > 0.05 m^2/s^4)
-      // Guard against fitting random MEMS thermal sensor noise at standstill/idle
-      if (lambda1 > 0.05) {
-        // Analytical non-degenerate PCA direction theta = 0.5 * atan2(2 * covXY, covXX - covYY)
-        final thetaPca = MathUtils.pcaOrientationAngle(covXX, covXY, covYY);
-        var uX = math.cos(thetaPca);
-        var uY = math.sin(thetaPca);
-
-        // Velocity-acceleration directional correlation to resolve 180-deg sign ambiguity
-        double dotCorrelation = 0.0;
-        if (_speedWindow.length == leveledSamples.length && _speedWindow.length >= 3) {
-          for (int i = 1; i < leveledSamples.length - 1; i++) {
-            final aProj = leveledSamples[i].x * uX + leveledSamples[i].y * uY;
-            final dv = _speedWindow[i + 1] - _speedWindow[i - 1];
-            dotCorrelation += aProj * dv;
-          }
+      // Resolve 180-deg ambiguity using speed-acceleration correlation
+      double dotCorrelation = 0.0;
+      if (_speedWindow.length >= 3 && _speedWindow.length == _accelWindow.length) {
+        for (int i = 1; i < _accelWindow.length - 1; i++) {
+          final aProj = rTilt.transform(_accelWindow[i]).x * uX + rTilt.transform(_accelWindow[i]).y * uY;
+          final dv = _speedWindow[i + 1] - _speedWindow[i - 1];
+          dotCorrelation += aProj * dv;
         }
-
-        // Centripetal turning confirmation: a_lat = v * omega_z (using leveled vehicle-frame yaw rate)
-        double centripetalCorrelation = 0.0;
-        if (_gyroWindow.length == leveledSamples.length) {
-          for (int i = 0; i < leveledSamples.length; i++) {
-            final aLat = -uY * leveledSamples[i].x + uX * leveledSamples[i].y;
-            final wZ = rTilt.transform(_gyroWindow[i]).z;
-            final v = i < _speedWindow.length ? _speedWindow[i] : 1.0;
-            if (v > 1.0 && wZ.abs() > 0.05) {
-              centripetalCorrelation += aLat * (v * wZ);
-            }
-          }
-        }
-
-        // Invert vector if correlation strongly indicates reverse alignment
-        if (dotCorrelation < -0.05 || (dotCorrelation.abs() <= 0.05 && centripetalCorrelation < -0.05)) {
-          uX = -uX;
-          uY = -uY;
-        }
-
-        _mountYaw = -math.atan2(uY, uX);
-        _qBv = Quaternion.fromEuler(_mountRoll, _mountPitch, _mountYaw);
-        _rBv = _qBv.toRotationMatrix();
       }
+
+      if (dotCorrelation < -0.05) {
+        uX = -uX;
+        uY = -uY;
+      }
+
+      _mountYaw = -math.atan2(uY, uX);
+      _yawResolved = true;
+      _updateMatrices();
     }
+  }
+
+  void _updateMatrices() {
+    final cp = math.cos(_mountPitch);
+    final sp = math.sin(_mountPitch);
+    final cr = math.cos(_mountRoll);
+    final sr = math.sin(_mountRoll);
+
+    final rRoll = Mat3([
+      1.0, 0.0, 0.0,
+      0.0, cr,  -sr,
+      0.0, sr,   cr,
+    ]);
+
+    final rPitch = Mat3([
+      cp,  0.0, sp,
+      0.0, 1.0, 0.0,
+      -sp, 0.0, cp,
+    ]);
+
+    if (_mountYaw.abs() > 1e-4) {
+      final cy = math.cos(_mountYaw);
+      final sy = math.sin(_mountYaw);
+      final rYaw = Mat3([
+        cy, -sy, 0.0,
+        sy,  cy, 0.0,
+        0.0, 0.0, 1.0,
+      ]);
+      _rBv = rYaw * (rPitch * rRoll);
+    } else {
+      _rBv = rPitch * rRoll;
+    }
+    _qBv = Quaternion.fromEuler(_mountRoll, _mountPitch, _mountYaw);
   }
 
   /// Transforms raw sensor acceleration into leveled vehicle frame WITHOUT gravity subtraction:
@@ -335,9 +302,7 @@ class CabinAligner {
   /// Transforms raw sensor acceleration into vehicle frame:
   /// [a_fwd, a_lat, a_vert] with gravity subtracted.
   Vec3 transformAccel(Vec3 rawAccel) {
-    // Rotate into leveled vehicle frame
     final aLeveled = _rBv.transform(rawAccel);
-    // Remove vertical gravity
     return Vec3(aLeveled.x, aLeveled.y, aLeveled.z - IdrConstants.gravity);
   }
 
@@ -345,14 +310,5 @@ class CabinAligner {
   /// [w_roll, w_pitch, w_yaw].
   Vec3 transformGyro(Vec3 rawGyro) {
     return _rBv.transform(rawGyro);
-  }
-
-  /// Exact 3D Rodrigues rotation of vector [v] around unit axis [axisUnit] by [angleRad].
-  static Vec3 _rotateVector(Vec3 v, Vec3 axisUnit, double angleRad) {
-    final c = math.cos(angleRad);
-    final s = math.sin(angleRad);
-    final kCrossV = axisUnit.cross(v);
-    final kDotV = axisUnit.dot(v);
-    return (v * c) + (kCrossV * s) + (axisUnit * (kDotV * (1.0 - c)));
   }
 }

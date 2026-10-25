@@ -66,7 +66,10 @@ public:
 
     // Getters
     Vec3 position() const { return {x_(0), x_(1), x_(2)}; }
-    Vec3 velocity() const { return {x_(4) * std::cos(x_(3)), x_(4) * std::sin(x_(3)), x_(5)}; }
+    Vec3 velocity() const {
+        double vH = x_(4) * std::cos(pitch_);
+        return {vH * std::cos(x_(3)), vH * std::sin(x_(3)), x_(5)};
+    }
     double yaw() const { return x_(3); }
     double forwardSpeed() const { return x_(4); }
     double climbRate() const { return x_(5); }
@@ -86,6 +89,11 @@ public:
     const Matrix6d& covariance() const { return P_; }
 
 private:
+    using RowVector6d = Eigen::Matrix<double, 1, 6>;
+    bool scalarUpdate(const RowVector6d& H, double innov, double R, double nisGate = -1.0);
+    void conditionCovariance();
+    static double wrapPi(double a) { return std::remainder(a, 2.0 * 3.14159265358979323846); }
+
     Vector6d x_ = Vector6d::Zero(); // [x, y, z, yaw, v_fwd, v_z]
     Matrix6d P_ = Matrix6d::Identity();
 

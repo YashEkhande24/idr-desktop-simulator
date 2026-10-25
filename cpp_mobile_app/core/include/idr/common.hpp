@@ -5,6 +5,15 @@
 #include <tuple>
 #include "idr/types.hpp"
 
+#if __cplusplus < 201703L
+namespace std {
+template<typename T>
+constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+    return (v < lo) ? lo : (hi < v) ? hi : v;
+}
+}
+#endif
+
 namespace idr {
 
 constexpr double WGS84_A = 6378137.0;

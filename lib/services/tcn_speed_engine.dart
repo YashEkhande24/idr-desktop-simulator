@@ -198,9 +198,9 @@ class TcnSpeedEngine {
     final normA = math.sqrt(ax * ax + ay * ay + az * az);
     final normW = math.sqrt(gx * gx + gy * gy + gz * gz);
 
-    // Maintain 200-step sliding window (2.0s @ 100 Hz) for robust frequency analysis
+    // Maintain sliding window for robust frequency analysis and 4.0s @ 10 Hz time-scale matching
     _buffer.add([ax, ay, az, gx, gy, gz, normA, normW]);
-    if (_buffer.length > 200) {
+    if (_buffer.length > 450) {
       _buffer.removeAt(0);
     }
 
@@ -288,14 +288,17 @@ class TcnSpeedEngine {
       if (shouldInfer) {
         _decimationCounter = 0;
         try {
+          final stride = math.max(1, (0.10 / effectiveDt).round());
           final input = Float32List(8 * IdrConstants.tcnWindowSize);
-          final startIndex = _buffer.length - IdrConstants.tcnWindowSize;
+          final lastIdx = _buffer.length - 1;
           for (int ch = 0; ch < 8; ch++) {
             final chMean = _channelMeans[ch];
             final chStd = _channelStds[ch];
             final chOffset = ch * IdrConstants.tcnWindowSize;
             for (int t = 0; t < IdrConstants.tcnWindowSize; t++) {
-              input[chOffset + t] = (_buffer[startIndex + t][ch] - chMean) / chStd;
+              final targetBack = (IdrConstants.tcnWindowSize - 1 - t) * stride;
+              final bufIdx = math.max(0, lastIdx - targetBack);
+              input[chOffset + t] = (_buffer[bufIdx][ch] - chMean) / chStd;
             }
           }
 

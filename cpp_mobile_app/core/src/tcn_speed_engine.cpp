@@ -199,9 +199,9 @@ void TcnSpeedEngine::checkStandstill(double gnssSpeedMps) {
     // Standstill condition: dynamic accel variance (< 2.5 m^2/s^4), no coupled turn,
     // low forward throttle, and accommodating physiological hand tremor (avgW < 0.35 rad/s, avgYaw < 0.18 rad/s).
     // Gated by low speed (< 1.2 m/s) to prevent smooth high-speed highway cruising in tunnels from falsely freezing.
-    bool isQuiet = !isOutageMode_ && (estimatedSpeed_ < 1.2 || isStandstill_) &&
+    bool isQuiet = (estimatedSpeed_ < 1.2 || isStandstill_) &&
         (accelVariance_ < 2.5) && !isCoupledTurn && (avgW < 0.35 || avgYaw < 0.18) && (fwdAccel < 0.25);
-    bool hasActiveMotion = isOutageMode_ || (accelVariance_ > 3.0) || isCoupledTurn || (fwdAccel > 0.40) || (!isStandstill_ && accelVariance_ > 1.2 && estimatedSpeed_ > 2.0);
+    bool hasActiveMotion = (accelVariance_ > 3.0) || isCoupledTurn || (fwdAccel > 0.40) || (!isStandstill_ && accelVariance_ > 1.2 && estimatedSpeed_ > 2.0);
 
     // Fast 5-sample hysteresis to avoid flapping
     if (isQuiet) {
