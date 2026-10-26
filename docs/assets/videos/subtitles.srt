@@ -1,0 +1,201 @@
+1
+00:00:00,200 --> 00:00:04,940
+Respected evaluators, before entering that blackout zone,
+
+2
+00:00:04,940 --> 00:00:07,000
+observe the opening baseline on both feeds.
+
+3
+00:00:07,150 --> 00:00:09,790
+Right here at the 7th second mark,
+
+4
+00:00:10,170 --> 00:00:14,950
+we pull down the notification shade
+to deliberately sever location services.
+
+5
+00:00:15,350 --> 00:00:21,350
+This replicates a sudden zero-satellite signal blackout as encountered
+
+6
+00:00:21,350 --> 00:00:23,850
+inside highway underpasses and deep transit tunnels.
+
+7
+00:00:26,750 --> 00:00:32,690
+On the left is our synchronized road ground truth,
+and on the right is our real-time cockpit HUD.
+
+8
+00:00:32,690 --> 00:00:37,570
+Notice the green indicator: GNSS is active,
+satellite health is optimal,
+
+9
+00:00:37,570 --> 00:00:41,600
+and position accuracy is calibrated to 0.7 meters
+under clear open sky.
+
+10
+00:00:44,000 --> 00:00:48,040
+Immediately, the cockpit shifts into
+emergency dead reckoning mode.
+
+11
+00:00:48,500 --> 00:00:53,640
+Notice that despite zero satellite availability,
+
+12
+00:00:53,640 --> 00:00:56,200
+the vehicle marker does not freeze, disappear,
+or jump into surrounding terrain.
+
+13
+00:00:56,500 --> 00:01:02,660
+Our on-device 8-channel Dilated SE-TCN neural network
+is now estimating instantaneous
+
+14
+00:01:02,660 --> 00:01:05,500
+speed directly from raw inertial vibrations.
+
+15
+00:01:08,000 --> 00:01:12,480
+Under classical double integration,
+accelerometer sensor bias compounds,
+
+16
+00:01:12,760 --> 00:01:19,380
+quadratically causing positional error
+to exceed 140 meters within just 30 seconds.
+
+17
+00:01:19,720 --> 00:01:25,240
+In contrast, IDR-Navigator fuses our neural speed estimates
+with a 9D Extended
+
+18
+00:01:25,240 --> 00:01:32,500
+Kalman Filter and vector road clamping,
+keeping the vehicle strictly confined within its actual driving lane.
+
+19
+00:01:36,000 --> 00:01:40,960
+A major failure mode in inertial navigation is road roughness—
+
+20
+00:01:40,960 --> 00:01:44,200
+speed breakers and potholes typically inject
+false acceleration spikes.
+
+21
+00:01:44,800 --> 00:01:50,560
+Our Savitzky-Golay jerk gating filter actively isolates
+genuine vehicle forward propulsion
+
+22
+00:01:50,560 --> 00:01:54,500
+from chassis vibration,
+preventing artificial speed surges.
+
+23
+00:02:00,000 --> 00:02:02,680
+Watch closely as the vehicle slows down.
+
+24
+00:02:03,140 --> 00:02:06,840
+Standard inertial systems suffer from coordinate drift
+when stationary.
+
+25
+00:02:07,200 --> 00:02:12,920
+Here, our physics-coupled Zero-Velocity Update—or ZUPT—
+detects complete stops instantly,
+
+26
+00:02:13,380 --> 00:02:17,600
+freezing coordinate drift without relying on
+GPS Doppler velocity.
+
+27
+00:03:05,000 --> 00:03:11,440
+As the vehicle clears the underpass,
+IDR-Navigator executes seamless satellite hand-off
+
+28
+00:03:11,440 --> 00:03:19,660
+via our sigmoidal HDOP gate, eliminating erratic UI teleportation
+typical of conventional consumer maps.
+
+29
+00:03:20,260 --> 00:03:26,500
+This concludes Trial One with continuous, unbroken
+lane-level tracking throughout the entire blackout.
+
+30
+00:03:31,500 --> 00:03:34,960
+Now transitioning to Trial Two on the Sangamner Bypass.
+
+31
+00:03:35,700 --> 00:03:42,780
+In this second run, we subject the system to an extended
+multi-minute blackout over high-speed bypass curves,
+
+32
+00:03:43,080 --> 00:03:47,300
+testing long-duration drift tolerance
+and edge thermal stability.
+
+33
+00:03:52,000 --> 00:03:55,820
+Observe how the vehicle negotiates banking and curve maneuvers.
+
+34
+00:03:56,160 --> 00:04:02,000
+Our dynamic Mahony SO(3) attitude observer
+
+35
+00:04:02,000 --> 00:04:07,900
+continuously separates centrifugal lateral acceleration from gravity,
+ensuring heading angle drift remains clamped even during sustained highway sweeps.
+
+36
+00:04:35,000 --> 00:04:40,400
+Crucially, this entire pipeline runs 100% locally
+on the smartphone's edge NPU.
+
+37
+00:04:41,060 --> 00:04:47,880
+Notice there are zero external wires,
+zero OBD-II telematics boxes, and zero wheel-speed encoders.
+
+38
+00:04:48,180 --> 00:04:55,800
+It delivers an inference latency of just 11.2 milliseconds
+while consuming less than 8% CPU overhead.
+
+39
+00:05:15,000 --> 00:05:22,260
+Even after thousands of meters traversed through complete satellite denial,
+our vehicle remains locked to vector road geometry.
+
+40
+00:05:22,920 --> 00:05:31,400
+The solution represents a robust production-ready architecture
+suitable for mass-automotive, logistics, and emergency fleet deployment.
+
+41
+00:05:45,000 --> 00:05:50,380
+IDR-Navigator proves that high-precision vehicular dead reckoning
+is completely achievable
+
+42
+00:05:50,380 --> 00:05:55,860
+using nothing more than commodity smartphone sensors
+and intelligent deep learning fusion.
+
+43
+00:05:56,320 --> 00:05:57,200
+Thank you.

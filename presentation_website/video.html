@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=20261019_4" />
+  <link rel="stylesheet" href="style.css?v=20261026_v1" />
 
   <!-- Google tag (gtag.js) GA4 for ISRO SIH26168 Telemetry -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9Q70X1FKB"></script>
@@ -54,51 +54,239 @@
     </div>
   </header>
 
-  <main class="container" style="padding-top: 3.5rem; padding-bottom: 4.5rem;">
-    <div class="kicker">EMPIRICAL PROVING GROUND &middot; NH60 HIGHWAY &amp; SANGAMNER BYPASS</div>
-    <h1 class="hero-title" style="font-size: clamp(2.2rem, 3.5vw, 3rem); margin-bottom: 1rem;">
-      Synchronized Dual-Feed HUD Field Demonstration
-    </h1>
-    <p class="hero-abstract" style="margin-bottom: 2.5rem;">
-      Live experimental trial recording evaluating continuous vehicular positioning across subterranean underpass blackouts and multi-kilometer highway bypass curves with GNSS satellite fixes severed deliberately on camera.
-    </p>
-
-    <!-- Video Showcase Container -->
-    <div class="video-showcase-box">
-      <div class="video-player-container">
-        <video id="demoVideo" controls poster="assets/videos/first_frame.jpg" preload="metadata">
-          <source src="assets/videos/demo_recording.mp4" type="video/mp4">
-          <track kind="subtitles" src="assets/videos/subtitles.vtt" srclang="en" label="English (CC)">
-          Your browser does not support HTML5 video.
-        </video>
-      </div>
-
-      <!-- Video Phase Chapters Bar -->
-      <div class="video-meta-bar" style="grid-template-columns: 1fr;">
-        <div>
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin: 0;">
-              Interactive Video Chapter Index
-            </h4>
-            <span class="mono-label" style="color: var(--accent-emerald);">Total Runtime: 05:59</span>
+  <!-- YouTube Theatre Mode Cinema Viewport (Immediate Above-The-Fold, Zero Scroll) -->
+  <section class="theatre-viewport-section" id="theatreSection" aria-label="Theatre Demonstration Screen">
+    <div class="theatre-player-wrapper">
+      <div class="video-showcase-box">
+        <!-- Custom Cinema Telemetry Media Player -->
+        <div class="custom-media-player" id="customMediaPlayer" tabindex="0" role="region" aria-label="IDR-Navigator Demonstration Video Player">
+          <!-- Player Top Bezel / Telemetry Header -->
+          <div class="player-top-bezel">
+            <div class="player-telemetry-left">
+              <span class="player-rec-tag">RECORDING</span>
+              <span class="player-res-tag">1080p 60FPS</span>
+              <span class="player-title-tag">ISRO SIH26168 &bull; TRIAL RUN HUD DUAL FEED</span>
+            </div>
+            <div class="player-telemetry-right">
+              <span class="telemetry-chip" id="playerSpeedBadge">SPEED: 1.0x</span>
+              <span class="telemetry-chip" id="playerAudioBadge">STEREO AUDIO</span>
+              <span class="telemetry-timecode" id="playerLiveTimecode">00:00.00 / 05:59.00</span>
+            </div>
           </div>
-          
-          <div class="trial-badges" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <button class="trial-pill" data-jump-time="0">00:00 &middot; Phase 1: Baseline Lock</button>
-            <button class="trial-pill" data-jump-time="7">00:07 &middot; Phase 2: Intentional GNSS Severing</button>
-            <button class="trial-pill" data-jump-time="26">00:26 &middot; Phase 1b: Dual-Feed Orientation</button>
-            <button class="trial-pill" data-jump-time="44">00:44 &middot; Phase 3: Outage Banner &amp; Neural Takeover</button>
-            <button class="trial-pill" data-jump-time="68">01:08 &middot; Phase 4: Highway Traversal &amp; Lane Clamping</button>
-            <button class="trial-pill" data-jump-time="96">01:36 &middot; Phase 5: Road Bumps &amp; Jerk Gating</button>
-            <button class="trial-pill" data-jump-time="120">02:00 &middot; Phase 6: Standstill ZUPT Detection</button>
-            <button class="trial-pill" data-jump-time="185">03:05 &middot; Phase 7: Sustained Outage Tracking</button>
-            <button class="trial-pill" data-jump-time="211">03:31 &middot; Phase 8: Trial 02 Sangamner Bypass Start</button>
-            <button class="trial-pill" data-jump-time="232">03:52 &middot; Phase 9: High-Speed Curvature &amp; Banking</button>
-            <button class="trial-pill" data-jump-time="275">04:35 &middot; Phase 10: Zero External Wires Inspection</button>
-            <button class="trial-pill" data-jump-time="315">05:15 &middot; Phase 11: Long-Distance Blackout Stability</button>
-            <button class="trial-pill" data-jump-time="345">05:45 &middot; Phase 12: Terminus &amp; Summary</button>
+
+          <!-- Stage: Video + Overlays -->
+          <div class="player-stage" id="playerStage">
+            <video id="demoVideo" poster="assets/videos/first_frame.jpg" preload="metadata" playsinline crossorigin="anonymous">
+              <source src="assets/videos/demo_recording.mp4" type="video/mp4">
+              <source src="https://idr-navigator-2026.web.app/assets/videos/demo_recording.mp4" type="video/mp4">
+              <track kind="subtitles" src="assets/videos/subtitles.vtt" srclang="en" label="English (CC)">
+              Your browser does not support HTML5 video.
+            </video>
+
+            <!-- Big Center Play Overlay (Visible when Paused / Initial State) -->
+            <div class="player-big-play-overlay" id="playerBigPlayOverlay" role="button" aria-label="Play Field Demonstration Video">
+              <div class="big-play-pulse-ring" aria-hidden="true"></div>
+              <div class="big-play-btn-circle">
+                <svg class="big-play-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              <div class="big-play-meta">
+                <span class="big-play-title">WATCH FIELD DEMONSTRATION</span>
+                <span class="big-play-sub">Click to Play &bull; 05:59 Runtime &bull; Synchronized Dual-HUD Telemetry</span>
+                <span class="big-play-prompt"><kbd>SPACE</kbd> or Click to Play Video</span>
+              </div>
+            </div>
+
+            <!-- Quick Action Splash Icon (Play/Pause flash feedback) -->
+            <div class="player-action-splash" id="playerActionSplash">
+              <div class="action-splash-icon" id="actionSplashIcon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="player-loader" id="playerLoader">
+              <div class="player-spinner"></div>
+              <span>Buffering trial stream...</span>
+            </div>
+
+            <!-- Chapter Jump OSD Toast -->
+            <div class="player-chapter-osd" id="playerChapterOsd">
+              <span>📍</span>
+              <span id="playerOsdText">Phase 1: Baseline Lock</span>
+            </div>
+
+            <!-- Floating Glassmorphic Bottom Controls Bar -->
+            <div class="player-controls-container" id="playerControls">
+              <!-- Scrubber / Timeline Bar -->
+              <div class="scrubber-wrapper" id="scrubberWrapper" role="slider" aria-label="Seek Video Timeline" tabindex="0">
+                <div class="scrubber-track">
+                  <div class="scrubber-buffered" id="scrubberBuffered"></div>
+                  <div class="scrubber-progress" id="scrubberProgress">
+                    <div class="scrubber-thumb"></div>
+                  </div>
+                  <div class="scrubber-markers" id="scrubberMarkers"></div>
+                </div>
+                <div class="scrubber-tooltip" id="scrubberTooltip">00:00 &bull; Baseline</div>
+              </div>
+
+              <!-- Controls Row -->
+              <div class="controls-row">
+                <div class="controls-left">
+                  <button class="ctrl-btn" id="ctrlPlayPauseBtn" aria-label="Play (Space)" title="Play (Space)">
+                    <svg class="ctrl-icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg class="ctrl-icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+
+                  <button class="ctrl-btn" id="ctrlRewindBtn" aria-label="Rewind 10 seconds (Left Arrow)" title="Rewind 10s">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
+                    </svg>
+                    <span class="btn-micro-badge">10</span>
+                  </button>
+
+                  <button class="ctrl-btn" id="ctrlForwardBtn" aria-label="Forward 10 seconds (Right Arrow)" title="Forward 10s">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
+                    </svg>
+                    <span class="btn-micro-badge">10</span>
+                  </button>
+
+                  <div class="volume-container" id="volumeContainer">
+                    <button class="ctrl-btn" id="ctrlVolumeBtn" aria-label="Mute (M)" title="Mute (M)">
+                      <svg class="vol-icon-high" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
+                      <svg class="vol-icon-low" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+                      <svg class="vol-icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                    </button>
+                    <div class="volume-slider-wrapper">
+                      <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" aria-label="Volume">
+                    </div>
+                  </div>
+
+                  <div class="time-display">
+                    <span id="currentTime">00:00</span>
+                    <span class="time-sep">/</span>
+                    <span id="totalDuration">05:59</span>
+                  </div>
+                </div>
+
+                <div class="controls-center">
+                  <div class="player-chapter-badge" id="playerCurrentChapterBadge" title="Current Video Chapter">
+                    <span class="pulse-dot"></span>
+                    <span class="chapter-badge-text" id="currentChapterName">Phase 1: Baseline Lock</span>
+                  </div>
+                </div>
+
+                <div class="controls-right">
+                  <div class="speed-menu-container">
+                    <button class="ctrl-btn speed-toggle-btn" id="ctrlSpeedBtn" title="Playback Speed">1.0x</button>
+                    <div class="speed-menu" id="speedMenu">
+                      <button class="speed-opt" data-speed="0.75">0.75x</button>
+                      <button class="speed-opt active" data-speed="1.0">1.0x (Normal)</button>
+                      <button class="speed-opt" data-speed="1.25">1.25x</button>
+                      <button class="speed-opt" data-speed="1.5">1.5x</button>
+                      <button class="speed-opt" data-speed="2.0">2.0x</button>
+                    </div>
+                  </div>
+
+                  <button class="ctrl-btn" id="ctrlCaptionsBtn" aria-label="Subtitles" title="Subtitles (Burned-in)">
+                    <span class="cc-badge">CC</span>
+                  </button>
+
+                  <button class="ctrl-btn" id="ctrlPipBtn" aria-label="Picture in Picture" title="Picture in Picture">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="4" width="20" height="16" rx="2"/>
+                      <rect x="13" y="11" width="7" height="6" rx="1" fill="currentColor"/>
+                    </svg>
+                  </button>
+
+                  <button class="ctrl-btn" id="ctrlTheatreBtn" aria-label="Theatre mode (T)" title="Theatre mode (T)">
+                    <svg class="theatre-icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="6" width="20" height="12" rx="2"/>
+                      <rect x="5" y="8" width="14" height="8" rx="1" fill="currentColor" fill-opacity="0.25"/>
+                    </svg>
+                    <svg class="theatre-icon-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="5" y="6" width="14" height="12" rx="2"/>
+                      <rect x="7" y="8" width="10" height="8" rx="1" fill="currentColor" fill-opacity="0.25"/>
+                    </svg>
+                  </button>
+
+                  <button class="ctrl-btn" id="ctrlFullscreenBtn" aria-label="Fullscreen (F)" title="Fullscreen (F)">
+                    <svg class="fs-icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+                    <svg class="fs-icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6m0 0v6m0-6l-7 7m17-11h-6m0 0V4m0 6l7-7M4 10h6m0 0V4m0 6L3 3m17 11h-6m0 0v6m0-6l7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Player Bottom Status Strip -->
+          <div class="player-bottom-strip">
+            <div class="strip-left">
+              <span class="strip-dot"></span>
+              <span>DUAL-FEED SYNC: Left Road Truth &bull; Right Real-Time Cockpit HUD (Zero Wiring)</span>
+            </div>
+            <div class="strip-right">
+              <span class="strip-key"><kbd>SPACE</kbd> Play/Pause</span>
+              <span class="strip-key"><kbd>&larr;</kbd><kbd>&rarr;</kbd> &plusmn;10s</span>
+              <span class="strip-key"><kbd>M</kbd> Mute</span>
+              <span class="strip-key"><kbd>T</kbd> Theatre</span>
+              <span class="strip-key"><kbd>F</kbd> Fullscreen</span>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editorial Analysis, Chapters, Protocols & Hardware Specs -->
+  <main class="container" style="padding-top: 2rem; padding-bottom: 4.5rem;">
+    <!-- Details Header -->
+    <div class="theatre-details-header">
+      <div class="video-hero-pill-bar" style="margin-bottom: 0.65rem;">
+        <div class="video-status-badge">
+          <span class="rec-dot" aria-hidden="true"></span>
+          <span>Empirical Proving Ground &bull; Field Trial Video</span>
+        </div>
+        <span class="video-sub-badge">1080p 60FPS</span>
+        <span class="video-sub-badge">Duration: 05:59</span>
+        <span class="video-sub-badge">Synchronized Cockpit HUD</span>
+        <span class="video-sub-badge">Audio Commentary</span>
+      </div>
+
+      <div class="kicker">EMPIRICAL PROVING GROUND &middot; NH60 HIGHWAY &amp; SANGAMNER BYPASS</div>
+      <h1 class="hero-title" style="font-size: clamp(2rem, 3.2vw, 2.75rem); margin-bottom: 0.85rem;">
+        Synchronized Dual-Feed HUD Field Demonstration
+      </h1>
+      <p class="hero-abstract" style="margin-bottom: 0; max-width: 980px;">
+        Live experimental trial recording evaluating continuous vehicular positioning across subterranean underpass blackouts and multi-kilometer highway bypass curves with GNSS satellite fixes severed deliberately on camera.
+      </p>
+    </div>
+
+    <!-- Interactive Video Chapter Index -->
+    <div class="theatre-chapters-panel">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.85rem;">
+        <h4 style="font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.45rem;">
+          <span>Interactive Video Chapter Index</span>
+        </h4>
+        <span class="mono-label" style="color: var(--accent-emerald);">Total Runtime: 05:59</span>
+      </div>
+      
+      <div class="trial-badges" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <button class="trial-pill active-chapter" data-jump-time="0">00:00 &middot; Phase 1: Baseline Lock</button>
+        <button class="trial-pill" data-jump-time="7">00:07 &middot; Phase 2: Intentional GNSS Severing</button>
+        <button class="trial-pill" data-jump-time="26">00:26 &middot; Phase 1b: Dual-Feed Orientation</button>
+        <button class="trial-pill" data-jump-time="44">00:44 &middot; Phase 3: Outage Banner &amp; Neural Takeover</button>
+        <button class="trial-pill" data-jump-time="68">01:08 &middot; Phase 4: Highway Traversal &amp; Lane Clamping</button>
+        <button class="trial-pill" data-jump-time="96">01:36 &middot; Phase 5: Road Bumps &amp; Jerk Gating</button>
+        <button class="trial-pill" data-jump-time="120">02:00 &middot; Phase 6: Standstill ZUPT Detection</button>
+        <button class="trial-pill" data-jump-time="185">03:05 &middot; Phase 7: Sustained Outage Tracking</button>
+        <button class="trial-pill" data-jump-time="211">03:31 &middot; Phase 8: Trial 02 Sangamner Bypass Start</button>
+        <button class="trial-pill" data-jump-time="232">03:52 &middot; Phase 9: High-Speed Curvature &amp; Banking</button>
+        <button class="trial-pill" data-jump-time="275">04:35 &middot; Phase 10: Zero External Wires Inspection</button>
+        <button class="trial-pill" data-jump-time="315">05:15 &middot; Phase 11: Long-Distance Blackout Stability</button>
+        <button class="trial-pill" data-jump-time="345">05:45 &middot; Phase 12: Terminus &amp; Summary</button>
       </div>
     </div>
 
@@ -174,6 +362,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261019_4"></script>
+  <script src="app.js?v=20261026_v1"></script>
 </body>
 </html>
