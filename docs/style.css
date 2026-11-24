@@ -990,6 +990,61 @@ code, pre {
   border: 1px solid #293547;
 }
 
+.player-telemetry-right .telemetry-views-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.2rem 0 0.45rem;
+  height: 20px;
+  background-color: #17202D;
+  border: 1px solid #293547;
+  border-radius: 3px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.player-telemetry-right .telemetry-views-chip:hover {
+  border-color: #10B981;
+  background-color: #1E293B;
+}
+
+.views-pulse-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #10B981;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+  animation: viewsPulse 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes viewsPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+.views-badge-img {
+  height: 18px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
+.video-sub-badge.video-views-badge {
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  padding: 0.25rem 0.45rem;
+}
+
+.video-sub-badge.video-views-badge:hover {
+  border-color: #10B981;
+  background-color: var(--bg-card);
+}
+
 .telemetry-timecode {
   color: #34D399;
   font-weight: 600;
