@@ -1045,6 +1045,43 @@ code, pre {
   background-color: var(--bg-card);
 }
 
+.topbar-views-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.65rem;
+  padding: 0 0.2rem 0 0.45rem;
+  height: 20px;
+  background-color: #17202D;
+  border: 1px solid #293547;
+  border-radius: 3px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  vertical-align: middle;
+}
+
+.topbar-views-chip:hover,
+.badge-views:hover {
+  border-color: #10B981;
+  background-color: #1E293B;
+}
+
+.badge-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.2rem 0 0.45rem;
+  height: 22px;
+  background-color: #17202D;
+  border: 1px solid #293547;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
 .telemetry-timecode {
   color: #34D399;
   font-weight: 600;
